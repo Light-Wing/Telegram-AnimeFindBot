@@ -82,7 +82,7 @@ bot.on("error", err => { //most telegram errors should get caught here
         })
 });
 process.on('unhandledRejection', function(reason, p) {
-    console.log("Possibly Unhandled Rejection at: Promise ", p, " reason: ", reason);
+    console.log("Possibly Unhandled Rejection at: Promise reason: ", reason.description); //  ", " p,
     try {
         let errMsg = `OK: ${reason.ok}\nError Code: ${reason.error_code}\nReason: ${reason.description}`
         report.error(bot, errMsg, '', false)
@@ -93,7 +93,7 @@ process.on('unhandledRejection', function(reason, p) {
 function getUserLanguage(msg) {
     let lang = require('./LANG');
     let l = (msg.from != undefined) ? msg.from.language_code.split("-")[0] : "en";
-    report.user(bot, msg, 'non', `language_code=${l}`)
+    // report.user(bot, msg, 'non', `language_code=${l}`)
     switch (l) {
         case "en":
             return lang.en;
