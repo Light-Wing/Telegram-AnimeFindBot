@@ -9,9 +9,12 @@ const TeleBot = require('telebot');
 const usePlugins = ['askUser', 'namedButtons', 'commandButton'];
 const BUTTONS = require('./buttons').buttons;
 const searcher = require('./searcher');
-let getUser = require("./search/getUserName").verifyUser;
+// let getUser = require("./search/getUserName").verifyUser;
 let report = require("./report");
 let can_i = require("./can_i");
+// let utils = require("./utils");
+let callbackQuery = require("./callbackQuery");
+
 
 const url = `https://${process.env.HEROKU_NAME}.herokuapp.com/bot${token}/`;
 
@@ -112,112 +115,19 @@ function getUserLanguage(msg) {
 
 
 bot.on('inlineQuery', (msg) => {
+    // console.log(msg)
     let userLang = getUserLanguage(msg);
     // console.log(msg.from.language_code)
     let type = "inline";
-    searcher.inline(type, msg, bot, userLang);
-});
+    searcher.inline(type, msg, bot, userLang)
+})
 bot.on('callbackQuery', msg => {
     let userLang = getUserLanguage(msg);
     // console.log(msg)
     // bot.answerCallbackQuery(msg.id, { text: "Updating..." }); //
-    let callbackOps = msg.data.split('-');
-    let id = callbackOps[0];
-    let type;
-    switch (callbackOps[1]) {
-        case 'a': //genre
-            type = 'anime';
-            break;
-        case 'm': //genre
-            type = 'manga';
-            break;
-        default:
-            type = null;
-            break;
-    }
-    switch (callbackOps[2]) {
-        case 'd':
-            searcher.description(id, type).then(function(res) {
-                let description = res.data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
-                if (description == null) {
-                    return userLang.desc_not_available;
-                }
-                if (description.length >= 199) {
-                    description = description.substring(0, 200);
-                    let last = description.lastIndexOf(" ");
-                    description = description.substring(0, last);
-                    return description + "...";
-                }
-                return description;
-            }).then(function(res) {
-                return bot.answerCallbackQuery(msg.id, { text: res, showAlert: true });
-            });
-            break;
-        case 'nxt':
-            let currentSavedEP = callbackOps[3];
-            if (currentSavedEP - time() > 0) {
-                let text = "Got Ep Air date (without extra lookup)😁";
-                report.user(bot, msg, "epDate", text);
-                let timeDiff = currentSavedEP - time()
-                let nextEpAir = msToTime(timeDiff);
-                return bot.answerCallbackQuery(msg.id, { text: "Next Ep Airs in:\n" + nextEpAir, showAlert: true });
-            } else {
-                let text = "Got Ep Air date (with extra lookup)😔";
-                report.user(bot, msg, "epDate", text);
-                searcher.nextEp(id, type).then(res => {
-                    let resToISO = res.data.nextRelease.replace(' ', 'T').replace(' ', '')
-                    let resToMilisec = new Date(resToISO).valueOf()
-                    return resToMilisec
-                }).then(res => {
-                    let timeDiff = res - time()
-                    let nextEpAir = msToTime(timeDiff);
-                    return bot.answerCallbackQuery(msg.id, { text: "Next Ep Airs in:\n" + nextEpAir, showAlert: true });
-                });
-            }
-            break;
-        case 'g':
-            // console.log("genre lookup")
-            searcher.getGenres(id, type).then(res => {
-                let genres_sting = '';
-                genres_sting += userLang.genres + ':\n'
-                for (let i = 0, len = res.meta.count; i < len; i++) {
-                    genres_sting += '-' + res.data[i].name + '\n' //(i != len - 1 ? ', ' : '');
-                }
-                return genres_sting
-            }).then(res => {
-                bot.answerCallbackQuery(msg.id, { text: res, showAlert: true });
-            });
-            break;
-        default:
-            null;
-            break;
-    }
+    callbackQuery(bot, msg, userLang, searcher)
 });
 
-function time() {
-    // res = 2018-07-08T09:30:00+0900
-    var time = new Date().valueOf();
-    return time
-}
-
-function msToTime(duration) {
-    if (duration < 0) {
-        return 0
-    }
-    let
-        minutes = parseInt((duration / (1000 * 60)) % 60),
-        hours = parseInt((duration / (1000 * 60 * 60)) % 24),
-        days = parseInt((duration / (1000 * 60 * 60 * 24))),
-        d_h_space, h_m_space;
-
-    d_h_space = ((days > 0) && ((hours > 0) || (minutes > 0))) ? " " : "";
-    h_m_space = ((hours > 0) && (minutes > 0)) ? " " : "";
-    minutes = (minutes > 0) ? minutes + "m" : "";
-    hours = (hours > 0) ? hours + "h" : "";
-    days = (days > 0) ? days + "d" : "";
-    let mstime = days + d_h_space + hours + h_m_space + minutes;
-    return mstime
-}
 //links: { self: 'https://kitsu.io/api/edge/anime/6570' },
 bot.on("/*", (msg, type) => {
     console.log(type.type)
@@ -225,7 +135,6 @@ bot.on("/*", (msg, type) => {
         let userLang = getUserLanguage(msg);
         let msgText = msg.text;
         if (msgText.includes("/start")) {
-            // console.log(JSON.stringify(userLang));
             let replyMarkup = bot.inlineKeyboard([
                 [bot.inlineButton(userLang.check_it_out, { inlineCurrent: '' })]
             ]);
@@ -233,8 +142,7 @@ bot.on("/*", (msg, type) => {
             //     [BUTTONS.hello.label, BUTTONS.world.label],
             //     [BUTTONS.hide.label]
             // ], { resize: true });
-
-            return bot.sendMessage(msg.chat.id, userLang.see_keyboard_below, { replyMarkup });
+            return bot.sendMessage(msg.chat.id, userLang.startMsg, { replyMarkup });
         }
         if (msgText.includes("/hello")) {
             bot.sendAction(msg.chat.id, 'typing')

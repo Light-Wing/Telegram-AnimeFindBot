@@ -4,13 +4,14 @@
 
 let _ = {};
 _.he = {
-    startMsg: "",
+    startMsg: `Hi ${user}\ntry me out inline`,
     check_it_out: "נסו עכשיו",
     see_keyboard_below: "הנה מקלדת",
     not_start: "לא התחל",
     genres: "ז׳אנרים",
     description: "תקציר",
     desc_not_available: "לא נמצא תקציר",
+    no_genres: "לא נמצאו ז׳אנרים",
     trailer: "Trailer",
     episodes: "מס׳ פרקים",
     minutes_per_episode: "דקות/לפרק",
@@ -46,13 +47,14 @@ _.he = {
     rated: "דירוג גילאים"
 }
 _.en = {
-    startMsg: "",
+    startMsg: `Hi ${user}\ntry me out inline`,
     check_it_out: "Check it out Now",
     see_keyboard_below: "See keyboard below",
     not_start: "not start",
     genres: "Genres",
     description: 'Description',
     desc_not_available: "Description not Available",
+    no_genres: "no Genres found",
     trailer: "Trailer",
     episodes: "Episodes",
     minutes_per_episode: 'min/ep',

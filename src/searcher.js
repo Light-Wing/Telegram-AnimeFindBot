@@ -6,8 +6,11 @@ const reply = require("./search/_reply");
 const Kitsu = require('kitsu');
 const kitsu = new Kitsu();
 let report = require("./report");
+let utils = require("./utils");
 
 _.inline = (type, msg, bot, userLang) => {
+    let startTime = new Date().valueOf()
+
     let query;
     if (type == "inline") {
         query = msg.query;
@@ -23,7 +26,7 @@ _.inline = (type, msg, bot, userLang) => {
         let Data = response.data;
         if (type == "inline") {
             if (msg.query.length >= 2) {
-                dataTo_inline(Data, bot, msg, userLang)
+                dataTo_inline(Data, bot, msg, userLang, startTime)
             } else {
                 var a = bot.answerList(msg.id)
                 a.addArticle(
@@ -37,11 +40,16 @@ _.inline = (type, msg, bot, userLang) => {
                 dataTo_inchat(Data, bot, msg, userLang)
             } else {}
         }
+    }).then(() => {
+        let timeDiff = new Date().valueOf() - startTime;
+        let msgText = 'Inline query took ' + timeDiff + 'ms';
+        console.log(msgText)
+            // bot.sendMessage(process.env.USERS_CNL, msgText);
     }).catch(handleError => console.log(`---\nFetch error: ${handleError}\n---`));
 }
 
 //https://kitsu.io/api/edge/anime/6791
-function dataTo_inline(Data, bot, msg, userLang) {
+function dataTo_inline(Data, bot, msg, userLang, startTime) {
     let results = bot.answerList(msg.id, { nextOffset: Data.next, cacheTime: 10 });
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i];
@@ -65,7 +73,9 @@ function dataTo_inline(Data, bot, msg, userLang) {
         results.addArticle(searchResault);
     }
     //make it check pre message to see if same id, if so, add this to that message
-    report.user(bot, msg, "search", results)
+    let timeDiff = new Date().valueOf() - startTime;
+    let time = timeDiff + 'ms'
+    report.user(bot, msg, "search", results, time)
 
     if (JSON.stringify(results.list.length) == "0") {
         results.addArticle(
