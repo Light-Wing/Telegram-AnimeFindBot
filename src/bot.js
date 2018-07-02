@@ -100,7 +100,7 @@ function getUserLanguage(msg) {
         case "iw":
             return lang.he;
         default:
-            console.log("default lang choosen")
+            console.log("default lang choosen") //imposible to get here
             return lang.he;
     }
 };
