@@ -4,7 +4,7 @@
 
 let _ = {};
 _.he = {
-    startMsg: `Hi ${user}\ntry me out inline`,
+    startMsg: `Hi \ntry me out inline`,
     check_it_out: "נסו עכשיו",
     see_keyboard_below: "הנה מקלדת",
     not_start: "לא התחל",
@@ -47,7 +47,7 @@ _.he = {
     rated: "דירוג גילאים"
 }
 _.en = {
-    startMsg: `Hi ${user}\ntry me out inline`,
+    startMsg: `Hi \ntry me out inline`,
     check_it_out: "Check it out Now",
     see_keyboard_below: "See keyboard below",
     not_start: "not start",
