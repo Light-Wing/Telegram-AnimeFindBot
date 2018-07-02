@@ -2,7 +2,8 @@
 let _ = {}
 const wordsToInclude = [
     'אפשר את האנימה',
-    'אפשר בבקשה את'
+    'אפשר בבקשה את',
+    'אפשר קישור ל'
 ]
 _ = (msg, type) => {
     if (wordsToInclude.includes(msg.text)) {
