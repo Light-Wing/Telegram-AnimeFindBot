@@ -4,7 +4,7 @@ let _ = {}
 let utils = require("./utils");
 
 _ = (bot, msg, userLang, searcher) => {
-    console.log(msg)
+    // console.log(msg)
     let startTime = new Date().valueOf()
 
     let callbackOps = msg.data.split('-');
@@ -26,15 +26,17 @@ _ = (bot, msg, userLang, searcher) => {
             searcher.description(id, type).then(function(res) {
                 let description = res.data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
                 if (description == null) {
-                    return userLang.desc_not_available;
+                    let re = userLang.desc_not_available;
                 }
                 if (description.length >= 199) {
                     description = description.substring(0, 200);
                     let last = description.lastIndexOf(" ");
                     description = description.substring(0, last);
-                    return description + "...";
+                    let re = description + "...";
                 }
-                return description;
+                let re = description;
+                console.log(re)
+                return re;
             }).then(function(res) {
                 return bot.answerCallbackQuery(msg.id, { text: res, showAlert: true, cacheTime: 10000000000 });
             }).then(() => {
