@@ -10,42 +10,58 @@ let utils = require("./utils");
 
 _.inline = (type, msg, bot, userLang) => {
     let startTime = new Date().valueOf()
-
-    let query;
+    let query, searchFor;
     if (type == "inline") {
         query = msg.query;
-    }
-    if (type == "inchat") {
+    } else if (type == "inchat") {
         query = msg.text.substr(msg.text.indexOf(' ') + 1);
     }
-    kitsu.get('anime', {
-        filter: {
-            text: query
-        }
-    }).then(response => {
-        let Data = response.data;
-        if (type == "inline") {
-            if (msg.query.length >= 2) {
+    if (query == null) {
+        let a = bot.answerList(msg.id)
+        a.addArticle(
+            reply.defaultMessage
+        )
+        return bot.answerQuery(a);
+    }
+    console.log(query)
+
+    if (query.length >= 2 && query.split(/^-m ?/)[1] != undefined) {
+        searchFor = 'manga';
+        query = query.split(/^-m ?/)[1]
+        console.log(query)
+    } else { searchFor = 'anime'; }
+    console.log(searchFor)
+    if (type == "inline") {
+        if (msg.query.length >= 2) {
+            kitsu.get(searchFor, {
+                filter: {
+                    text: query
+                }
+            }).then(response => {
+                //console.log(response)
+                let Data = response.data;
+
                 dataTo_inline(Data, bot, msg, userLang, startTime)
-            } else {
-                var a = bot.answerList(msg.id)
-                a.addArticle(
-                    reply.defaultMessage
-                )
-                return bot.answerQuery(a);
-            }
+
+            }).then(() => {
+                let timeDiff = new Date().valueOf() - startTime;
+                let msgText = 'Inline query took ' + timeDiff + 'ms';
+                console.log(msgText)
+                    // bot.sendMessage(process.env.USERS_CNL, msgText);
+            }).catch(handleError => console.log(`---\nFetch error: ${handleError}\n---`));
+        } else {
+            let a = bot.answerList(msg.id)
+            a.addArticle(
+                reply.defaultMessage
+            )
+            return bot.answerQuery(a);
         }
-        if (type == "inchat") {
-            if (msg.query.length >= 3) {
-                dataTo_inchat(Data, bot, msg, userLang)
-            } else {}
-        }
-    }).then(() => {
-        let timeDiff = new Date().valueOf() - startTime;
-        let msgText = 'Inline query took ' + timeDiff + 'ms';
-        console.log(msgText)
-            // bot.sendMessage(process.env.USERS_CNL, msgText);
-    }).catch(handleError => console.log(`---\nFetch error: ${handleError}\n---`));
+    }
+    if (type == "inchat") {
+        if (msg.query.length >= 3) {
+            dataTo_inchat(Data, bot, msg, userLang)
+        } else {}
+    }
 }
 
 //https://kitsu.io/api/edge/anime/6791
@@ -155,11 +171,11 @@ function messageSent(data, userLang) {
     popularity = (data.popularity != null) ? `\n- ${userLang.popularity}: *${data.popularity}*` : '';
     //rating ageRating ageRatingGuide
     ageRating = (data.ageRating != null) ? `\n- ${userLang.rated}: *${data.ageRating}*` : '';
-    ageRatingGuide = (data.ageRatingGuide != null) ? ` - ${data.ageRatingGuide}` : '';
+    ageRatingGuide = ((data.ageRating != null) && (data.ageRatingGuide != null)) ? ` - ${data.ageRatingGuide}` : '';
     //description
     // description = (data.synopsis != null) ? `\n\n ${data.synopsis}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')
     //message text - removed: ${description}
-    return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${episodeCount}${episodeLength}${volumes}${chapters}${status}${averageScore}${popularity}${ageRating}${ageRatingGuide}${startDate}*${sday}${smonth}${syear}*${endDate}*${eday}${emonth}${eyear}*`;
+    return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${episodeCount}${episodeLength}${volumes}${chapters}${status}${averageScore}${popularity}${startDate}*${sday}${smonth}${syear}*${endDate}*${eday}${emonth}${eyear}*${ageRating}${ageRatingGuide}`;
 }
 
 

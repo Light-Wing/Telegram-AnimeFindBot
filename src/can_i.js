@@ -2,7 +2,7 @@
 let _ = {}
 
 _ = (msg, type) => {
-    if (msg.text.includes("אפשר")) {
+    if (msg.text.includes("אפשר את")) {
         msg.reply.text("לאחר שקראת את כלל 7 אשר כתוב בחוקי הקבוצה, חפש את הסדרה בגוגל או בקבוצה.", { asReply: true });
     }
 }

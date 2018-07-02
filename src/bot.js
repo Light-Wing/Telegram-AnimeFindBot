@@ -104,12 +104,12 @@ function getUserLanguage(msg) {
     }
 };
 
-// bot.on("text", (msg, type) => {
-//     // console.log(msg)
-//     if ((msg.chat.id == 1082225626 || ERR_CHNL_CHAT_ID || -284603852) && (type.type == "text")) {
-//         can_i(msg, type)
-//     }
-// })
+bot.on("text", (msg, type) => {
+    // console.log(msg)
+    if ((msg.chat.id == 1082225626 || ERR_CHNL_CHAT_ID || -284603852) && (type.type == "text")) {
+        can_i(msg, type)
+    }
+})
 
 // bot.on('text', (msg) => msg.reply.text(msg.text, { asReply: true }));
 
