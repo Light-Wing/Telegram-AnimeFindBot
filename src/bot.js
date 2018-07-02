@@ -92,6 +92,7 @@ process.on('unhandledRejection', function(reason, p) {
 
 function getUserLanguage(msg) {
     let lang = require('./LANG');
+    report.user(bot, msg, '', `language_code=${lang}`)
     let l = (msg.from != undefined) ? msg.from.language_code.split("-")[0] : "en";
     switch (l) {
         case "en":

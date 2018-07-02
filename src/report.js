@@ -33,7 +33,7 @@ _.user = (bot, msg, didWhat, results, time) => {
             text = results
             break;
         default:
-            text = "user did somthing" + results;
+            text = results;
     }
     let msgText = `ID: \`${msg.from.id}\` - [${getUser(msg.from, "first&last")}](tg://user?id=${msg.from.id})\n${text}`
     bot.sendMessage(USERS_CNL, msgText, ops);
