@@ -25,17 +25,18 @@ _ = (bot, msg, userLang, searcher) => {
     switch (callbackOps[2]) {
         case 'd':
             searcher.description(id, type).then(function(res) {
+                let re;
                 let description = res.data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
                 if (description == null) {
-                    let re = userLang.desc_not_available;
+                    re = userLang.desc_not_available;
                 }
                 if (description.length >= 199) {
                     description = description.substring(0, 200);
                     let last = description.lastIndexOf(" ");
                     description = description.substring(0, last);
-                    let re = description + "...";
+                    re = description + "...";
                 }
-                let re = description;
+                re = description;
                 console.log(re)
                 return re;
             }).then(function(res) {
