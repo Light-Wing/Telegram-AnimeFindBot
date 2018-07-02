@@ -45,7 +45,7 @@ _ = (bot, msg, userLang, searcher) => {
             break;
         case 'nxt':
             let currentSavedEP = callbackOps[3];
-            if (currentSavedEP - time() > 0) {
+            if ((currentSavedEP - new Date().valueOf()) > 0) {
                 let text = "Got Ep Air date (without extra lookup)😁";
                 report.user(bot, msg, "epDate", text);
                 let timeDiff = currentSavedEP - new Date().valueOf()
