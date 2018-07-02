@@ -93,24 +93,23 @@ process.on('unhandledRejection', function(reason, p) {
 function getUserLanguage(msg) {
     let lang = require('./LANG');
     let l = (msg.from != undefined) ? msg.from.language_code.split("-")[0] : "en";
-    // report.user(bot, msg, 'non', `language_code=${l}`)
+    report.user(bot, msg, 'non', `language code=${l}`)
     switch (l) {
         case "en":
             return lang.en;
         case "iw":
             return lang.he;
         default:
-            console.log("default lang choosen") //imposible to get here
-            return lang.he;
+            return null
     }
 };
 
-bot.on("text", (msg, type) => {
-    // console.log(msg)
-    if ((msg.chat.id == 1082225626 || ERR_CHNL_CHAT_ID || -284603852) && (type.type == "text")) {
-        can_i(msg, type)
-    }
-})
+// bot.on("text", (msg, type) => {
+//     // console.log(msg)
+//     if ((msg.chat.id == 1082225626 || ERR_CHNL_CHAT_ID || -284603852) && (type.type == "text")) {
+//         can_i(msg, type)
+//     }
+// })
 
 // bot.on('text', (msg) => msg.reply.text(msg.text, { asReply: true }));
 
