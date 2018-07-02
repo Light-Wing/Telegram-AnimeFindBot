@@ -31,7 +31,7 @@ _ = (bot, msg, userLang, searcher) => {
                     re = userLang.desc_not_available;
                 }
                 if (description.length >= 199) {
-                    description = description.substring(0, 200);
+                    description = description.substring(0, 190);
                     let last = description.lastIndexOf(" ");
                     description = description.substring(0, last);
                     re = description + "...";
