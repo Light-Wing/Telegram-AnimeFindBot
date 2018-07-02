@@ -32,6 +32,8 @@ _.user = (bot, msg, didWhat, results, time) => {
         case "epDate":
             text = results
             break;
+        case 'non':
+            text = results;
         default:
             text = results;
     }
