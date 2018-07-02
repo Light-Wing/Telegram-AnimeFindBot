@@ -37,7 +37,7 @@ _ = (bot, msg, userLang, searcher) => {
                     re = description + "...";
                 }
                 re = description;
-                console.log(re)
+                console.log(res)
                 return re;
             }).then(function(res) {
                 return bot.answerCallbackQuery(msg.id, { text: res, showAlert: true, cacheTime: 10000000000 });
