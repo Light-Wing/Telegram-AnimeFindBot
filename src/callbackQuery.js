@@ -26,7 +26,6 @@ _ = (bot, msg, userLang, searcher) => {
         case 'd':
             searcher.description(id, type).then(function(res) {
                 let re;
-                bot.sendMessage(process.env.USERS_CNL, res);
                 let description = res.data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
                 if (description == null) {
                     re = userLang.desc_not_available;
@@ -38,7 +37,6 @@ _ = (bot, msg, userLang, searcher) => {
                     re = description + "...";
                 }
                 re = description;
-                // console.log(res)
                 return re;
             }).then(function(res) {
                 return bot.answerCallbackQuery(msg.id, { text: res, showAlert: true, cacheTime: 10000000000 });
