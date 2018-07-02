@@ -2,6 +2,7 @@
 
 let _ = {}
 let utils = require("./utils");
+let report = require("./report");
 
 _ = (bot, msg, userLang, searcher) => {
     // console.log(msg)
