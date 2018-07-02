@@ -64,7 +64,7 @@ bot.getMe().then(function(me) { //self check
     return botName;
 });
 bot.on("error", err => { //most telegram errors should get caught here
-    console.log("Telegram Error " + err.error_code + "\nDescription: " + err.description + "\nfull report " + JSON.stringify(err))
+    console.log("Telegram Error " + err.error.error_code + "\nDescription: " + err.error.description + "\nfull report " + JSON.stringify(err))
     return axios.post(baseUrl + "sendMessage", {
             chat_id: ERR_CHNL_CHAT_ID,
             text: "Telegram Error " + err.error.error_code + "\nDescription: " + err.error.description + "\nfull report " + JSON.stringify(err),
