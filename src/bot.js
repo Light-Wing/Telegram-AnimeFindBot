@@ -22,7 +22,7 @@ const DEV_TELEGRAM_ID = parseInt(process.env.DEV_TELEGRAM_ID) || 0;
 const ERR_CHNL_CHAT_ID = process.env.ERR_CHNL_CHAT_ID;
 const USERS_CNL = process.env.USERS_CNL;
 
-
+var kitsu2 = require('node-kitsu');
 
 const axios = require('axios');
 const fetch = require('node-fetch');
@@ -82,7 +82,7 @@ bot.on("error", err => { //most telegram errors should get caught here
         })
 });
 process.on('unhandledRejection', function(reason, p) {
-    console.log("Possibly Unhandled Rejection at: Promise reason: ", reason.description); //  ", " p,
+    console.log("Possibly Unhandled Rejection at: Promise reason: ", reason.description, p); //  ", " p,
     try {
         let errMsg = `OK: ${reason.ok}\nError Code: ${reason.error_code}\nReason: ${reason.description}`
         report.error(bot, errMsg, '', false)
@@ -93,11 +93,12 @@ process.on('unhandledRejection', function(reason, p) {
 function getUserLanguage(msg) {
     let lang = require('./LANG');
     let l = (msg.from != undefined && msg.from.language_code != undefined) ? msg.from.language_code.split("-")[0] : "en";
-    report.user(bot, msg, 'non', `language code=${l}`)
+    let l2 = (msg.from != undefined && msg.from.language_code != undefined) ? msg.from.language_code : "en";
+    report.user(bot, msg, 'non', `language code=${l2}`)
     switch (l) {
         case "en":
             return lang.en;
-        case "iw":
+        case "iw" || 'he':
             return lang.he;
         default:
             return null
@@ -115,7 +116,6 @@ bot.on("text", (msg, type) => {
 
 
 bot.on('inlineQuery', (msg) => {
-    // console.log(msg)
     let userLang = getUserLanguage(msg);
     // console.log(msg.from.language_code)
     let type = "inline";

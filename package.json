@@ -15,6 +15,7 @@
         "mysql": "^2.15.0",
         "nani": "^1.2.0",
         "node-fetch": "^2.1.1",
+        "node-kitsu": "^1.1.1",
         "telebot": "^1.2.6"
     },
     "devDependencies": {

@@ -6,6 +6,10 @@ const ERR_CHNL_CHAT_ID = process.env.ERR_CHNL_CHAT_ID;
 const USERS_CNL = process.env.USERS_CNL;
 let getUser = require("./search/getUserName").verifyUser;
 
+// ok: false,
+// error_code: 400,
+// description: 'Bad Request: QUERY_ID_INVALID' 
+
 _.error = (bot, errMsg, error, markdown) => {
     const ops = {
         parseMode: (markdown == false) ? "HTML" : "Markdown",

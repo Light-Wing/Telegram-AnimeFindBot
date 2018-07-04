@@ -1,9 +1,9 @@
 'use strict';
 
-const searchPic = "https://api.telegram.org/file/bot503582942:AAGTmWcCEsFSG_1ncSYYDG4VSKmTS0muCJo/photos/file_32.jpg"
-const errorPic = "https://api.telegram.org/file/bot503582942:AAGTmWcCEsFSG_1ncSYYDG4VSKmTS0muCJo/documents/file_16.png"
+const searchPic = "https://emojipedia-us.s3.amazonaws.com/thumbs/120/apple/129/smiling-face-with-open-mouth_1f603.png"
+const errorPic = "https://emojipedia-us.s3.amazonaws.com/thumbs/120/apple/129/face-with-head-bandage_1f915.png"
 
-const searchText = 'Search for anime, manga, characteres, staff and studios.';
+const searchText = 'type inline to search anime.';
 let _ = {};
 _.defaultMessage = {
     cacheTime: 300,
@@ -24,10 +24,35 @@ _.errorMessage = {
     description: "no results for the keyword(s) you provided",
     thumb_url: errorPic,
     input_message_content: {
-        message_text: "anilist.co",
+        message_text: "(ಥ﹏ಥ)",
         parse_mode: 'Markdown',
         disable_web_page_preview: false
     }
 }
+_.loadedMore = {
+    cacheTime: 100,
+    id: 0,
+    title: "Added Some more answers",
+    description: "keep going down",
+    thumb_url: errorPic,
+    input_message_content: {
+        message_text: "ಥ‿ಥ",
+        parse_mode: 'Markdown',
+        disable_web_page_preview: false
+    }
+}
+_.errorMessageNoMore = {
+    cacheTime: 100,
+    id: 0,
+    title: "thats the end of the line",
+    description: "no more results found",
+    thumb_url: "https://emojipedia-us.s3.amazonaws.com/thumbs/120/apple/129/sleepy-face_1f62a.png", //😴",
+    input_message_content: {
+        message_text: "ಥ‿ಥ",
+        parse_mode: 'Markdown',
+        disable_web_page_preview: false
+    }
+}
+
 
 module.exports = _;
