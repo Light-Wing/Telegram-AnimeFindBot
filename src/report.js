@@ -9,6 +9,8 @@ let getUser = require("./search/getUserName").verifyUser;
 // ok: false,
 // error_code: 400,
 // description: 'Bad Request: QUERY_ID_INVALID' 
+// description: 'Bad Request: WEBDOCUMENT_URL_INVALID'
+//RESULT_ID_DUPLICATE
 
 _.error = (bot, errMsg, error, markdown) => {
     const ops = {

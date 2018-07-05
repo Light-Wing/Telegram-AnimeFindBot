@@ -16,6 +16,7 @@
         "nani": "^1.2.0",
         "node-fetch": "^2.1.1",
         "node-kitsu": "^1.1.1",
+        "sanitize-html": "^1.18.2",
         "telebot": "^1.2.6"
     },
     "devDependencies": {

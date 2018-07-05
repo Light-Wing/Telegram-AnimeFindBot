@@ -125,7 +125,7 @@ bot.on('callbackQuery', msg => {
     let userLang = getUserLanguage(msg);
     // console.log(msg)
     // bot.answerCallbackQuery(msg.id, { text: "Updating..." }); //
-    callbackQuery(bot, msg, userLang, searcher)
+    callbackQuery(bot, msg, userLang)
 });
 
 //links: { self: 'https://kitsu.io/api/edge/anime/6570' },

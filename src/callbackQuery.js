@@ -3,8 +3,9 @@
 let _ = {}
 let utils = require("./utils");
 let report = require("./report");
+const searcher = require('./searcher');
 
-_ = (bot, msg, userLang, searcher) => {
+_ = (bot, msg, userLang) => {
     // console.log(msg)
     let startTime = new Date().valueOf()
 

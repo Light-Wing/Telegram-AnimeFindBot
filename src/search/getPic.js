@@ -24,7 +24,7 @@ module.exports = (data, what, pref) => {
         case 'full':
             let posterImage = largePoster != null ? largePoster : (originalPoster != null ? originalPoster : (mediumPoster != null ? mediumPoster : tinyPoster != null ? tinyPoster : null))
             let coverImage = largeCover != null ? largeCover : (originalCover != null ? originalCover : (mediumCover != null ? mediumCover : (tinyCover != null ? tinyCover : null)))
-            let full = coverImage != null ? coverImage : posterImage;
+            let full = posterImage != null ? posterImage : coverImage;
             return full
         default:
             return null

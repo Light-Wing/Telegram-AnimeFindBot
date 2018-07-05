@@ -66,6 +66,7 @@ _.en = {
     status: "Status",
     KitsuStuff: {
         'anime': 'Anime',
+        'characters': 'Character',
         'TV': 'TV',
         'movie': 'Movie',
         'special': 'Special',
