@@ -59,7 +59,7 @@ _.inline = (type, msg, bot, userLang) => {
             let nextOffset = ((msg.offset != '') ? parseInt(msg.offset) + 10 : 0)
             switch (sFor) {
                 case 'manga':
-                    // console.log('manga reach switch')
+                    console.log('manga reach switch')
                     if (query.length > 0) {
                         return kitsu2.searchManga(query, nextOffset).then(results => {
                             let Data = results;
@@ -93,7 +93,7 @@ _.inline = (type, msg, bot, userLang) => {
                     }
                     break;
                 case 'anime':
-                    // console.log('anime reach switch')
+                    console.log('anime reach switch')
                     if (query.length > 0) {
                         return kitsu2.searchAnime(query, nextOffset).then(results => {
                             let Data = results;
