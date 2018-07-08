@@ -1,5 +1,6 @@
 'use strict';
 
+
 require('dotenv').config()
 const token = process.env.TELEGRAM_TOKEN;
 const port = process.env.PORT || 443;
@@ -31,38 +32,8 @@ const baseUrl = `https://api.telegram.org/bot${token}/`;
 const Kitsu = require('kitsu');
 const kitsu = new Kitsu();
 
-let bot;
-if (process.env.NPM_CONFIG_PRODUCTION) {
-    console.log('----Production----')
-    bot = new TeleBot({
-        token,
-        usePlugins,
-        pluginConfig: {
-            namedButtons: {
-                buttons: BUTTONS
-            }
-        },
-        webHook: { port: port, host: host }
-    });
-} else {
-    console.log('----non-Production----')
-    bot = new TeleBot({
-        token,
-        usePlugins,
-        pluginConfig: {
-            namedButtons: {
-                buttons: BUTTONS
-            }
-        },
-        polling: true
-    });
-};
-bot.getMe().then(function(me) { //self check
-    const botName = me.username;
-    console.log('---\nHello! My name is %s!', me.first_name);
-    console.log(`And my username is @${ botName }\n---`);
-    return botName;
-});
+let bot = require('./botSetup')
+
 bot.on("error", err => { //most telegram errors should get caught here
     console.log("Telegram Error " + err.error.error_code + "\nDescription: " + err.error.description + "\nfull report " + JSON.stringify(err))
     return axios.post(baseUrl + "sendMessage", {
@@ -76,7 +47,7 @@ bot.on("error", err => { //most telegram errors should get caught here
             console.log("got error" + err)
             try {
                 let errMsg = ''
-                report.error(bot, errMsg, err, false)
+                report.error(errMsg, err, false)
             } catch (e) { console.log('Error from error sender report.error did not work: ', JSON.stringify(e)) }
             return console.log('Error44 from error sender: ', err.Error)
         })
@@ -85,7 +56,7 @@ process.on('unhandledRejection', function(reason, p) {
     console.log("Possibly Unhandled Rejection at: Promise reason: ", reason.description, p); //  ", " p,
     try {
         let errMsg = `OK: ${reason.ok}\nError Code: ${reason.error_code}\nReason: ${reason.description}`
-        report.error(bot, errMsg, '', false)
+        report.error(errMsg, '', false)
     } catch (e) { console.log('Error report.error on unhandledRejection: ', JSON.stringify(e)) }
     // application specific logging here
 });
@@ -94,7 +65,7 @@ function getUserLanguage(msg) {
     let lang = require('./LANG');
     let l = (msg.from != undefined && msg.from.language_code != undefined) ? msg.from.language_code.split("-")[0] : "en";
     let l2 = (msg.from != undefined && msg.from.language_code != undefined) ? msg.from.language_code : "en";
-    report.user(bot, msg, 'non', `language code=${l2}`)
+    report.user(msg, 'lang', l2)
     switch (l) {
         case "en":
             return lang.en;
@@ -120,6 +91,7 @@ bot.on('inlineQuery', (msg) => {
     // console.log(msg.from.language_code)
     let type = "inline";
     searcher.inline(type, msg, bot, userLang)
+
 })
 bot.on('callbackQuery', msg => {
     let userLang = getUserLanguage(msg);

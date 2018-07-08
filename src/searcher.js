@@ -164,8 +164,8 @@ function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor) {
     }
     //make it check pre message to see if same id, if so, add this to that message
     let timeDiff = new Date().valueOf() - startTime;
-    let time = timeDiff + 'ms'
-    report.user(bot, msg, "search", results, time)
+    let resultsNumber = JSON.stringify(results.list.length)
+    report.user(msg, "search", resultsNumber, timeDiff)
 
     if (JSON.stringify(results.list.length) == "0") {
         results = bot.answerList(msg.id, { nextOffset: '', cacheTime: 100, personal: false, });
@@ -193,9 +193,9 @@ function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor) {
             ]
             if (knownErrors.includes(err.description)) {
                 errMsg = "Description";
-                report.error(bot, errMsg, err.description, false);
+                report.error(errMsg, err.description, false);
             } else {
-                report.error(bot, errMsg, JSON.stringify(err));
+                report.error(errMsg, JSON.stringify(err));
             }
         })
 }

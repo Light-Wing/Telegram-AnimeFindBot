@@ -5,7 +5,7 @@ var sanitizeHtml = require('sanitize-html');
 let _ = {}
 
 _ = (Data, nextOffset, bot, msg, userLang) => {
-    console.log('character serach called', nextOffset)
+    // console.log('character serach called', nextOffset)
     let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 10, personal: false, });
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i].attributes;

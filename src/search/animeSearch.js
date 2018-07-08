@@ -5,7 +5,7 @@ let getPic = require('./getPic')
 let _ = {}
 
 _ = (Data, nextOffset, bot, msg, userLang) => {
-    console.log('anime serach called')
+    // console.log('anime serach called')
     let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 100, personal: false, });
     // results.addArticle(
     //     reply.loadedMore
