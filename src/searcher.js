@@ -163,9 +163,9 @@ function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor) {
             break;
     }
     //make it check pre message to see if same id, if so, add this to that message
-    let timeDiff = new Date().valueOf() - startTime;
-    let resultsNumber = JSON.stringify(results.list.length)
-    report.user(msg, "search", resultsNumber, timeDiff)
+    // let timeDiff = new Date().valueOf() - startTime;
+    let resultsNumber = JSON.stringify(results.list.length);
+    report.user(msg, "search", resultsNumber, startTime)
 
     if (JSON.stringify(results.list.length) == "0") {
         results = bot.answerList(msg.id, { nextOffset: '', cacheTime: 100, personal: false, });
@@ -179,9 +179,11 @@ function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor) {
             )
         }
     }
+    // console.log(results)
+
     bot.answerQuery(results)
         .then(response => {
-            // return console.log(`bot answered successfully: ${response}`)
+            return console.log(`bot answered successfully: ${response}`)
         })
         .catch(err => {
             console.log('Error answering query: ', JSON.stringify(err));
@@ -233,8 +235,19 @@ _.getGenres = (id, type) => {
 _.nextEp = (id, type) => {
     return kitsu.get(`${type}/${id}/`)
 }
-_.description = (id, type) => {
-    return kitsu.get(`${type}/${id}/`)
+_.description = (id, type, maxChar) => {
+    return kitsu.get(`${type}/${id}/`) //.then(res => {
+        //     let re;
+        //     let description = res.data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
+        //     if (description == null) {
+        //         return re = lang[userLang].desc_not_available;
+        //     } else if (description.length >= maxChar) {
+        //         description = description.substring(0, maxChar);
+        //         let last = description.lastIndexOf(" ");
+        //         description = description.substring(0, last);
+        //         return re = description + "...";
+        //     } else return re = description;
+        // })
 }
 
 

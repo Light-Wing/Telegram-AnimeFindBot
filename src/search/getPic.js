@@ -19,7 +19,8 @@ module.exports = (data, what, pref) => {
     switch (what) {
         case 'thumb':
             // getPref(pref, 'tiny')
-            let thumb = (tinyPoster != null) ? tinyPoster : (tinyCover != null ? tinyCover : (mediumPoster != null ? mediumPoster : (mediumCover != null ? mediumCover : (largePoster != null ? largePoster : (largeCover != null ? largeCover : (originalPoster != null ? originalPoster : (originalCover != null ? originalCover : "*")))))));
+            //if nothing is found it sends undefined and it show a [ instead of the picture
+            let thumb = (tinyPoster != null) ? tinyPoster : (tinyCover != null ? tinyCover : (mediumPoster != null ? mediumPoster : (mediumCover != null ? mediumCover : (largePoster != null ? largePoster : (largeCover != null ? largeCover : (originalPoster != null ? originalPoster : (originalCover != null ? originalCover : undefined)))))));
             return thumb;
         case 'full':
             let posterImage = largePoster != null ? largePoster : (originalPoster != null ? originalPoster : (mediumPoster != null ? mediumPoster : tinyPoster != null ? tinyPoster : null))

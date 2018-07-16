@@ -4,6 +4,7 @@ let _ = {};
 
 const ERR_CHNL_CHAT_ID = process.env.ERR_CHNL_CHAT_ID;
 const USERS_CNL = process.env.USERS_CNL;
+const FEEDBACK_CHNL = process.env.FEEDBACK_CHNL;
 let getUser = require("./search/getUserName").verifyUser;
 let bot = require('./botSetup')
 
@@ -18,7 +19,7 @@ const ops = {
 // error_code: 400,
 // description: 'Bad Request: QUERY_ID_INVALID' 
 // description: 'Bad Request: WEBDOCUMENT_URL_INVALID'
-//RESULT_ID_DUPLICATE
+// description: 'Bad Request: RESULT_ID_DUPLICATE'
 
 _.error = (errMsg, error, markdown) => {
     const opsErr = {
@@ -29,6 +30,12 @@ _.error = (errMsg, error, markdown) => {
         replyMarkup: null
     };
     bot.sendMessage(ERR_CHNL_CHAT_ID, errMsg + error, opsErr);
+}
+_.feedback = (msg, feedback) => {
+    let userID = msg.from.id;
+    let head = `ID: \`${userID}\` - [${getUser(msg.from, "first&last")}](tg://user?id=${userID})`;
+    let msgText = msg.text;
+    bot.sendMessage(FEEDBACK_CHNL, `${head}\nHas some ${feedback}:\n${msgText}`, ops);
 }
 let dataToSend = {};
 let rmFrom_dataToSend = [];
@@ -48,7 +55,7 @@ _.user = (msg, didWhat, extraInfo, time) => {
     switch (didWhat) {
         case "search":
             text = `searched "*${msg.query}*" and got: ${extraInfo} results`
-            searchTime = time;
+            searchTime = new Date().valueOf() - time;
             break;
         case 'genre':
             text = 'Genres took ' + time + 'ms';
@@ -73,7 +80,9 @@ _.user = (msg, didWhat, extraInfo, time) => {
     //prepare data
     if (dataToSend[userID] === undefined) {
         dataToSend[userID] = {};
+        dataToSend[userID]['msgBody'] = []
     }
+
     let searchNum = (dataToSend[userID]['searchNum'] == null || undefined) ? 0 : dataToSend[userID]['searchNum'];
 
     dataToSend[userID]['time'] = new Date().valueOf();
@@ -81,13 +90,15 @@ _.user = (msg, didWhat, extraInfo, time) => {
     dataToSend[userID]['status'] = 'unprocessed'; // unprocessed || pending || done
     dataToSend[userID]['msgHead'] = `ID: \`${userID}\` - [${getUser(msg.from, "first&last")}](tg://user?id=${userID})`;
     if (didWhat != 'lang') {
-        if (dataToSend[userID]['msgBody'] == (undefined || null)) {
+        if (dataToSend[userID]['msgBody'] === (undefined || null || [])) { // || ["nothing more"]
             dataToSend[userID]['msgBody'] = [text]
         } else {
+            // console.log(dataToSend[userID]['msgBody'])
             dataToSend[userID]['msgBody'].push(text)
         }
     } else {
         dataToSend[userID]['lang'] = lang;
+        dataToSend[userID]['msgBody'] = []; //"nothing more"
     }
     let biggestSearchTime;
 
@@ -98,10 +109,13 @@ _.user = (msg, didWhat, extraInfo, time) => {
         searchNum++;
         dataToSend[userID]['searchNum'] = searchNum;
     }
-}
+    setInterval(() => {
+        // console.log('interval', dataToSend);
+        sendReport(bot);
+    }, 10000);
+};
 
-
-setInterval(() => {
+function sendReport(bot) {
     // console.log('interval', dataToSend);
     for (let userID in dataToSend) {
         let elapsed_time = new Date().valueOf() - dataToSend[userID]['time'];
@@ -119,7 +133,7 @@ setInterval(() => {
                 });
             } catch (e) {
                 console.log('error :(', e)
-                _.error('error :(', e)
+                _.error('error :( ', e)
             }
         }
         for (let i = rmFrom_dataToSend.length - 1; i >= 0; i--) {
@@ -127,8 +141,7 @@ setInterval(() => {
             rmFrom_dataToSend.splice(i, 1);
         }
     }
-}, 10000);
-
+};
 
 function uniqBy(a, key) {
     var seen = {};
@@ -136,7 +149,7 @@ function uniqBy(a, key) {
         var k = key(item);
         return seen.hasOwnProperty(k) ? false : (seen[k] = true);
     })
-}
+};
 
 
 

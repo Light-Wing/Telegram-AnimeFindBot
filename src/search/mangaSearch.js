@@ -1,6 +1,7 @@
 'use strict';
 
 let getPic = require('./getPic')
+let lang = require('../LANG');
 
 let _ = {}
 
@@ -18,15 +19,15 @@ _ = (Data, nextOffset, bot, msg, userLang) => {
             // console.log(data.id)
             let dateToMilisec = (data.nextRelease != null) ? new Date(data.nextRelease.replace(' ', 'T').replace(' ', '')).valueOf() : "";
             let replyMarkup = bot.inlineKeyboard([
-                [bot.inlineButton(userLang.description, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-d' }), bot.inlineButton(userLang.genres, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-g' })],
-                (data.nextRelease != null) ? [bot.inlineButton(userLang.nextRelease, { callback: (Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-nxt-' + dateToMilisec) })] : []
+                [bot.inlineButton(lang[userLang].description, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-d' }), bot.inlineButton(lang[userLang].genres, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-g' })],
+                (data.nextRelease != null) ? [bot.inlineButton(lang[userLang].nextRelease, { callback: (Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-nxt-' + dateToMilisec) })] : []
             ]);
             let thumb = getPic(data, 'thumb');
 
             var searchResault = {
                 id: Data[i].id,
-                title: `[${userLang.KitsuStuff[Data[i].type]}] ${data.canonicalTitle}`,
-                description: `${(data.synopsis != (null && undefined && '')) ? JSON.stringify(data.synopsis) : userLang.desc_not_available}`, //.replace(/<(?:.|\n)*?>/gm, '')
+                title: `[${lang[userLang].KitsuStuff[Data[i].type]}] ${data.canonicalTitle}`,
+                description: `${(data.synopsis != (null && undefined && '')) ? JSON.stringify(data.synopsis) : lang[userLang].desc_not_available}`, //.replace(/<(?:.|\n)*?>/gm, '')
                 thumb_url: thumb,
                 input_message_content: {
                     message_text: messageSent(data, userLang, Data[i].type, Data[i].id),
@@ -98,34 +99,34 @@ function messageSent(data, userLang, type, id) {
     let pic = getPic(data, 'full')
     imageCover = pic != null ? `[\u200B](${pic})` : null;
     //trailer
-    trailer = (data.youtubeVideoId != (null && undefined && '')) ? (`🎥 [${userLang.trailer}](https://youtu.be/${data.youtubeVideoId})\n`) : '';
+    trailer = (data.youtubeVideoId != (null && undefined && '')) ? (`🎥 [${lang[userLang].trailer}](https://youtu.be/${data.youtubeVideoId})\n`) : '';
     //eps 
-    episodeCount = data.episodeCount != (null && undefined && '') ? `\n- ${userLang.episodes}: *${data.episodeCount}*` : '';
-    episodeLength = (data.episodeLength != (null && undefined && '') && data.episodeCount != (null && undefined && '')) ? ` (${data.episodeLength} ${userLang.minutes_per_episode})` : '';
+    episodeCount = data.episodeCount != (null && undefined && '') ? `\n- ${lang[userLang].episodes}: *${data.episodeCount}*` : '';
+    episodeLength = (data.episodeLength != (null && undefined && '') && data.episodeCount != (null && undefined && '')) ? ` (${data.episodeLength} ${lang[userLang].minutes_per_episode})` : '';
     //volumes 
     // these two dont work yet, need to get kitsu to search manga as well
-    volumes = data.volumes != (null && undefined && '') ? `\n- ${userLang.volumes}: *${data.volumes}*` : '';
+    volumes = data.volumes != (null && undefined && '') ? `\n- ${lang[userLang].volumes}: *${data.volumes}*` : '';
     //chapters
     // these two dont work yet, need to get kitsu to search manga as well
-    chapters = data.chapters != (null && undefined && '') ? `\n- ${userLang.chapters}: *${data.chapters}*` : '';
+    chapters = data.chapters != (null && undefined && '') ? `\n- ${lang[userLang].chapters}: *${data.chapters}*` : '';
     //startDate startDate nextRelease year-month-day
     StartDate = (data.startDate != (null && undefined && '')) ? data.startDate.split('-') : ''
-    startDate = (data.startDate != (null && undefined && '')) ? `\n- ${userLang.start_date}: ` : '';
+    startDate = (data.startDate != (null && undefined && '')) ? `\n- ${lang[userLang].start_date}: ` : '';
     sday = (StartDate[2] != (null && undefined && '')) ? `${StartDate[2]}/` : '';
     smonth = (StartDate[1] != (null && undefined && '')) ? `${StartDate[1]}/` : '';
     syear = (StartDate[0] != (null && undefined && '')) ? `${StartDate[0]}` : '';
     //endDate endDate
     EndDate = (data.endDate != (null || undefined)) ? data.endDate.split('-') : ''
-    endDate = (data.endDate != (null && undefined && '')) ? `\n- ${userLang.end_date}: ` : '';
+    endDate = (data.endDate != (null && undefined && '')) ? `\n- ${lang[userLang].end_date}: ` : '';
     eday = (EndDate[2] != (null && undefined && '')) ? `${EndDate[2]}/` : '';
     emonth = (EndDate[1] != (null && undefined && '')) ? `${EndDate[1]}/` : '';
     eyear = (EndDate[0] != (null && undefined && '')) ? `${EndDate[0]}` : '';
     //status
-    status = (data.status != (null && undefined && '')) ? `\n- ${userLang.status}: *${userLang.KitsuStuff[data.status]}*` : ''; //.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase() })
-    averageScore = (data.averageScore != (null && undefined && '')) ? `\n- ${userLang.score}: *${data.averageScore}*` : '';
-    popularity = (data.popularity != (null && undefined && '')) ? `\n- ${userLang.popularity}: *${data.popularity}*` : '';
+    status = (data.status != (null && undefined && '')) ? `\n- ${lang[userLang].status}: *${lang[userLang].KitsuStuff[data.status]}*` : ''; //.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase() })
+    averageScore = (data.averageScore != (null && undefined && '')) ? `\n- ${lang[userLang].score}: *${data.averageScore}*` : '';
+    popularity = (data.popularity != (null && undefined && '')) ? `\n- ${lang[userLang].popularity}: *${data.popularity}*` : '';
     //rating ageRating ageRatingGuide
-    ageRating = (data.ageRating != (null && undefined && '')) ? `\n- ${userLang.rated}: *${data.ageRating}*` : '';
+    ageRating = (data.ageRating != (null && undefined && '')) ? `\n- ${lang[userLang].rated}: *${data.ageRating}*` : '';
     ageRatingGuide = ((data.ageRating != (null && undefined && '')) && (data.ageRatingGuide != null)) ? ` - ${data.ageRatingGuide}` : '';
     //description
     // description = (data.synopsis != null) ? `\n\n ${data.synopsis}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')

@@ -6,8 +6,17 @@ const port = process.env.PORT || 443;
 const host = process.env.HOST;
 
 const TeleBot = require('telebot');
-const usePlugins = ['askUser', 'namedButtons', 'commandButton'];
-const BUTTONS = require('./buttons').buttons; //not realy needed
+const usePlugins = ['askUser', 'commandButton']; //, 'namedButtons', 'commandButton' , 'floodProtection'
+// const pluginConfig = {
+//     floodProtection: {
+//         interval: 5,
+//         message: 'Too many messages, relax!'
+//     }
+//     //     namedButtons: {
+//     //         buttons: BUTTONS
+//     //     }
+// };
+//const BUTTONS = require('./buttons').buttons; //not realy needed
 
 let bot;
 if (process.env.NPM_CONFIG_PRODUCTION) {
@@ -15,11 +24,8 @@ if (process.env.NPM_CONFIG_PRODUCTION) {
     bot = new TeleBot({
         token,
         usePlugins,
-        pluginConfig: {
-            namedButtons: {
-                buttons: BUTTONS
-            }
-        },
+        pluginFolder: '../plugins/',
+        // pluginConfig,
         webHook: { port: port, host: host }
     });
 } else {
@@ -27,19 +33,10 @@ if (process.env.NPM_CONFIG_PRODUCTION) {
     bot = new TeleBot({
         token,
         usePlugins,
-        pluginConfig: {
-            namedButtons: {
-                buttons: BUTTONS
-            }
-        },
+        pluginFolder: '../plugins/',
+        // pluginConfig,
         polling: true
     });
 };
-bot.getMe().then(function(me) { //self check
-    const botName = me.username;
-    console.log('---\nHello! My name is %s!', me.first_name);
-    console.log(`And my username is @${ botName }\n---`);
-    return botName;
-});
 
 module.exports = bot;

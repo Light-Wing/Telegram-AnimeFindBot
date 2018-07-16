@@ -1,6 +1,7 @@
 'use strict';
 
 var sanitizeHtml = require('sanitize-html');
+let lang = require('../LANG');
 
 let _ = {}
 
@@ -12,8 +13,8 @@ _ = (Data, nextOffset, bot, msg, userLang) => {
 
         var searchResault = {
             id: Data[i].id,
-            title: `[${userLang.KitsuStuff[Data[i].type]}] ${data.canonicalName}`,
-            description: ((data.description) != (null && undefined && '')) ? sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, " ").replace(/\n{2,}/g, ' ') : userLang.desc_not_available, //.replace(/<(?:.|\n)*?>/gm, '')
+            title: `[${lang[userLang].KitsuStuff[Data[i].type]}] ${data.canonicalName}`,
+            description: ((data.description) != (null && undefined && '')) ? sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, " ").replace(/\n{2,}/g, ' ') : lang[userLang].desc_not_available, //.replace(/<(?:.|\n)*?>/gm, '')
             thumb_url: (data.image != (null && undefined && '')) ? data.image.original : undefined,
             input_message_content: {
                 message_text: messageSent(data, Data[i].type, Data[i].id),

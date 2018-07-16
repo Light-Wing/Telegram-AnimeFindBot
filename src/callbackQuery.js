@@ -4,9 +4,36 @@ let _ = {}
 let utils = require("./utils");
 let report = require("./report");
 const searcher = require('./searcher');
+const dbs = require("./dbs/dbs");
+let dataOnUser = require("./userCache");;
+let lang = require('./LANG');
 
 _ = (bot, msg, userLang) => {
     // console.log(msg)
+    if (msg.data == '/cancel') {
+        console.log(lang[userLang].cancelled) //
+        let chatId = msg.message.chat.id
+        let messageId = msg.message.message_id
+        bot.editMessageText({ chatId, messageId }, lang[userLang].cancelled)
+        bot.answerCallbackQuery(msg.id, { text: lang[userLang].cancelled });
+        return 'cancel'
+    }
+    if (msg.data == '/hebrew') {
+        let chatId = msg.message.chat.id
+        let messageId = msg.message.message_id
+        bot.editMessageText({ chatId, messageId }, 'שפה שונתה לעברית')
+        bot.answerCallbackQuery(msg.id, { text: 'שפה שונתה לעברית' });
+        dataOnUser[msg.from.id]['lang'] = 'he'
+        return dbs.changeUserLangPrefs(msg, 'setHebrew')
+    }
+    if (msg.data == '/english') {
+        let chatId = msg.message.chat.id
+        let messageId = msg.message.message_id
+        bot.editMessageText({ chatId, messageId }, "Language changed to English")
+        bot.answerCallbackQuery(msg.id, { text: "Language changed to English" });
+        dataOnUser[msg.from.id]['lang'] = 'en'
+        return dbs.changeUserLangPrefs(msg, 'setEnglish')
+    }
     let startTime = new Date().valueOf()
     let callbackOps = msg.data.split('-');
     let id = callbackOps[0];
@@ -22,21 +49,25 @@ _ = (bot, msg, userLang) => {
             type = null;
             break;
     }
+    //This is a story about you. A tale about the inside of your body... According to a new study, the human body consists of approximately 37 trillion cells. These cells are hard at work every day within...    
     switch (callbackOps[2]) {
         case 'd':
-            searcher.description(id, type).then(function(res) {
+            searcher.description(id, type, 195).then(function(res) {
                 let re;
                 let description = res.data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
-                if (description == null) {
-                    return re = userLang.desc_not_available;
-                } else if (description.length >= 199) {
-                    description = description.substring(0, 196);
-                    let last = description.lastIndexOf(" ");
-                    description = description.substring(0, last);
-                    return re = description + "...";
-                } else return re = description;
+                if (description == (null || undefined || '')) {
+                    re = lang[userLang].desc_not_available;
+                } else if (description.length >= 200) {
+                    let tempDesc = description.substring(0, 197);
+                    let last = tempDesc.lastIndexOf(" ");
+                    let descriptionFinal = description.substring(0, last);
+                    re = descriptionFinal + "...";
+                } else re = description;
+                //console.log(msg)
+                bot.sendMessage(msg.from.id, description) //cant send to msg.chat.id, need to find another way
+                return re
             }).then(function(res) {
-                return bot.answerCallbackQuery(msg.id, { text: res, showAlert: true, cacheTime: 604800000 });
+                return bot.answerCallbackQuery(msg.id, { text: res, showAlert: true, cacheTime: 0 }); //604800000
             }).then(() => {
                 let timeDiff = new Date().valueOf() - startTime;
                 let msgText = 'Description took ' + timeDiff + 'ms';
@@ -46,7 +77,7 @@ _ = (bot, msg, userLang) => {
         case 'nxt':
             let currentSavedEP = callbackOps[3];
             if ((currentSavedEP - new Date().valueOf()) > 0) {
-                // report.user(bot, msg, "epDate", text);
+                // report.user(msg, "epDate", text);
                 let timeDiff = currentSavedEP - new Date().valueOf()
                     // console.log(timeDiff)
 
@@ -78,9 +109,9 @@ _ = (bot, msg, userLang) => {
                     // console.log(res)
                     let genres_sting = '';
                     if (res.meta.count == 0) {
-                        return userLang.no_genres;
+                        return lang[userLang].no_genres;
                     }
-                    genres_sting += userLang.genres + ':\n'
+                    genres_sting += lang[userLang].genres + ':\n'
                     for (let i = 0, len = res.meta.count; i < len; i++) {
                         genres_sting += '-' + res.data[i].name + '\n' //(i != len - 1 ? ', ' : '');
                     }
