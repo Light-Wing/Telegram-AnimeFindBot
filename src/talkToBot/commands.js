@@ -3,7 +3,9 @@
 let _ = {};
 let lang = require('../LANG');
 require('dotenv').config()
-    // require('util')  util.format
+const dbs = require("../dbs/dbs");
+
+// require('util')  util.format
 _.commandList = [
     '/start',
     '/feedback',
@@ -60,6 +62,9 @@ _.reactToCommand = (bot, msg, userLang) => {
             setTimeout(() => {
                 bot.start()
             }, 2000)
+        };
+        if (msgText == '/restart') {
+            dbs.trystart()
         };
         if (msgText == "/test") {
             console.log(msg);

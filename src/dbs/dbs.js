@@ -29,7 +29,8 @@ let errors = {
 // PROTOCOL_ENQUEUE_HANDSHAKE_TWICE
 // ER_PARSE_ERROR
 // PROTOCOL_ENQUEUE_AFTER_QUIT
-setTimeout(() => {
+_.trystart = () => {
+
     con.connect(function(err) {
         // if (err) throw err;
         if (err != null && err.errno == 1045) {
@@ -49,7 +50,7 @@ setTimeout(() => {
         }
     });
     // setTimeout(() => { con.end() }, 100)
-}, 100)
+}
 
 _.checkUserLangPrefs = (msg) => {
     // connectFunc()
