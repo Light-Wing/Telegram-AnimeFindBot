@@ -81,6 +81,23 @@ _.userCache = (msg, check) => {
         return cache[0]
     }
 }
+_.md2html = (text) => {
+    return text
+        .replace(/_(.+?)_/g, `<i>$1</i>`)
+        .replace(/\*(.+?)\*/g, `<b>$1</b>`)
+        .replace(/`{3}\w*\n(.+?)\n`{3}/gs, `<pre>$1</pre>`)
+        .replace(/`(.+?)`/g, `<code>$1</code>`)
+        .replace(/\[(.+?)\]\((.+?)\)/g, `<a href="$2">$1</a>`);
+};
+
+_.html2md = (text) => {
+    return text
+        .replace(/<i>(.+?)<\/i>/g, `_$1_`)
+        .replace(/<b>(.+?)<\/b>/g, `*$1*`)
+        .replace(/<pre>(.+?)<\/pre>/gs, `\`\`\`$1\`\`\``)
+        .replace(/<code>(.+?)<\/code>/g, `\`$1\``)
+        .replace(/<a href="(.+?)">(.+?)<\/a>/g, `[$2]($1)`);
+};
 
 function getUserLanguage(msg) {
     let lang = (msg.from != undefined && msg.from.language_code != (undefined || null)) ? msg.from.language_code.split("-")[0] : "en";
