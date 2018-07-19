@@ -4,13 +4,36 @@ const mysql = require("mysql");
 
 require('dotenv').config()
 let bot = require('../botSetup')
+let report = require("../report");
 
-var con = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USERNAME,
-    password: process.env.DB_PASS,
-    database: process.env.DB_DATABASE,
-});
+let con;
+
+function handleDisconnect() {
+    con = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USERNAME,
+        password: process.env.DB_PASS,
+        database: process.env.DB_DATABASE,
+    }); // Recreate the connection, since
+    // the old one cannot be reused.
+
+    con.connect(function(err) { // The server is either down
+        if (err) { // or restarting (takes a while sometimes).
+            console.log('error when connecting to db:', err);
+            setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
+        } // to avoid a hot loop, and to allow our node script to
+    }); // process asynchronous requests in the meantime.
+    // If you're also serving http, display a 503 error.
+    con.on('error', function(err) {
+        console.log('db error', err.stack);
+        if (err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
+            handleDisconnect(); // lost due to either server restart, or a
+        } else { // connnection idle timeout (the wait_timeout
+            throw err; // server variable configures this)
+        }
+    });
+}
+handleDisconnect();
 
 let _ = {};
 let errors = {
@@ -18,7 +41,7 @@ let errors = {
     1062: 'ER_DUP_ENTRY',
 };
 // err.code: 'ER_ACCESS_DENIED_ERROR'
-// err.code: 'PROTOCOL_ENQUEUE_HANDSHAKE_TWICE'
+// err.code: 'PROTOCOL_ENQUEUE_HANDSHAKE_TWICE' 
 // err.errno: 1045
 // err.sqlMessage: "Access denied for user \'jerusap9_LW\'@\'141.226.11.164\' (using password: YES)", - 1045
 // err.sqlMessage: "Duplicate entry '0' for key 'PRIMARY'" - 1062
@@ -29,60 +52,60 @@ let errors = {
 // PROTOCOL_ENQUEUE_HANDSHAKE_TWICE
 // ER_PARSE_ERROR
 // PROTOCOL_ENQUEUE_AFTER_QUIT
-_.trystart = () => {
+// PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR
 
-    con.connect(function(err) {
-        // if (err) throw err;
-        if (err != null && err.errno == 1045) {
-            console.log(err);
-            console.log(err.errno);
-            let ipRegex = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
-            let parseMode = 'Markdown';
-            let host = err.sqlMessage.match(ipRegex)
-            let addlink = `https://cpanel-box5167.bluehost.com/cpsess3967134238/frontend/bluehost/sql/addhost.html?host=${host}`
-            bot.sendMessage(process.env.DEV_TELEGRAM_ID, `${err.errno}\n[add host](${addlink})\nhost: ${host}`, { parseMode })
-        } else if (err != null && err.errno != 1045) {
-            console.log(err);
-            console.log(err.errno);
-        } else {
-            console.log("Connected!");
-            // bot.sendMessage(process.env.DEV_TELEGRAM_ID, `DB Connected!`)
-        }
-    });
-    // setTimeout(() => { con.end() }, 100)
-}
-
-_.checkUserLangPrefs = (msg) => {
+// _.tryStart = () => {
+//     con.connect(function(err) {
+//         // if (err) throw err;
+//         if (err != null && err.errno == 1045) {
+//             console.log(err);
+//             console.log(err.errno);
+//             let ipRegex = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
+//             let parseMode = 'Markdown';
+//             let host = err.sqlMessage.match(ipRegex)
+//             let addlink = `https://cpanel-box5167.bluehost.com/cpsess3967134238/frontend/bluehost/sql/addhost.html?host=${host}`
+//             bot.sendMessage(process.env.DEV_TELEGRAM_ID, `${err.errno}\n[add host](${addlink})\nhost: ${host}`, { parseMode })
+//         } else if (err != null && err.errno != 1045) {
+//             console.log(err);
+//             console.log(err.errno);
+//             errMsg = "DB error: ";
+//             report.error(errMsg, err.stack, false);
+//         } else {
+//             console.log("Connected!");
+//             bot.sendMessage(process.env.DEV_TELEGRAM_ID, `DB Connected!`)
+//         }
+//     });
+//     // setTimeout(() => { con.end() }, 100)
+// }
+_.checkUserPrefs = (msg) => {
     // connectFunc()
+    // switch (checkWaht) {
+    //     case 'lang':
+    //         checkWaht = 'langPref'
+    //         break;
+    //     case 'desc':
+    //         checkWaht = 'descPref'
+    //         break;
+    //     default:
+    //         checkWaht = 'default'
+    //         break;
+    // }
+    // console.log('checking')
     return new Promise(function(resolve, reject) {
         console.log('user db check start')
         const check = `SELECT * FROM userPrefs WHERE id = ${msg.from.id} LIMIT 1` //WHERE id = ${msg.from.id}
-        let lang;
         con.query(check, function(err, result) {
                 if (err != null) { // && err.errno == 1062
-                    console.log(err);
-                    console.log(err.errno);
+                    err_s(err)
                     reject(err)
                 } else if (result == '') {
                     _.addUser(msg)
-                        // console.log('test1', result)
-                        // bot.sendMessage(msg.from.id, 'result empty')
-                    lang = null
                     resolve(null)
-                } else if (result[0].langPref != null) {
-                    // bot.sendMessage(msg.from.id, 'dbs not null - lang is: ' + result[0].langPref)
-                    // console.log('user db check end')
-                    // lang = result[0].langPref
-                    resolve(result[0].langPref)
-                } else if (result[0].langPref == null) {
-                    // console.log('test3', result[0].langPref)
-                    lang = null
-                    resolve(null)
-                } else if (err == null) {
-                    // console.log('test4', result[0].langPref)
-                    lang = result[0].langPref
-                    resolve(result[0].langPref)
+                    return report.user(msg, 'addedToDB', `added user to database`) //add addedToDB to user report switch
+                } else if (result[0] != null) { // && checkWaht == 'langPref'
+                    resolve([result[0].langPref, result[0].descPref])
                 } else {
+                    // err_s(err)
                     reject(err)
                     throw err;
                 }
@@ -108,142 +131,187 @@ _.changeUserLangPrefs = (msg, ops) => {
     con.query(changeLang, function(err, result) {
         if (err != null && err.errno == 1062) {
             console.log(JSON.stringify(err));
-            bot.sendMessage(msg.from.id, 'lang exits?')
+            // bot.sendMessage(msg.from.id, 'lang exits?')
         } else if (err == null) {
             // console.log('result', result);
             // console.log("lang changed");
-            bot.sendMessage(msg.from.id, 'lang changed')
+            return report.user(msg, 'DB_langChange', `Language changed to ${lang}`) //add DB_langChange to user report switch
+                // bot.sendMessage(msg.from.id, 'lang changed')
         } else {
+            err_s(err)
             console.error(err.message);
             // throw err;
         }
     });
-}
-_.setUserLangPrefs = (msg, ops) => {
-    let lang;
-    switch (ops) {
-        case 'setHebrew':
-            lang = 'he'
-        case 'setEnglish':
-            lang = 'en'
-        default:
-            lang = 'en'
-    }
-    let changeLang = `INSERT INTO userPrefs (langPref) VALUES ('${lang}')`;
-    con.query(changeLang, function(err, result) {
+};
+_.changeUserDescPrefs = (msg, descSetting) => {
+    let changeDesc = `UPDATE userPrefs SET descPref = ${mysql.escape(descSetting)} WHERE id = ${mysql.escape(msg.from.id)}`;
+    con.query(changeDesc, function(err, result) {
         if (err != null && err.errno == 1062) {
-            console.log(JSON.stringify(err));
-            bot.sendMessage(msg.from.id, 'lang exits?')
-        } else if (err == null) {
-            console.log('result', result);
-            console.log("lang changed");
-            bot.sendMessage(msg.from.id, 'lang changed')
-        } else {
-            console.error(err.message);
-            // throw err;
-        }
-    });
-}
+            // console.log('\n\n\n-------1062')
 
-_.checkUserExists = (msg) => {
-    const check = `SELECT * FROM userPrefs WHERE id = ${msg.from.id} LIMIT 5` //WHERE id = ${msg.from.id}
-    con.query(check, function(err, result, fields) {
-        if (err != null) { // && err.errno == 1062
-            console.log(err.errno);
-        } else if (result == '') {
-            _.addUser(msg).then(() => {
-                con.query(check, function(err, result, fields) {
-                    if (err) throw err;
-                    return result
-                })
-            })
+            console.log(JSON.stringify(err));
+            // bot.sendMessage(msg.from.id, 'desc exits?')
         } else if (err == null) {
             // console.log('result', result);
-            // bot.sendMessage(msg.from.id, 'x' + JSON.stringify(result))
-            // console.log(fields);
-            return result
-        } else throw err;
+            // console.log("lang changed");
+            return report.user(msg, 'DB_descChange', `Description changed to ${descSetting.replace('_','-')}`) //add DB_descChange to user report switch
+                // bot.sendMessage(msg.from.id, 'desc changed')
+        } else {
+            // console.log('\n\n\n-------9')
+
+            err_s(err)
+            console.error(err.message);
+            // throw err;
+        }
     });
-}
-_.getField = (msg) => {
-    const check = `SELECT * FROM userPrefs LIMIT 10` //WHERE id = ${msg.from.id}
-    con.query(check, function(err, result, fields) {
-        if (err != null) { // && err.errno == 1062
-            console.log(err.errno);
-        } else if (err == null) {
-            console.log('result', result);
-            bot.sendMessage(msg.from.id, 'x' + JSON.stringify(result))
-            console.log(fields);
-            return result
-        } else throw err;
-    });
-}
+};
+
+
+// _.setUserLangPrefs = (msg, ops) => {
+//     let lang;
+//     switch (ops) {
+//         case 'setHebrew':
+//             lang = 'he'
+//         case 'setEnglish':
+//             lang = 'en'
+//         default:
+//             lang = 'en'
+//     }
+//     let changeLang = `INSERT INTO userPrefs (langPref) VALUES ('${lang}')`;
+//     con.query(changeLang, function(err, result) {
+//         if (err != null && err.errno == 1062) {
+//             console.log(JSON.stringify(err));
+//             bot.sendMessage(msg.from.id, 'lang exits?')
+//         } else if (err == null) {
+//             console.log('result', result);
+//             console.log("lang changed");
+//             bot.sendMessage(msg.from.id, 'lang changed')
+//         } else {
+//             console.error(err.message);
+//             // throw err;
+//         }
+//     });
+// }
+
+// _.checkUserExists = (msg) => {
+//         const check = `SELECT * FROM userPrefs WHERE id = ${msg.from.id} LIMIT 5` //WHERE id = ${msg.from.id}
+//         con.query(check, function(err, result, fields) {
+//             if (err != null) { // && err.errno == 1062
+//                 console.log(err.errno);
+//             } else if (result == '') {
+//                 _.addUser(msg).then(() => {
+//                     con.query(check, function(err, result, fields) {
+//                         if (err) throw err;
+//                         return result
+//                     })
+//                 })
+//             } else if (err == null) {
+//                 // console.log('result', result);
+//                 // bot.sendMessage(msg.from.id, 'x' + JSON.stringify(result))
+//                 // console.log(fields);
+//                 return result
+//             } else throw err;
+//         });
+//     };
+// _.getField = (msg) => {
+//     const check = `SELECT * FROM userPrefs LIMIT 10` //WHERE id = ${msg.from.id}
+//     con.query(check, function(err, result, fields) {
+//         if (err != null) { // && err.errno == 1062
+//             console.log(err.errno);
+//         } else if (err == null) {
+//             console.log('result', result);
+//             bot.sendMessage(msg.from.id, 'x' + JSON.stringify(result))
+//             console.log(fields);
+//             return result
+//         } else throw err;
+//     });
+// }
 
 _.addUser = (msg) => {
-    var alter_table = "ALTER TABLE userPrefs ADD COLUMN id INT NOT NULL PRIMARY KEY"; // AUTO_INCREMENT
     let addUser = `INSERT INTO userPrefs (ID, LastName, FirstName, UserName) VALUES (${msg.from.id},'${msg.from.last_name}','${msg.from.first_name}','${msg.from.username}')`;
-    // con.query(alter_table, function(err, result) {
-    //     if (err) throw err;
-    //     console.log("alter_table");
-    // });
     con.query(addUser, function(err, result) {
         if (err != null && err.errno == 1062) {
             // console.log(err.errno);
-            bot.sendMessage(msg.from.id, 'User already in DB')
+            bot.sendMessage(process.env.DEV_TELEGRAM_ID, `${msg.from.id}, User already in DB`)
         } else if (err == null) {
-            console.log('result', result);
-            console.log("added");
-            bot.sendMessage(msg.from.id, 'User added to DB succesfully')
+            // console.log('result', result);
+            console.log("added user");
+            bot.sendMessage(process.env.DEV_TELEGRAM_ID, `${msg.from.id}, User added to DB succesfully`)
         } else throw err;
     });
-}
-_.addTable = (msg) => {
-    var create_table = `CREATE TABLE IF NOT EXISTS userPrefs (
-        ID int NOT NULL,
-        LastName varchar(255),
-        FirstName varchar(255) NOT NULL,
-        UserName varchar(255),
-        langPref varchar(10),
-        PRIMARY KEY(ID))`;
-    con.connect(function(err) {
-        if (err) {
-            console.log(JSON.stringify(err))
+};
+// _.addTable = (msg) => {
+//     var create_table = `CREATE TABLE IF NOT EXISTS userPrefs (
+//         ID int NOT NULL,
+//         LastName varchar(255),
+//         FirstName varchar(255) NOT NULL,
+//         UserName varchar(255),
+//         langPref varchar(10),
+//         PRIMARY KEY(ID))`;
+//     con.connect(function(err) {
+//         if (err) {
+//             console.log(JSON.stringify(err))
 
-            // throw err;
-        }
-        console.log("Connected!");
-        con.query(create_table, function(err, result) {
-            if (err) throw err;
-            bot.sendMessage(msg.from.id, 'x' + JSON.stringify(result))
-            console.log("added");
-        });
-    });
-}
-_.dropTable = (msg) => {
-    var create_table = "DROP TABLE IF EXISTS userPrefs";
-    con.connect(function(err) {
-        if (err) throw err;
-        console.log("Connected!");
-        con.query(create_table, function(err, result) {
-            if (err) throw err;
-            bot.sendMessage(msg.from.id, JSON.stringify(result))
-            console.log("DROPPED");
-        });
-    });
+//             // throw err;
+//         }
+//         console.log("Connected!");
+//         con.query(create_table, function(err, result) {
+//             if (err) throw err;
+//             bot.sendMessage(msg.from.id, 'x' + JSON.stringify(result))
+//             console.log("added");
+//         });
+//     });
+// }
+// _.dropTable = (msg) => {
+//     var create_table = "DROP TABLE IF EXISTS userPrefs";
+//     con.connect(function(err) {
+//         if (err) throw err;
+//         console.log("Connected!");
+//         con.query(create_table, function(err, result) {
+//             if (err) throw err;
+//             bot.sendMessage(msg.from.id, JSON.stringify(result))
+//             console.log("DROPPED");
+//         });
+//     });
+// }
+
+// _.checkTable = (msg) => {
+//     const check = `SELECT * FROM userPrefs LIMIT 10` // LIMIT 5 WHERE id = ${msg.from.id}
+//     con.connect(function(err) { //ER_NO_SUCH_TABLE
+//         if (err) throw err;
+//         console.log("Connected!");
+//         con.query(check, function(err, result, fields) {
+//             if (err) throw err;
+//             bot.sendMessage(msg.from.id, 'x' + JSON.stringify(result))
+//             console.log("added" + JSON.stringify(result));
+//         });
+//     });
+// }
+
+function err_s(err) {
+    console.log('\n\n\n-------')
+    if (err.errno == 1045) {
+        console.log(err.message)
+        let ipRegex = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
+        let parseMode = 'Markdown';
+        let host = err.sqlMessage.match(ipRegex)
+            // reject(err)
+        console.log('sent link to open port')
+            // con.end()
+
+        let addlink = `https://cpanel-box5167.bluehost.com/cpsess3967134238/frontend/bluehost/sql/addhost.html?host=${host}`
+        return bot.sendMessage(process.env.DEV_TELEGRAM_ID, `${err.errno}\n[add host](${addlink})\nhost: ${host}`, { parseMode })
+    } else if (err.code == 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR') {
+        console.log('try reconnect')
+        console.log(err.message)
+            // con.end()
+    } else {
+        console.log(err)
+    }
 }
 
-_.checkTable = (msg) => {
-    const check = `SELECT * FROM userPrefs LIMIT 10` // LIMIT 5 WHERE id = ${msg.from.id}
-    con.connect(function(err) { //ER_NO_SUCH_TABLE
-        if (err) throw err;
-        console.log("Connected!");
-        con.query(check, function(err, result, fields) {
-            if (err) throw err;
-            bot.sendMessage(msg.from.id, 'x' + JSON.stringify(result))
-            console.log("added" + JSON.stringify(result));
-        });
-    });
-}
+
 
 
 module.exports = _;

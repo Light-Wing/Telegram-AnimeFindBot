@@ -4,11 +4,11 @@ let _ = {};
 let getUser = require("./search/getUserName").verifyUser;
 const reply = require("./search/_reply");
 const Kitsu = require('kitsu');
-const kitsu = new Kitsu();
+const kitsuGet = new Kitsu();
 const report = require("./report");
 const utils = require("./utils");
 const getPic = require("./search/getPic");
-const kitsu2 = require('node-kitsu');
+const kitsu = require('./search/main-kitsu-search');
 const characterSearch = require('./search/characterSearch')
 const mangaSearch = require('./search/mangaSearch')
 const animeSearch = require('./search/animeSearch')
@@ -59,12 +59,13 @@ _.inline = (type, msg, bot, userLang) => {
             let nextOffset = ((msg.offset != '') ? parseInt(msg.offset) + 10 : 0)
             switch (sFor) {
                 case 'manga':
-                    console.log('manga reach switch')
+                    // console.log('manga reach switch')
                     if (query.length > 0) {
-                        return kitsu2.searchManga(query, nextOffset).then(results => {
+                        return kitsu.searchManga(query, nextOffset).then(res => {
+                            let [results, allofit] = res
                             let Data = results;
                             // console.log(results)
-                            dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'manga')
+                            dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'manga', allofit.meta.count)
 
                         }).then(() => {
                             let timeDiff = new Date().valueOf() - startTime;
@@ -75,9 +76,9 @@ _.inline = (type, msg, bot, userLang) => {
                     }
                     break;
                 case 'character':
-                    console.log('character reach switch')
+                    // console.log('character reach switch')
                     if (query.length > 0) {
-                        return kitsu2.findCharacter(query, nextOffset).then(results => {
+                        return kitsu.findCharacter(query, nextOffset).then(results => {
                             let Data = results;
                             // console.log(results)
                             dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'character')
@@ -93,17 +94,20 @@ _.inline = (type, msg, bot, userLang) => {
                     }
                     break;
                 case 'anime':
-                    console.log('anime reach switch')
+                    // console.log('anime reach switch')
                     if (query.length > 0) {
-                        return kitsu2.searchAnime(query, nextOffset).then(results => {
+                        let count
+                        return kitsu.searchAnime(query, nextOffset).then(res => { //nextOffset
+                            let [results, allofit] = res
                             let Data = results;
-                            // console.log(results)
-                            dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'anime')
+                            let count = allofit.meta.count
+                                // console.log(count)
+                            dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'anime', count)
                         }).then(() => {
                             let timeDiff = new Date().valueOf() - startTime;
                             let msgText = `Inline query of ${sFor} took ${timeDiff}ms`;
-                            console.log(msgText)
-                                // bot.sendMessage(process.env.USERS_CNL, msgText);
+                            // console.log(msgText)
+                            // bot.sendMessage(process.env.USERS_CNL, msgText);
                         }).catch(handleError => console.log(`---\nanime Fetch error: ${handleError}\n---`));
                     }
                     break;
@@ -142,20 +146,20 @@ _.inline = (type, msg, bot, userLang) => {
 }
 
 //https://kitsu.io/api/edge/anime/6791
-function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor) {
+function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor, count) {
     //check which search to do, and get correct file
     //import file
     let results = {};
     switch (sFor) {
         case 'manga':
-            results = mangaSearch(Data, nextOffset, bot, msg, userLang);
+            results = mangaSearch(Data, nextOffset, bot, msg, userLang, count);
             break;
         case 'character':
             results = characterSearch(Data, nextOffset, bot, msg, userLang);
             break;
         case 'anime':
-            results = animeSearch(Data, nextOffset, bot, msg, userLang);
-            // console.log(results)
+            results = animeSearch(Data, nextOffset, bot, msg, userLang, count);
+            // console.log(results.list)
             break;
         default:
             results = null
@@ -168,7 +172,7 @@ function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor) {
     report.user(msg, "search", resultsNumber, startTime)
 
     if (JSON.stringify(results.list.length) == "0") {
-        results = bot.answerList(msg.id, { nextOffset: '', cacheTime: 100, personal: false, });
+        results = bot.answerList(msg.id, { nextOffset: '', cacheTime: 100, personal: false });
         if (nextOffset == 0) {
             results.addArticle(
                 reply.errorMessage
@@ -183,10 +187,10 @@ function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor) {
 
     bot.answerQuery(results)
         .then(response => {
-            return console.log(`bot answered successfully: ${response}`)
+            return //console.log(`bot answered successfully: ${response}`)
         })
         .catch(err => {
-            console.log('Error answering query: ', JSON.stringify(err));
+            console.log('Error answering query: ', err);
             let errMsg = "Searcher error: ";
             //might be QUERY_ID_INVALID
             let knownErrors = [
@@ -207,47 +211,27 @@ function dataTo_inchat(Data, bot, msg) {
 }
 // https://kitsu.io/api/edge/anime/11351/relationships/genres
 _.getGenres = (id, type) => {
-    return kitsu.get(`${type}/${id}/genres`)
+    return kitsuGet.get(`${type}/${id}/genres`)
 };
 
-// kitsu2.searchManga('Monster Musume', 0).then(results => {
+// kitsu.searchManga('Monster Musume', 0).then(results => {
 //     console.log(results[0])
 // });
-// kitsu2.listAnime(11467).then(results => {
+// kitsu.listAnime(11467).then(results => {
 //     console.log(results)
 // });
-// kitsu2.searchAnime('New Game!', 0).then(results => {
+// kitsu.searchAnime('New Game!', 0).then(results => {
 //     console.log(results[0])
 // });
-// kitsu2.findCharacter('armin').then(results => {
+// kitsu.findCharacter('armin').then(results => {
 //     console.log(results)
 // });
 
-// const Genres = await getGenres(data.id, data.type).then(res => {
-//     let genres_sting = '';
-//     for (let i = 0, len = res.meta.count; i < len; i++) {
-//         genres_sting += res.data[i].name + (i != len - 1 ? ', ' : '');
-//     }
-//     // console.log('genres_sting = ' + genres_sting)
-//     return genres_sting
-// });
-// genres = (Genres != '') ? `\n- Genres: ${Genres.toString()}` : ''; // JSON.stringify(data.genres).replace(/","/g,', ').replace(/"/g,'')
 _.nextEp = (id, type) => {
-    return kitsu.get(`${type}/${id}/`)
+    return kitsuGet.get(`${type}/${id}/`)
 }
 _.description = (id, type, maxChar) => {
-    return kitsu.get(`${type}/${id}/`) //.then(res => {
-        //     let re;
-        //     let description = res.data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
-        //     if (description == null) {
-        //         return re = lang[userLang].desc_not_available;
-        //     } else if (description.length >= maxChar) {
-        //         description = description.substring(0, maxChar);
-        //         let last = description.lastIndexOf(" ");
-        //         description = description.substring(0, last);
-        //         return re = description + "...";
-        //     } else return re = description;
-        // })
+    return kitsuGet.get(`${type}/${id}/`)
 }
 
 

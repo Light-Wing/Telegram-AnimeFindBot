@@ -90,7 +90,7 @@ _.user = (msg, didWhat, extraInfo, time) => {
     dataToSend[userID]['status'] = 'unprocessed'; // unprocessed || pending || done
     dataToSend[userID]['msgHead'] = `ID: \`${userID}\` - [${getUser(msg.from, "first&last")}](tg://user?id=${userID})`;
     if (didWhat != 'lang') {
-        if (dataToSend[userID]['msgBody'] === (undefined || null || [])) { // || ["nothing more"]
+        if (dataToSend[userID]['msgBody'] === (undefined || null || [] || '')) { // || ["nothing more"]
             dataToSend[userID]['msgBody'] = [text]
         } else {
             // console.log(dataToSend[userID]['msgBody'])
@@ -98,7 +98,7 @@ _.user = (msg, didWhat, extraInfo, time) => {
         }
     } else {
         dataToSend[userID]['lang'] = lang;
-        dataToSend[userID]['msgBody'] = []; //"nothing more"
+        // dataToSend[userID]['msgBody'].push(""); //"nothing more"
     }
     let biggestSearchTime;
 

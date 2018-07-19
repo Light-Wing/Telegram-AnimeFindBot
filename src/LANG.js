@@ -5,17 +5,36 @@
 let _ = {};
 
 _.he = {
-    startMsg: `שלום %s\nבוט זה מחפש אנימות במצב אינליין (לדוגמאות -> /example או בלחיצה על הכפתור "נסו אותי")\nלהגדרת שפה -> /settings\nלפידבאק (שיתוף דעתכם על הבוט, מה אפשר לשפר מה אפשר להוסיף או לתקן משהו שלא עובד כמו שצריך) -> /feedback`,
+    startMsg: `שלום %s\nבוט זה מחפש אנימות במצב אינליין (לדוגמאות -> /example או בלחיצה על הכפתור "נסו עכשיו")\n` +
+        `להגדרת שפה -> /settings\nלפידבאק (שיתוף דעתכם על הבוט, מה אפשר לשפר מה אפשר להוסיף או לתקן משהו שלא עובד כמו שצריך) -> /feedback`,
     cancel: 'בַטֵל ❌',
     cancelled: 'הפעולה האחרונה בוטלה', //maybe add diif answers to diff cancels like cancelled_idea (within this one)
     check_it_out: "נסו עכשיו",
-    feedback: `יש לכם הצעה לשיפור, נתקלתם בתקלה או  אולי יש לכם חוות דעת כללית?
-\nבחרו באחת האפשרויות...`,
+    feedback: `יש לכם הצעה לשיפור, נתקלתם בתקלה או  אולי יש לכם חוות דעת כללית?\nבחרו באחת האפשרויות...`,
     see_keyboard_below: "הנה מקלדת",
     setLang: {
-        language: 'לחצו לבחירת שפה חדשה',
+        language: 'בחרו את השפה המועדפת עליכם...',
         he: 'עברית 🇮🇱',
         en: 'אנגלית 🇺🇸'
+    },
+    settings: {
+        settings: `רוצים לשנות הגדרות?\nאלו ההגדרות שניתנים לשינוי (להצעות ושיפור -> /feedback)` +
+            `\n\n*הגדרות שפה* - אפשר לשנות את השפה שבה הבוט יתכתב והודעות שנשלחות דרך הבוט (בחיפוש במצב אינליין) ישלחו בהתאם.` +
+            `\n\n*הגדרות תקציר* - רוצים לקבל תקציר מלא (שישלח לכאן) כשלוחצים על כפתור תקציר? תגדירו את זה עכשיו!` +
+            `\n(כשלוחצים על כפתור ״תקציר״ הבוט שולח חלק מהתקציר בבועה... לפעמים אין מספיק מקום בבועה ויכול ליהיות מצב שחלק מהתקציר לא מופיע שם... לכן יש את האפשרות שהתקציר ישלח (בנוסף לבועה) לכאן...`,
+        setDesc: 'הגדרות תקציר',
+        setLang: 'הגדרות שפה',
+    },
+    setDesc: {
+        desc: `כדי לקבל תקציר מלא שישלח כאן בפרטי, בחרו ב - ״כן״`,
+        sendDesc: 'כן, בבקשה',
+        dontSendDesc: 'לא תודה',
+        descNotiYes: 'האם אתה רוצים לקבל התראה כל פעם שנשלחת תקציר, או לקבל אותה בשקט?',
+        descNotiSilent: 'ללא התראה!',
+        deskNotiNonSilent: 'אני רוצה התראה!',
+        dontSendDesc_done: 'אוקיי, אני לא אשלח לכאן תקצירים.',
+        SendDescSilent_done: 'אוקיי, אני אשלח לכאן תקצירים ללא התראה.',
+        SendDescNonSilent_done: 'אוקיי, אני אשלח לכאן תקצירים (אם התראה).'
     },
     feedbackOps: {
         issue: '⚠️ תקלה',
@@ -35,6 +54,8 @@ _.he = {
         idea: 'תודה על ההצעה, אבדוק איך ליישם אותה',
         g_feedback: 'תודה על חוות דעתך, אקרא את זה בזמן הקרוב'
     },
+    found: 'נמצאו',
+    results: 'תוצאות',
     choose_one_or_cancel: 'בבקשה בחרו באחת האפשרויות, או בטלו על ידי לחיצה על /cancel',
     not_start: "לא התחל",
     genres: "ז׳אנרים",
@@ -125,7 +146,10 @@ _.he = {
     example: 'עדיין לא הכנתי דוגמאות, אבל ברעיון אם כותבים -m או -c לפני החיפוש, זה מחפש מנגה או דמות'
 }
 _.en = {
-    startMsg: `Hello %s!\ntry me out inline`,
+    startMsg: `Hello %s!\n` +
+        `This bot searches for anime in inline mode (for examples press /example or press the "Check me out Now" button below)\n` +
+        `for setting press /settings\n` +
+        `and if you want to share your thoughts about the bot, please press /feedback`,
     cancel: '❌ Cancel',
     cancelled: 'Cancelled',
     check_it_out: "Check it out Now",
@@ -135,6 +159,22 @@ _.en = {
         language: 'Choose a Language',
         he: '🇮🇱 Hebrew',
         en: '🇺🇸 English'
+    },
+    settings: {
+        settings: 'Which settings do you want to change?',
+        setDesc: 'Description settings',
+        setLang: 'Language settings',
+    },
+    setDesc: {
+        desc: 'Do you want anime and manga descriptions sent here?',
+        sendDesc: 'yes, please',
+        dontSendDesc: 'no thanks, the popup is enough',
+        descNotiYes: 'Do you want the descriptions sent with a notification?',
+        descNotiSilent: 'silance is best',
+        deskNotiNonSilent: 'yes, please',
+        dontSendDesc_done: 'Ok, You wont get any descriptions sent here.',
+        SendDescSilent_done: 'Ok, I\'ll send descriptions without a notification',
+        SendDescNonSilent_done: 'Ok, I\'ll send descriptions with a notification'
     },
     feedbackOps: {
         issue: '⚠️ Issues',
@@ -151,6 +191,8 @@ _.en = {
         idea: 'Thank you for your knowladge, I\'ll see what I can do with it',
         g_feedback: 'Thank you for your feedback, I\'ll make sure to read it when I can'
     },
+    found: 'found',
+    results: 'results',
     choose_one_or_cancel: 'Please choose an option, or press /cancel',
     not_start: "not start",
     genres: "Genres",

@@ -4,17 +4,27 @@ module.exports = (data, what, pref) => {
     //what = thumb, full
     //pref = posterImage, coverImage
     let tinyPoster, tinyCover, mediumPoster, mediumCover, largePoster, largeCover, originalPoster, originalCover;
-    if (data.posterImage != (null || undefined)) {
-        tinyPoster = data.posterImage.tiny != null ? data.posterImage.tiny : null;
+    if (data.posterImage != (null && undefined && '')) {
+        tinyPoster = data.posterImage.tiny != null ? data.posterImage.tiny : (data.posterImage.small != null ? data.posterImage.small : null);
         mediumPoster = data.posterImage.medium != null ? data.posterImage.medium : null;
         largePoster = data.posterImage.large != null ? data.posterImage.large : null;
         originalPoster = data.posterImage.tiny != null ? data.posterImage.tiny : null;
+    } else {
+        tinyPoster = null;
+        mediumPoster = null;
+        largePoster = null;
+        originalPoster = null;
     }
-    if (data.coverImage != (null || undefined)) {
+    if (data.coverImage != (null && undefined && '')) {
         tinyCover = data.coverImage.tiny != null ? data.coverImage.tiny : null;
         mediumCover = data.coverImage.medium != null ? data.coverImage.medium : null;
         largeCover = data.coverImage.large != null ? data.coverImage.large : null;
         originalCover = data.coverImage.original != null ? data.coverImage.original : null;
+    } else {
+        tinyCover = null;
+        mediumCover = null;
+        largeCover = null;
+        originalCover = null;
     }
     switch (what) {
         case 'thumb':

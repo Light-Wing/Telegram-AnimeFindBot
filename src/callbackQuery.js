@@ -7,32 +7,80 @@ const searcher = require('./searcher');
 const dbs = require("./dbs/dbs");
 let dataOnUser = require("./userCache");;
 let lang = require('./LANG');
+let getPic = require('./search/getPic')
 
-_ = (bot, msg, userLang) => {
-    // console.log(msg)
-    if (msg.data == '/cancel') {
-        console.log(lang[userLang].cancelled) //
-        let chatId = msg.message.chat.id
+_ = (bot, msg, userPref) => {
+    let userLang = userPref[0]
+    let descSettigs = userPref[1]
+        // console.log(msg)
+        // let userData = dataOnUser[msg.from.id]
+    if (msg.message && msg.message.chat.id == msg.from.id) {
+        let chatId = msg.from.id
         let messageId = msg.message.message_id
-        bot.editMessageText({ chatId, messageId }, lang[userLang].cancelled)
-        bot.answerCallbackQuery(msg.id, { text: lang[userLang].cancelled });
-        return 'cancel'
-    }
-    if (msg.data == '/hebrew') {
-        let chatId = msg.message.chat.id
-        let messageId = msg.message.message_id
-        bot.editMessageText({ chatId, messageId }, 'שפה שונתה לעברית')
-        bot.answerCallbackQuery(msg.id, { text: 'שפה שונתה לעברית' });
-        dataOnUser[msg.from.id]['lang'] = 'he'
-        return dbs.changeUserLangPrefs(msg, 'setHebrew')
-    }
-    if (msg.data == '/english') {
-        let chatId = msg.message.chat.id
-        let messageId = msg.message.message_id
-        bot.editMessageText({ chatId, messageId }, "Language changed to English")
-        bot.answerCallbackQuery(msg.id, { text: "Language changed to English" });
-        dataOnUser[msg.from.id]['lang'] = 'en'
-        return dbs.changeUserLangPrefs(msg, 'setEnglish')
+        if (msg.data == 'cancel') {
+            console.log(lang[userLang].cancelled) //
+            bot.editMessageText({ chatId, messageId }, lang[userLang].cancelled)
+            bot.answerCallbackQuery(msg.id, { text: lang[userLang].cancelled });
+            return 'cancel'
+        }
+        if (msg.data == 'descSetting') {
+            let replyMarkup = bot.inlineKeyboard([
+                [bot.inlineButton(lang[userLang].setDesc.sendDesc, { callback: 'sendDesc' }), bot.inlineButton(lang[userLang].setDesc.dontSendDesc, { callback: 'dontSendDesc' })],
+                [bot.inlineButton(lang[userLang].cancel, { callback: 'cancel' })]
+            ]);
+            bot.editMessageText({ chatId, messageId }, lang[userLang].setDesc.desc, { replyMarkup })
+            bot.answerCallbackQuery(msg.id);
+            return
+        }
+        if (msg.data == 'sendDesc') {
+            let replyMarkup = bot.inlineKeyboard([
+                [bot.inlineButton(lang[userLang].setDesc.descNotiSilent, { callback: 'sendDesc_silent' })],
+                [bot.inlineButton(lang[userLang].setDesc.deskNotiNonSilent, { callback: 'sendDesc_nonsilent' })]
+            ]);
+            bot.editMessageText({ chatId, messageId }, lang[userLang].setDesc.descNotiYes, { replyMarkup })
+            bot.answerCallbackQuery(msg.id);
+            dataOnUser[msg.from.id]['desc'] = 'sendDesc_silent'
+            return dbs.changeUserDescPrefs(msg, 'sendDesc_silent')
+        }
+        if (msg.data == 'dontSendDesc') {
+            bot.editMessageText({ chatId, messageId }, lang[userLang].setDesc.dontSendDesc_done)
+            bot.answerCallbackQuery(msg.id);
+            dataOnUser[msg.from.id]['desc'] = 'dontSendDesc'
+            return dbs.changeUserDescPrefs(msg, 'dontSendDesc')
+        }
+        if (msg.data == 'sendDesc_silent') {
+            bot.editMessageText({ chatId, messageId }, lang[userLang].setDesc.SendDescSilent_done)
+            bot.answerCallbackQuery(msg.id);
+            dataOnUser[msg.from.id]['desc'] = 'sendDesc_silent'
+            return dbs.changeUserDescPrefs(msg, 'sendDesc_silent')
+        }
+        if (msg.data == 'sendDesc_nonsilent') {
+            bot.editMessageText({ chatId, messageId }, lang[userLang].setDesc.SendDescNonSilent_done)
+            bot.answerCallbackQuery(msg.id);
+            dataOnUser[msg.from.id]['desc'] = 'sendDesc_nonsilent'
+            return dbs.changeUserDescPrefs(msg, 'sendDesc_nonsilent')
+        }
+        if (msg.data == 'setLang') {
+            let replyMarkup = bot.inlineKeyboard([
+                [bot.inlineButton(lang[userLang].setLang.en, { callback: 'english' }), bot.inlineButton(lang[userLang].setLang.he, { callback: 'hebrew' })],
+                [bot.inlineButton(lang[userLang].cancel, { callback: 'cancel' })]
+            ]);
+            bot.editMessageText({ chatId, messageId }, lang[userLang].setLang.language, { replyMarkup })
+            bot.answerCallbackQuery(msg.id);
+            return
+        }
+        if (msg.data == 'hebrew') {
+            bot.editMessageText({ chatId, messageId }, 'שפה שונתה לעברית')
+            bot.answerCallbackQuery(msg.id, { text: 'שפה שונתה לעברית' });
+            dataOnUser[msg.from.id]['lang'] = 'he'
+            return dbs.changeUserLangPrefs(msg, 'setHebrew')
+        }
+        if (msg.data == 'english') {
+            bot.editMessageText({ chatId, messageId }, "Language changed to English")
+            bot.answerCallbackQuery(msg.id, { text: "Language changed to English" });
+            dataOnUser[msg.from.id]['lang'] = 'en'
+            return dbs.changeUserLangPrefs(msg, 'setEnglish')
+        }
     }
     let startTime = new Date().valueOf()
     let callbackOps = msg.data.split('-');
@@ -53,7 +101,7 @@ _ = (bot, msg, userLang) => {
     switch (callbackOps[2]) {
         case 'd':
             searcher.description(id, type, 195).then(function(res) {
-                let re;
+                let re, message, data = res.data;
                 let description = res.data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
                 if (description == (null || undefined || '')) {
                     re = lang[userLang].desc_not_available;
@@ -63,11 +111,26 @@ _ = (bot, msg, userLang) => {
                     let descriptionFinal = description.substring(0, last);
                     re = descriptionFinal + "...";
                 } else re = description;
-                //console.log(msg)
-                bot.sendMessage(msg.from.id, description) //cant send to msg.chat.id, need to find another way
+                // console.log(dataOnUser[msg.from.id])
+                if (dataOnUser[msg.from.id]['desc'] !== 'dontSendDesc') {
+                    let notification;
+                    switch (dataOnUser[msg.from.id]['desc']) {
+                        case 'sendDesc_silent':
+                            notification = false
+                            break;
+                        case 'sendDesc_nonsilent':
+                            notification = true;
+                            break;
+                        default:
+                            notification = false
+                            break
+                    }
+                    message = messageSent(data, userLang, data.type, data.id)
+                    bot.sendMessage(msg.from.id, message, { notification, parseMode: 'Markdown' }) //cant send to msg.chat.id, need to find another way    
+                }
                 return re
             }).then(function(res) {
-                return bot.answerCallbackQuery(msg.id, { text: res, showAlert: true, cacheTime: 0 }); //604800000
+                return bot.answerCallbackQuery(msg.id, { text: res, showAlert: true, cacheTime: 604800000 }); //604800000
             }).then(() => {
                 let timeDiff = new Date().valueOf() - startTime;
                 let msgText = 'Description took ' + timeDiff + 'ms';
@@ -130,6 +193,52 @@ _ = (bot, msg, userLang) => {
             null;
             break;
     }
+}
+
+function updateDescKeyboard(userLang, data) {
+
+    let apples = 'apples';
+    let oranges = 'oranges';
+
+    if (fruit == 'apples') {
+        apples = `==> ${ apples } <==`;
+    } else {
+        oranges = `==> ${ oranges } <==`;
+    }
+
+    return bot.inlineKeyboard([
+        [
+            bot.inlineButton(apples, { callback: 'apples' }),
+            bot.inlineButton(oranges, { callback: 'oranges' })
+        ]
+    ]);
+
+}
+
+function messageSent(data, userLang, type, id) {
+    //titles - romaji english native
+    let titleRJ = data.titles.en_jp != (null && undefined && '') ? `🇺🇸 [${data.titles.en_jp}](https://kitsu.io/${type}/${id})\n` : (data.canonicalTitle != (null || undefined) ? `🇺🇸 [${data.canonicalTitle}](https://kitsu.io/${type}/${id})\n` : '');
+    let titleJP = data.titles.ja_jp != (null && undefined && '') ? `🇯🇵 ${data.titles.ja_jp}\n` : '';
+    let titleEN = data.titles.en != (null && undefined && '') ? `🇬🇧 ${data.titles.en}\n` : '';
+    //cover - banner
+    //imageCover = data.coverImage.large != null ? `[\u200B](${data.coverImage.large})` : '';
+    let pic = getPic(data, 'full')
+    let imageCover = pic != null ? `[\u200B](${pic})` : null;
+    //trailer
+    let trailer = (data.youtubeVideoId != (null && undefined && '')) ? (`🎥 [${lang[userLang].trailer}](https://youtu.be/${data.youtubeVideoId})\n`) : '';
+    //eps 
+    let episodeCount = data.episodeCount != (null && undefined && '') ? `\n- ${lang[userLang].episodes}: *${data.episodeCount}*` : '';
+    let episodeLength = (data.episodeLength != (null && undefined && '') && data.episodeCount != (null && undefined && '')) ? ` (${data.episodeLength} ${lang[userLang].minutes_per_episode})` : '';
+    //volumes 
+    // these two dont work yet, need to get kitsu to search manga as well
+    let volumes = data.volumes != (null && undefined && '') ? `\n- ${lang[userLang].volumes}: *${data.volumes}*` : '';
+    //chapters
+    // these two dont work yet, need to get kitsu to search manga as well
+    let chapters = data.chapters != (null && undefined && '') ? `\n- ${lang[userLang].chapters}: *${data.chapters}*` : '';
+    //description
+    let description = (data.synopsis != null) ? `\n\n${data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')}` : '';
+    //message text - removed: ${description}
+    return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${episodeCount}${episodeLength}${volumes}${chapters}${description}`;
 }
 
 module.exports = _;

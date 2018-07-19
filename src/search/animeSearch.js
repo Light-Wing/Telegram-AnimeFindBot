@@ -3,52 +3,54 @@
 let getPic = require('./getPic')
 let lang = require('../LANG');
 
+
 let _ = {}
 
-_ = (Data, nextOffset, bot, msg, userLang) => {
-    // console.log('anime serach called')
-    let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 100, personal: false, });
-    // results.addArticle(
-    //     reply.loadedMore
-    // )
-    for (let i = 0, len = Data.length; i < len; i++) {
-        let data = Data[i].attributes;
-        if (!data.canonicalTitle.includes('delete')) {
-            // console.log('dataid', Data[i].id)
-            let dateToMilisec = (data.nextRelease != null) ? new Date(data.nextRelease.replace(' ', 'T').replace(' ', '')).valueOf() : "";
-            let replyMarkup = bot.inlineKeyboard([
-                [bot.inlineButton(lang[userLang].description, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-d' }), bot.inlineButton(lang[userLang].genres, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-g' })],
-                (data.nextRelease != null) ? [bot.inlineButton(lang[userLang].nextRelease, { callback: (Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-nxt-' + dateToMilisec) })] : []
-            ]);
-            let thumb = getPic(data, 'thumb');
-            // let desc = data.synopsis != (null && undefined && '') ? JSON.stringify(data.synopsis) : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
-            let desc = data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
-            if (desc == (null || undefined || '')) {
-                desc = lang[userLang].desc_not_available;
-            } else if (desc.length >= 100) {
-                desc = desc.substring(0, 100);
-                let last = desc.lastIndexOf(" ");
-                desc = desc.substring(0, last);
-                desc = desc + "...";
-            }
+_ = (Data, nextOffset, bot, msg, userLang, count) => {
+        let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 10000, personal: false, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
+        // results.addArticle(
+        //     reply.loadedMore
+        // )
+        for (let i = 0, len = Data.length; i < len; i++) {
+            let data = Data[i].attributes;
+            // console.log(data)
+            if (!data.canonicalTitle.includes('delete') && data.ageRatingGuide != "Mild Nudity") { //
+                // console.log('dataid', Data[i].id)
+                let dateToMilisec = (data.nextRelease != null) ? new Date(data.nextRelease.replace(' ', 'T').replace(' ', '')).valueOf() : "";
+                let replyMarkup = bot.inlineKeyboard([
+                    [bot.inlineButton(lang[userLang].description, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-d' }), bot.inlineButton(lang[userLang].genres, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-g' })],
+                    (data.nextRelease != null) ? [bot.inlineButton(lang[userLang].nextRelease, { callback: (Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-nxt-' + dateToMilisec) })] : []
+                ]);
+                let thumb = getPic(data, 'thumb');
+                let desc = data.synopsis != (null && undefined) ? data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\n{2,}/g, '\n\n') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
+                // let desc = 'hello' //data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
+                if (desc == (null || undefined || '')) {
+                    desc = lang[userLang].desc_not_available;
+                } else if (desc.length >= 100) {
+                    desc = desc.substring(0, 100);
+                    let last = desc.lastIndexOf(" ");
+                    desc = desc.substring(0, last);
+                    desc = desc + "...";
+                }
 
-            var searchResault = {
-                id: Data[i].id,
-                title: `[${lang[userLang].KitsuStuff[Data[i].type]}] ${data.canonicalTitle}`,
-                description: desc,
-                thumb_url: thumb,
-                input_message_content: {
-                    message_text: messageSent(data, userLang, Data[i].type, Data[i].id),
-                    parse_mode: 'Markdown',
-                    disable_web_page_preview: false
-                },
-                reply_markup: replyMarkup
+                var searchResault = {
+                    id: Data[i].id,
+                    title: `[${lang[userLang].KitsuStuff[Data[i].type]}] ${data.canonicalTitle}`,
+                    description: desc,
+                    thumb_url: thumb,
+                    input_message_content: {
+                        message_text: _.messageSent(data, userLang, Data[i].type, Data[i].id).replace(/(`)/g, ''),
+                        parse_mode: 'Markdown',
+                        disable_web_page_preview: false
+                    },
+                    reply_markup: replyMarkup
+                }
+                results.addArticle(searchResault);
             }
-            results.addArticle(searchResault);
         }
+        return results;
     }
-    return results;
-}
+    //anime:
 
 //     "data": {
 //       "id": "1",
@@ -104,7 +106,57 @@ _ = (Data, nextOffset, bot, msg, userLang) => {
 //         "showType": "TV",
 //         "nsfw": false}}}
 
-function messageSent(data, userLang, type, id) {
+//manga:
+
+// {
+//     "data": {
+//       "id": "13569",
+//       "type": "manga",
+//       "links": {
+//         "self": "https://kitsu.io/api/edge/manga/13569"
+//       },
+//       "attributes": {
+//         "createdAt": "2013-12-18T13:58:09.101Z",
+//         "updatedAt": "2018-07-04T18:00:27.841Z",
+//         "slug": "kiss-ariki",
+//         "synopsis": "Tohru, the son ",
+//         "coverImageTopOffset": 0,
+//         "titles": {
+//           "en": "Starting with a Kiss",
+//           "en_jp": "Kiss Ariki."
+//         },
+//         "canonicalTitle": "Kiss Ariki.",
+//         "abbreviatedTitles": null,
+//         "averageRating": null,
+//         "userCount": 21,
+//         "favoritesCount": 0,
+//         "startDate": "2010-05-30",
+//         "endDate": null,
+//         "nextRelease": null,
+//         "popularityRank": 12416,
+//         "ratingRank": null,
+//         "ageRating": "PG",
+//         "ageRatingGuide": null,
+//         "subtype": "manga",
+//         "status": "current",
+//         "tba": null,
+//         "posterImage": {
+//           "tiny": "https://media.kitsu.io/manga/poster_images/13569/tiny.jpg?1434279134",
+//           "small": "https://media.kitsu.io/manga/poster_images/13569/small.jpg?1434279134",
+//           "medium": "https://media.kitsu.io/manga/poster_images/13569/medium.jpg?1434279134",
+//           "large": "https://media.kitsu.io/manga/poster_images/13569/large.jpg?1434279134",
+//           "original": "https://media.kitsu.io/manga/poster_images/13569/original.jpg?1434279134"
+//         },
+//         "coverImage": null,
+//         "chapterCount": null,
+//         "volumeCount": 0,
+//         "serialization": "B-Boy Honey",
+//         "mangaType": "manga"
+//       }
+//     }
+//   }
+
+_.messageSent = (data, userLang, type, id) => {
     let titleEN, titleJP, titleRJ, imageCover, ageRating, ageRatingGuide, episodeCount, StartDate, EndDate, episodeLength, trailer, volumes, chapters, startDate, sday, smonth, syear, endDate, eday, emonth, eyear, status, averageScore, popularity;
     //titles - romaji english native
     titleRJ = data.titles.en_jp != (null && undefined && '') ? `🇺🇸 [${data.titles.en_jp}](https://kitsu.io/${type}/${id})\n` : (data.canonicalTitle != (null || undefined) ? `🇺🇸 [${data.canonicalTitle}](https://kitsu.io/${type}/${id})\n` : '');
@@ -131,15 +183,15 @@ function messageSent(data, userLang, type, id) {
     sday = (StartDate[2] != (null && undefined && '')) ? `${lang[userLang].days[StartDate[2]]}` : '';
     smonth = (StartDate[1] != (null && undefined && '')) ? `${lang[userLang].months[StartDate[1]]}` : '';
     syear = (StartDate[0] != (null && undefined && '')) ? `${StartDate[0]}` : '';
-    let sdate = `\n- ${startDate}: *${userLang == 'en' ? (smonth + ' ' + sday + ', ' + syear) :  (sday + ' ' + smonth + ', ' + syear)}*`;
+    let sdate = StartDate != '' ? `\n- ${startDate}: *${userLang == 'en' ? (smonth + ' ' + sday + ', ' + syear) :  (sday + ' ' + smonth + ', ' + syear)}*` : '';
     //endDate endDate
     EndDate = (data.endDate != (null || undefined)) ? data.endDate.split('-') : '';
-    console.log(EndDate, StartDate)
+    // console.log(EndDate, StartDate)
     endDate = (data.endDate != (null && undefined && '')) ? `${lang[userLang].end_date}` : '';
     eday = (EndDate[2] != (null && undefined && '')) ? `${lang[userLang].days[EndDate[2]]}` : '';
     emonth = (EndDate[1] != (null && undefined && '')) ? `${lang[userLang].months[EndDate[1]]}` : '';
     eyear = (EndDate[0] != (null && undefined && '')) ? `${EndDate[0]}` : '';
-    let edate = `\n- ${endDate}: *${userLang == 'en' ? (emonth + ' ' + eday + ', ' + eyear) :  (eday + ' ' + emonth + ', ' + eyear)}*`;
+    let edate = EndDate != '' ? `\n- ${endDate}: *${userLang == 'en' ? (emonth + ' ' + eday + ', ' + eyear) :  (eday + ' ' + emonth + ', ' + eyear)}*` : '';
     //en month day year
     //status
     status = (data.status != (null && undefined && '')) ? `\n- ${lang[userLang].status}: *${lang[userLang].KitsuStuff[data.status]}*` : ''; //.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase() })

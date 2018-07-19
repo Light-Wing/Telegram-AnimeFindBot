@@ -1,6 +1,5 @@
 'use strict';
 
-
 require('dotenv').config()
 const token = process.env.TELEGRAM_TOKEN;
 // const port = process.env.PORT || 443;
@@ -29,13 +28,21 @@ const baseUrl = `https://api.telegram.org/bot${token}/`;
 
 let bot = require('./botSetup')
 
+let dataOnUser = require("./userCache");
+let userCache = require('./utils').userCache;
+let rmFrom_dataOnUser = [];
+const DELAY = 60000 * 60 * 24;
 
 bot.getMe().then(function(me) { //self check
-    const botName = me.username;
-    console.log('---\nHello! My name is %s!', me.first_name);
-    console.log(`And my username is @${ botName }\n---`);
-    return botName;
-});
+        const botName = me.username;
+        console.log('---\nHello! My name is %s!', me.first_name);
+        console.log(`And my username is @${ botName }\n---`);
+        return botName;
+    }) //.then(() => {
+    //update usercache from db
+    // let userLang = userCache(msg);
+    //need to make a function to check for db users and fill cache with the info from there...
+    // });
 bot.on("error", err => { //most telegram errors should get caught here
     console.log("Telegram Error " + err.error.error_code + "\nDescription: " + err.error.description + "\nfull report " + JSON.stringify(err))
     return axios.post(baseUrl + "sendMessage", {
@@ -63,112 +70,37 @@ process.on('unhandledRejection', function(reason, p) {
     // application specific logging here
 });
 
-// require("./userCache");
-
-let dataOnUser = require("./userCache");;
-let rmFrom_dataOnUser = [];
-const DELAY = 60000 * 60 * 24;
-
-// setInterval(() => {
-//     console.log(dataOnUser)
-// }, 1000);
-
-function userCache(msg) {
-    let userID = msg.from.id;
-    //check cache, if not there, then check db, if not there, then check getUserLanguage
-    if (dataOnUser[userID] === undefined) {
-        dataOnUser[userID] = {};
-    }
-    dataOnUser[userID]['time'] = new Date().valueOf();
-    if (dataOnUser[userID]['lang'] === undefined) {
-        //then get it ready for next time, but dont wait now...
-        dbs.checkUserLangPrefs(msg)
-            .then(res => {
-                if (res == null) {
-                    dataOnUser[userID]['lang'] = getUserLanguage(msg)
-                } else {
-                    dataOnUser[userID]['lang'] = res
-                }
-            }).catch(function(err) {
-                if (err = 'error') {
-                    lang = getUserLanguage(msg)
-                }
-            });
-        return getUserLanguage(msg)
-    } else {
-        return dataOnUser[userID]['lang']
-    }
-}
-
-function getUserLanguage(msg) {
-    let l = (msg.from != undefined && msg.from.language_code != undefined) ? msg.from.language_code.split("-")[0] : "en";
-    let l2 = (msg.from != undefined && msg.from.language_code != undefined) ? msg.from.language_code : "en";
-    //report.user(msg, 'lang', l2)
-    switch (l) {
-        case "en":
-            return 'en'
-        case "iw" || 'he':
-            return 'he'
-        default:
-            return 'en'
-    }
-};
-bot.on('/updateLang', msg => { //async
-    let userLang = userCache(msg); //await
-
-    let replyMarkup = bot.inlineKeyboard([
-        [bot.inlineButton(lang[userLang].setLang.en, { callback: '/english' }), bot.inlineButton(lang[userLang].setLang.he, { callback: '/hebrew' })],
-        [bot.inlineButton(lang[userLang].cancel, { callback: '/cancel' })]
-    ]);
-    return bot.sendMessage(msg.from.id, lang[userLang].setLang.language, { replyMarkup }); //, ask: 'lang'
-});
-// bot.on('/change', (msg) => {
-//     // console.log(msg)
-//     bot.sendMessage(msg.from.id, 'ok')
-//     dbs.changeUserLangPrefs(msg)
-// });
-// bot.on('/chktable', (msg) => {
-//     // console.log(msg)
-//     bot.sendMessage(msg.from.id, 'ok')
-//     dbs.checkTable(msg)
-// });
-// bot.on('/droptable', (msg) => {
-//     // console.log(msg)
-//     bot.sendMessage(msg.from.id, 'ok')
-//     dbs.dropTable(msg)
-// });
-// bot.on('/table', (msg) => {
-//     // console.log(msg)
-//     bot.sendMessage(msg.from.id, 'ok')
-//     dbs.addTable(msg)
-// });
-
-// bot.on("text", (msg, type) => {
-//     // console.log(msg)
-//     if ((msg.chat.id == 1082225626 || ERR_CHNL_CHAT_ID || -284603852) && (type.type == "text")) {
-//         can_i(msg, type)
-//     }
-// })
-
-// bot.on('text', (msg) => msg.reply.text(msg.text, { asReply: true }));
-
 bot.on('inlineQuery', (msg) => {
     let userLang = userCache(msg);
-    // console.log(msg.from.language_code)
+    let lang;
+    if (dataOnUser[msg.from.id]['lang'] !== (undefined && null)) {
+        lang = dataOnUser[msg.from.id]['lang']
+    } else {
+        lang = (msg.from != undefined && msg.from.language_code != null) ? msg.from.language_code : "en";
+    }
+    report.user(msg, 'lang', lang)
+        // console.log(userLang)
+
     let type = "inline";
     searcher.inline(type, msg, bot, userLang)
 });
 bot.on('callbackQuery', msg => {
-    let userLang = userCache(msg);
-    // console.log(msg)
-    // bot.answerCallbackQuery(msg.id, { text: "Updating..." }); //
-    callbackQuery(bot, msg, userLang)
+    let userPref = userCache(msg, 'both');
+    // console.log('------------', userPref)
+    let lang;
+    if (dataOnUser[msg.from.id]['lang'] !== (undefined && null)) {
+        lang = dataOnUser[msg.from.id]['lang']
+    } else {
+        lang = (msg.from != undefined && msg.from.language_code != null) ? msg.from.language_code : "en";
+    }
+    report.user(msg, 'lang', lang)
+    callbackQuery(bot, msg, userPref)
 });
 
 let reactToCommand = require('./talkToBot/commands').reactToCommand;
 bot.on(['*', '/*'], (msg, self) => {
-    // console.log(self.type)
-    // console.log(msg) //lang[userLang].feedback
+    console.log(msg)
+        // console.log(msg) //lang[userLang].feedback
     if (msg.chat.type == 'private') { //!channel
         if (self.type = ("command") && (msg.chat.id == msg.from.id)) {
             let userLang = userCache(msg);
@@ -184,7 +116,9 @@ bot.on('ask.router', msg => {
     let askWhat = msg.ask
     ask(bot, msg, askWhat, userLang)
 });
-
+// setInterval(() => {
+//     console.log(dataOnUser)
+// }, 1000);
 setInterval(() => {
     for (let userID in dataOnUser) {
         let elapsed_time = new Date().valueOf() - dataOnUser[userID]['time'];
@@ -204,5 +138,9 @@ setInterval(() => {
     }
 }, 60000 * 2 * 60);
 
+//a one time function that runs at bot strt to update cache from db
+
 // Call API
 bot.start();
+
+// https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=jjj%40gmail%2ecom&lc=US&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHostedGuest

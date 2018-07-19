@@ -1,5 +1,8 @@
 'use strict';
 
+let dataOnUser = require("./userCache");;
+const dbs = require("./dbs/dbs");
+
 let _ = {}
 
 _.time = () => {
@@ -29,5 +32,69 @@ _.msToTime = (duration) => {
     let mstime = days + d_h_space + hours + h_m_space + minutes; //+ m_s_space + sec;
     return mstime
 }
+_.userCache = (msg, check) => {
+    let cache = [];
+    let userID = msg.from.id;
+    //check cache, if not there, then check db, if not there, then check getUserLanguage
+    if (dataOnUser[userID] === undefined) {
+        dataOnUser[userID] = {};
+    }
+    dataOnUser[userID]['time'] = new Date().valueOf();
+    if (dataOnUser[userID]['lang'] === undefined || dataOnUser[userID]['desc'] === undefined) {
+        //then get it ready for next time, but dont wait now...
+        dbs.checkUserPrefs(msg)
+            .then(res => {
+                //res[0] -> lang
+                //res[1] -> desc
+                if (res[0] == null) {
+                    dataOnUser[userID]['lang'] = getUserLanguage(msg)
+                } else {
+                    dataOnUser[userID]['lang'] = res[0]
+                }
+                if (res[1] == null) {
+                    dataOnUser[userID]['desc'] = 'sendDesc_silent2'
+                } else {
+                    dataOnUser[userID]['desc'] = res[1]
+                }
+            }).catch(function(err) {
+                if (err = 'error') {
+                    dataOnUser[userID]['lang'] = getUserLanguage(msg)
+                }
+            });
+        if (dataOnUser[userID]['lang'] === undefined) {
+            cache[0] = getUserLanguage(msg)
+        } else {
+            cache[0] = dataOnUser[userID]['lang']
+        }
+        if (dataOnUser[userID]['desc'] === undefined) {
+            cache[1] = 'sendDesc_silent'
+        } else {
+            cache[1] = dataOnUser[userID]['desc']
+        }
+    } else {
+        cache[0] = dataOnUser[userID]['lang']
+        cache[1] = dataOnUser[userID]['desc']
+    }
+    if (check == 'both') {
+        return cache
+    } else {
+        return cache[0]
+    }
+}
+
+function getUserLanguage(msg) {
+    let lang = (msg.from != undefined && msg.from.language_code != (undefined || null)) ? msg.from.language_code.split("-")[0] : "en";
+    switch (lang) {
+        case "en":
+            return 'en'
+        case "iw" || 'he':
+            return 'he'
+        default:
+            return 'en'
+    }
+};
+// setInterval(() => {
+//     console.log(dataOnUser)
+// }, 1000);
 
 module.exports = _;
