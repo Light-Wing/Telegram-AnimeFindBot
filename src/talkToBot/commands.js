@@ -70,7 +70,7 @@ _.reactToCommand = (bot, msg, userLang) => {
             dbs.tryStart()
         };
         if (msgText == "/test") {
-            console.log(msg);
+            // console.log(msg);
             let parseMode = 'Markdown';
             return bot.sendMessage(msg.chat.id, `[inline mention of a user](tg://user?id=${msg.from.id})`, { parseMode });
         };

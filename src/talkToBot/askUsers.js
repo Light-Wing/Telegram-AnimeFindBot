@@ -6,7 +6,7 @@ const userList = {};
 
 module.exports = {
 
-    id: 'askUser',
+    id: 'askUsers',
     defaultConfig: {
         messageTypes: ['text']
     },
@@ -34,7 +34,7 @@ module.exports = {
             // Delete user from list and send custom event
             // delete userList[id];
             // bot.event('ask.' + ask, msg, props);
-
+            // console.log('plugin ask user loaded')
             delete userList[id];
             msg.ask = ask;
             bot.event('ask.router', msg, props);

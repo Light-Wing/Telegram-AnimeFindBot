@@ -6,9 +6,10 @@ const port = process.env.PORT || 443;
 const host = process.env.HOST;
 
 const TeleBot = require('telebot');
-const usePlugins = ['askUser', 'commandButton']; //, 'namedButtons', 'commandButton' , 'floodProtection'
+const usePlugins = ['commandButton']; //, 'namedButtons', 'commandButton' , 'floodProtection'
+// const pluginFolder = '../plugins/';
 // const pluginConfig = {
-//     floodProtection: {
+//     floodProtection: {'askUsers',
 //         interval: 5,
 //         message: 'Too many messages, relax!'
 //     }
@@ -24,8 +25,7 @@ if (process.env.NPM_CONFIG_PRODUCTION) {
     bot = new TeleBot({
         token,
         usePlugins,
-        pluginFolder: '../plugins/',
-        // pluginConfig,
+        // pluginConfig, pluginFolder,
         webHook: { port: port, host: host }
     });
 } else {
@@ -33,10 +33,11 @@ if (process.env.NPM_CONFIG_PRODUCTION) {
     bot = new TeleBot({
         token,
         usePlugins,
-        pluginFolder: '../plugins/',
         // pluginConfig,
         polling: true
     });
 };
+bot.plug(require('./talkToBot/askUsers'))
+
 
 module.exports = bot;
