@@ -11,9 +11,19 @@ _.time = () => {
     return time
 }
 
-_.msToTime = (duration) => {
+_.msToTime = (duration, userLang) => {
     if (duration < 0) {
         return 0
+    }
+    let h, m, d;
+    if (userLang == 'he') {
+        h = ' שעות';
+        m = ' דקות';
+        d = ' ימים';
+    } else {
+        h = 'h';
+        m = 'm';
+        d = 'd';
     }
     let
     // sec = parseInt((duration / (1000)) % 60),
@@ -26,9 +36,9 @@ _.msToTime = (duration) => {
     // m_s_space = ((hours > 0) && ((minutes > 0) || (sec > 0))) ? " " : "";
     h_m_space = ((hours > 0) && (minutes > 0)) ? " " : "";
     // sec = (sec > 0) ? sec + "s" : "";
-    minutes = (minutes > 0) ? minutes + "m" : "";
-    hours = (hours > 0) ? hours + "h" : "";
-    days = (days > 0) ? days + "d" : "";
+    minutes = (minutes > 0) ? minutes + m : "";
+    hours = (hours > 0) ? hours + h : "";
+    days = (days > 0) ? days + d : "";
     let mstime = days + d_h_space + hours + h_m_space + minutes; //+ m_s_space + sec;
     return mstime
 }

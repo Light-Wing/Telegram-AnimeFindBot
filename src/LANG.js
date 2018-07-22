@@ -71,7 +71,7 @@ _.he = {
     end_date: "תאריך סיום",
     nextRelease: "פרק הבא יצא בעוד",
     status: "סטטוס",
-    KitsuStuff: {
+    kitsuStuff: {
         'anime': 'Anime', //אנימה
         'TV': 'TV',
         'movie': 'Movie', //סרט
@@ -208,7 +208,7 @@ _.en = {
     end_date: "End date",
     nextRelease: "Next Ep Air Date",
     status: "Status",
-    KitsuStuff: {
+    kitsuStuff: {
         'anime': 'Anime',
         'characters': 'Character',
         'TV': 'TV',

@@ -121,7 +121,7 @@ _.getUsefulData = aniData => {
     titleJP = aniData.title.native != null ? `🇯🇵 ${aniData.title.native}\n` : '';
     titleEN = aniData.title.english != null ? `🇬🇧 ${aniData.title.english}\n` : '';
     //genres
-    genres = aniData.genres != '' ? `\n- Genres: ${JSON.stringify(aniData.genres).replace(/","/g,', ').replace(/"/g,'')}` : '';
+    genres = aniData.genres !== '' ? `\n- Genres: ${JSON.stringify(aniData.genres).replace(/","/g,', ').replace(/"/g,'')}` : '';
     //cover - banner
     //imageCover = aniData.coverImage.large != null ? `[\u200B](${aniData.coverImage.large})` : '';
     imageCover = aniData.bannerImage != null ? `[\u200B](${aniData.bannerImage})` : (aniData.coverImage.large != null ? `[\u200B](${aniData.coverImage.large})` : '');

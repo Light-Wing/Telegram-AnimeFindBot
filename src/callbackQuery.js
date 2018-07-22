@@ -8,6 +8,8 @@ const dbs = require("./dbs/dbs");
 let dataOnUser = require("./userCache");;
 let lang = require('./LANG');
 let getPic = require('./search/getPic')
+const genreList = require("./langFiles/genres");
+
 
 _ = (bot, msg, userPref) => {
     let userLang = userPref[0]
@@ -126,15 +128,29 @@ _ = (bot, msg, userPref) => {
                             break
                     }
                     message = messageSent(data, userLang, data.type, data.id)
-                    bot.sendMessage(msg.from.id, message, { notification, parseMode: 'Markdown' }) //cant send to msg.chat.id, need to find another way    
+                    bot.sendMessage(msg.from.id, message, { notification, parseMode: 'Markdown' }).catch(err => { //cant send to msg.chat.id, need to find another way    
+                        if (err.error_code == 403) {
+                            report.error(err.description, '', false)
+                            report.user(msg, 'error', err.description.replace(/(`)/g, '') + ' ' + err.error_code)
+                            console.log(err.description)
+                        } else {
+                            console.log(err)
+                        }
+                    })
                 }
                 return re
             }).then(function(res) {
-                return bot.answerCallbackQuery(msg.id, { text: res, showAlert: true, cacheTime: 604800000 }); //604800000
+                return bot.answerCallbackQuery(msg.id, { text: res, showAlert: true, cacheTime: 604800 }); //604800000
             }).then(() => {
                 let timeDiff = new Date().valueOf() - startTime;
                 let msgText = 'Description took ' + timeDiff + 'ms';
                 report.user(msg, "desc", msgText, timeDiff);
+            }).catch(err => {
+                if (err.error_code == 403) {
+                    console.log(err.description)
+                } else {
+                    console.log(err)
+                }
             });
             break;
         case 'nxt':
@@ -144,8 +160,8 @@ _ = (bot, msg, userPref) => {
                 let timeDiff = currentSavedEP - new Date().valueOf()
                     // console.log(timeDiff)
 
-                let nextEpAir = utils.msToTime(timeDiff);
-                return bot.answerCallbackQuery(msg.id, { text: "Next Ep Airs in:\n" + nextEpAir, showAlert: true, cacheTime: 30000 }).then(() => {
+                let nextEpAir = utils.msToTime(timeDiff, userLang);
+                return bot.answerCallbackQuery(msg.id, { text: lang[userLang].nextRelease + ":\n" + nextEpAir, showAlert: true, cacheTime: 40 }).then(() => {
                     let timeDiff = new Date().valueOf() - startTime;
                     let extraInfo = false; // 'Next Ep Air Date took ' + timeDiff + 'ms (without extra lookup)😁';
                     report.user(msg, "next", extraInfo, timeDiff);
@@ -157,8 +173,8 @@ _ = (bot, msg, userPref) => {
                     return resToMilisec
                 }).then(res => {
                     let timeDiff = res - new Date().valueOf()
-                    let nextEpAir = utils.msToTime(timeDiff);
-                    return bot.answerCallbackQuery(msg.id, { text: "Next Ep Airs in:\n" + nextEpAir, showAlert: true, cacheTime: 30000 });
+                    let nextEpAir = utils.msToTime(timeDiff, userLang);
+                    return bot.answerCallbackQuery(msg.id, { text: lang[userLang].nextRelease + ":\n" + nextEpAir, showAlert: true, cacheTime: 40 });
                 }).then(() => {
                     let timeDiff = new Date().valueOf() - startTime;
                     let extraInfo = true; // 'Next Ep Air Date took ' + timeDiff + 'ms (with extra lookup)😔';
@@ -176,11 +192,17 @@ _ = (bot, msg, userPref) => {
                     }
                     genres_sting += lang[userLang].genres + ':\n'
                     for (let i = 0, len = res.meta.count; i < len; i++) {
-                        genres_sting += '-' + res.data[i].name + '\n' //(i != len - 1 ? ', ' : '');
+                        let genre
+                        if (userLang == 'he') {
+                            genre = genreList[res.data[i].name][1]
+                        } else if (userLang == 'en') {
+                            genre = genreList[res.data[i].name][0]
+                        }
+                        genres_sting += '-' + genre + '\n' //(i != len - 1 ? ', ' : '');
                     }
                     return genres_sting
                 }).then(res => {
-                    bot.answerCallbackQuery(msg.id, { text: res, showAlert: true, cacheTime: 604800000 });
+                    bot.answerCallbackQuery(msg.id, { text: res, showAlert: true, cacheTime: 604800 }); //604800000
                 })
                 .then(() => {
                     let timeDiff = new Date().valueOf() - startTime;
@@ -195,46 +217,26 @@ _ = (bot, msg, userPref) => {
     }
 }
 
-function updateDescKeyboard(userLang, data) {
-
-    let apples = 'apples';
-    let oranges = 'oranges';
-
-    if (fruit == 'apples') {
-        apples = `==> ${ apples } <==`;
-    } else {
-        oranges = `==> ${ oranges } <==`;
-    }
-
-    return bot.inlineKeyboard([
-        [
-            bot.inlineButton(apples, { callback: 'apples' }),
-            bot.inlineButton(oranges, { callback: 'oranges' })
-        ]
-    ]);
-
-}
-
 function messageSent(data, userLang, type, id) {
     //titles - romaji english native
-    let titleRJ = data.titles.en_jp != (null && undefined && '') ? `🇺🇸 [${data.titles.en_jp}](https://kitsu.io/${type}/${id})\n` : (data.canonicalTitle != (null || undefined) ? `🇺🇸 [${data.canonicalTitle}](https://kitsu.io/${type}/${id})\n` : '');
-    let titleJP = data.titles.ja_jp != (null && undefined && '') ? `🇯🇵 ${data.titles.ja_jp}\n` : '';
-    let titleEN = data.titles.en != (null && undefined && '') ? `🇬🇧 ${data.titles.en}\n` : '';
+    let titleRJ = data.titles.en_jp ? `🇺🇸 [${data.titles.en_jp}](https://kitsu.io/${type}/${id})\n` : (data.canonicalTitle != (null || undefined) ? `🇺🇸 [${data.canonicalTitle}](https://kitsu.io/${type}/${id})\n` : '');
+    let titleJP = data.titles.ja_jp ? `🇯🇵 ${data.titles.ja_jp}\n` : '';
+    let titleEN = data.titles.en ? `🇬🇧 ${data.titles.en}\n` : '';
     //cover - banner
     //imageCover = data.coverImage.large != null ? `[\u200B](${data.coverImage.large})` : '';
     let pic = getPic(data, 'full')
     let imageCover = pic != null ? `[\u200B](${pic})` : null;
     //trailer
-    let trailer = (data.youtubeVideoId != (null && undefined && '')) ? (`🎥 [${lang[userLang].trailer}](https://youtu.be/${data.youtubeVideoId})\n`) : '';
+    let trailer = (data.youtubeVideoId) ? (`🎥 [${lang[userLang].trailer}](https://youtu.be/${data.youtubeVideoId})\n`) : '';
     //eps 
-    let episodeCount = data.episodeCount != (null && undefined && '') ? `\n- ${lang[userLang].episodes}: *${data.episodeCount}*` : '';
-    let episodeLength = (data.episodeLength != (null && undefined && '') && data.episodeCount != (null && undefined && '')) ? ` (${data.episodeLength} ${lang[userLang].minutes_per_episode})` : '';
+    let episodeCount = data.episodeCount ? `\n- ${lang[userLang].episodes}: *${data.episodeCount}*` : '';
+    let episodeLength = (data.episodeLength && data.episodeCount) ? ` (${data.episodeLength} ${lang[userLang].minutes_per_episode})` : '';
     //volumes 
     // these two dont work yet, need to get kitsu to search manga as well
-    let volumes = data.volumes != (null && undefined && '') ? `\n- ${lang[userLang].volumes}: *${data.volumes}*` : '';
+    let volumes = data.volumes ? `\n- ${lang[userLang].volumes}: *${data.volumes}*` : '';
     //chapters
     // these two dont work yet, need to get kitsu to search manga as well
-    let chapters = data.chapters != (null && undefined && '') ? `\n- ${lang[userLang].chapters}: *${data.chapters}*` : '';
+    let chapters = data.chapters ? `\n- ${lang[userLang].chapters}: *${data.chapters}*` : '';
     //description
     let description = (data.synopsis != null) ? `\n\n${data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')}` : '';
     //message text - removed: ${description}

@@ -8,6 +8,9 @@ let report = require("../report");
 
 let con;
 
+// connectionLimit: 15,
+// queueLimit: 30,
+// acquireTimeout: 1000000
 function handleDisconnect() {
     con = mysql.createConnection({
         host: process.env.DB_HOST,
@@ -25,7 +28,7 @@ function handleDisconnect() {
     }); // process asynchronous requests in the meantime.
     // If you're also serving http, display a 503 error.
     con.on('error', function(err) {
-        console.log('db error', err.stack);
+        console.log('db error', err.message, err.code, err.errno);
         if (err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
             handleDisconnect(); // lost due to either server restart, or a
         } else { // connnection idle timeout (the wait_timeout

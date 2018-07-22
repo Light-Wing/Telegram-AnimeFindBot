@@ -15,7 +15,7 @@ _.commandList = [
     '/search'
 ]
 _.reactToCommand = (bot, msg, userLang) => {
-    let msgText = msg.text;
+    let msgText = msg.text.toLowerCase();
     if (msgText == "/start") {
         // console.log(msg)
         let replyMarkup = bot.inlineKeyboard([
@@ -58,6 +58,7 @@ _.reactToCommand = (bot, msg, userLang) => {
     }
     //dev area 
     if (msg.from.id == process.env.DEV_TELEGRAM_ID) {
+        // console.log(msg)
         if (msgText == '/restart') {
             setTimeout(() => {
                 bot.stop('stop')
@@ -66,9 +67,12 @@ _.reactToCommand = (bot, msg, userLang) => {
                 bot.start()
             }, 2000)
         };
-        if (msgText == '/tryConnecting') {
-            dbs.tryStart()
+        if (msgText == '/sendpm') {
+            return bot.sendMessage(msg.chat.id, "send pm to who? (chad id or forwarded message)", { ask: 'sendTo' });
         };
+        if (msg.forward_from) {
+            bot.sendMessage(msg.chat.id, `User ID: \`${msg.forward_from.id}\``, { replyToMessage: msg.message_id, parseMode: 'markdown' });
+        }
         if (msgText == "/test") {
             // console.log(msg);
             let parseMode = 'Markdown';

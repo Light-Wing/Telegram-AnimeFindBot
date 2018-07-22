@@ -13,7 +13,9 @@ _ = (Data, nextOffset, bot, msg, userLang, count) => { //nextOffset: nextOffset,
     // )
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i].attributes;
-        if (!data.canonicalTitle.includes('delete') && data.ageRatingGuide != "Mild Nudity") {
+        // console.log(data.subtype)
+
+        if (!data.canonicalTitle.includes('delete')) { // && data.ageRatingGuide != "Mild Nudity"
             // console.log(data.id)
             let dateToMilisec = (data.nextRelease != null) ? new Date(data.nextRelease.replace(' ', 'T').replace(' ', '')).valueOf() : "";
             let replyMarkup = bot.inlineKeyboard([
@@ -21,11 +23,19 @@ _ = (Data, nextOffset, bot, msg, userLang, count) => { //nextOffset: nextOffset,
                 (data.nextRelease != null) ? [bot.inlineButton(lang[userLang].nextRelease, { callback: (Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-nxt-' + dateToMilisec) })] : []
             ]);
             let thumb = getPic(data, 'thumb');
-
+            let desc = data.synopsis != (null && undefined) ? data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\n{2,}/g, '\n\n') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
+            if (desc == (null || undefined || '')) {
+                desc = lang[userLang].desc_not_available;
+            } else if (desc.length >= 100) {
+                desc = desc.substring(0, 100);
+                let last = desc.lastIndexOf(" ");
+                desc = desc.substring(0, last);
+                desc = desc + "...";
+            }
             var searchResault = {
                 id: Data[i].id,
-                title: `[${lang[userLang].KitsuStuff[Data[i].type]}] ${data.canonicalTitle}`,
-                description: `${(data.synopsis != (null && undefined && '')) ? JSON.stringify(data.synopsis) : lang[userLang].desc_not_available}`, //.replace(/<(?:.|\n)*?>/gm, '')
+                title: `[${lang[userLang].kitsuStuff[data.subtype]}] ${data.canonicalTitle}`,
+                description: desc,
                 thumb_url: thumb,
                 input_message_content: {
                     message_text: animeSearch.messageSent(data, userLang, Data[i].type, Data[i].id),

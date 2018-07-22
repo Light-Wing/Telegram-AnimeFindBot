@@ -70,6 +70,11 @@ process.on('unhandledRejection', function(reason, p) {
     // application specific logging here
 });
 
+// bot.on('/genre', async msg => {
+//     let list = await searcher.getGenres2()
+//     console.log(list)
+//     bot.sendMessage(process.env.DEV_TELEGRAM_ID, list.toString()) //.replace(/,/g, '\n'))
+// })
 bot.on('inlineQuery', (msg) => {
     let userLang = userCache(msg);
     let lang;

@@ -5,6 +5,7 @@ let lang = require('../LANG');
 let report = require("../report");
 let commandList = require('./commands').commandList;
 
+let sendTo_userID
 _.ask = (bot, msg, askWhat, userLang, pref) => {
     if (msg.text == '/cancel' || commandList.includes(msg.text) || msg.text == lang['he'].cancel || msg.text == lang['en'].cancel) {
         //console.log("canceld")
@@ -38,6 +39,17 @@ _.ask = (bot, msg, askWhat, userLang, pref) => {
             return bot.sendMessage(msg.chat.id, lang[userLang].feedbackThanks.g_feedback);
         case 'lang':
             break;
+        case 'sendTo':
+            sendTo_userID = parseInt(msg.text)
+            return bot.sendMessage(msg.chat.id, 'what should i send', { ask: 'sendWhat', replyToMessage: msg.message_id });
+        case 'sendWhat':
+            return bot.sendMessage(sendTo_userID, msg.text).then(() => {
+                bot.sendMessage(msg.chat.id, 'sent', { replyToMessage: msg.message_id })
+                sendTo_userID = undefined;
+            }).catch(err => {
+                bot.sendMessage(msg.chat.id, 'Error - Code: ' + err.error_code + '\n' + err.description, { replyToMessage: msg.message_id })
+                sendTo_userID = undefined;
+            });
         default:
             return
     }

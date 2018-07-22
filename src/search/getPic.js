@@ -4,7 +4,7 @@ module.exports = (data, what, pref) => {
     //what = thumb, full
     //pref = posterImage, coverImage
     let tinyPoster, tinyCover, mediumPoster, mediumCover, largePoster, largeCover, originalPoster, originalCover;
-    if (data.posterImage != (null && undefined && '')) {
+    if (data.posterImage) {
         tinyPoster = data.posterImage.tiny != null ? data.posterImage.tiny : (data.posterImage.small != null ? data.posterImage.small : null);
         mediumPoster = data.posterImage.medium != null ? data.posterImage.medium : null;
         largePoster = data.posterImage.large != null ? data.posterImage.large : null;
@@ -15,7 +15,7 @@ module.exports = (data, what, pref) => {
         largePoster = null;
         originalPoster = null;
     }
-    if (data.coverImage != (null && undefined && '')) {
+    if (data.coverImage) {
         tinyCover = data.coverImage.tiny != null ? data.coverImage.tiny : null;
         mediumCover = data.coverImage.medium != null ? data.coverImage.medium : null;
         largeCover = data.coverImage.large != null ? data.coverImage.large : null;

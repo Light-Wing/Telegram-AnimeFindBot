@@ -13,9 +13,9 @@ _ = (Data, nextOffset, bot, msg, userLang) => {
 
         var searchResault = {
             id: Data[i].id,
-            title: `[${lang[userLang].KitsuStuff[Data[i].type]}] ${data.canonicalName}`,
-            description: ((data.description) != (null && undefined && '')) ? sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, " ").replace(/\n{2,}/g, ' ') : lang[userLang].desc_not_available, //.replace(/<(?:.|\n)*?>/gm, '')
-            thumb_url: (data.image != (null && undefined && '')) ? data.image.original : undefined,
+            title: `[${lang[userLang].kitsuStuff[Data[i].type]}] ${data.canonicalName}`,
+            description: ((data.description)) ? sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, " ").replace(/\n{2,}/g, ' ') : lang[userLang].desc_not_available, //.replace(/<(?:.|\n)*?>/gm, '')
+            thumb_url: (data.image) ? data.image.original : undefined,
             input_message_content: {
                 message_text: messageSent(data, Data[i].type, Data[i].id),
                 parse_mode: 'Markdown',
@@ -25,8 +25,8 @@ _ = (Data, nextOffset, bot, msg, userLang) => {
         // var searchResaultPhoto = {
         //     id: Data[i].id,
         //     caption: 'Telegram logo.', //messageSent(data, Data[i].type, Data[i].id),
-        //     photo_url: (data.image != (null && undefined && '')) ? data.image.original.split('?')[0] : 'undefined',
-        //     thumb_url: (data.image != (null && undefined && '')) ? data.image.original.split('?')[0] : 'undefined',
+        //     photo_url: (data.image  ) ? data.image.original.split('?')[0] : 'undefined',
+        //     thumb_url: (data.image  ) ? data.image.original.split('?')[0] : 'undefined',
         // }
         // console.log(searchResaultPhoto)
         // results.addPhoto(searchResaultPhoto);
@@ -63,20 +63,20 @@ _ = (Data, nextOffset, bot, msg, userLang) => {
 function messageSent(data, type, id) {
     let titleEN, titleJP, titleRJ, image, malId, description, aka;
     //titles - romaji english native
-    titleRJ = data.names.en != (null && undefined && '') ? `[${data.names.en}](https://kitsu.io/${type}/${id})\n` : (data.canonicalName != (null || undefined) ? `[${data.canonicalName}](https://kitsu.io/${type}/${id})\n` : '');
-    titleJP = data.names.ja_jp != (null && undefined && '') ? `${data.names.ja_jp}\n` : '';
-    titleEN = data.names.en_jp != (null && undefined && '') ? `${data.names.en_jp}\n` : '';
+    titleRJ = data.names.en ? `[${data.names.en}](https://kitsu.io/${type}/${id})\n` : (data.canonicalName != (null || undefined) ? `[${data.canonicalName}](https://kitsu.io/${type}/${id})\n` : '');
+    titleJP = data.names.ja_jp ? `${data.names.ja_jp}\n` : '';
+    titleEN = data.names.en_jp ? `${data.names.en_jp}\n` : '';
     //add to aka a space after each ,
-    aka = data.otherNames != (null && undefined && '') ? `A.K.A: ${data.otherNames.toString()}` : '';
+    aka = data.otherNames ? `A.K.A: ${data.otherNames.toString()}` : '';
     // console.log(aka, data.otherNames, data.otherNames.toString())
 
     // let pic = getPic(data, 'full')
-    image = (data.image != (null && undefined && '')) ? `[\u200B](${data.image.original})` : '';
+    image = (data.image) ? `[\u200B](${data.image.original})` : '';
 
     //status
-    malId = (data.malId != (null && undefined && '')) ? `\n- MAL ID: *${data.malId}*` : '';
+    malId = (data.malId) ? `\n- MAL ID: *${data.malId}*` : '';
     //description
-    description = (data.description != (null && undefined && '')) ? `\n\n ${sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, ' ')}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')
+    description = (data.description) ? `\n\n ${sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, ' ')}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')
     if (description.length >= 400) {
         description = description.substring(0, 400);
         let last = description.lastIndexOf(" ");

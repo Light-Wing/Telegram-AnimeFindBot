@@ -2,6 +2,7 @@
 
 let getPic = require('./getPic')
 let lang = require('../LANG');
+const ageRateGuideList = require("../langFiles/ageRatingGuide");
 
 
 let _ = {}
@@ -14,7 +15,7 @@ _ = (Data, nextOffset, bot, msg, userLang, count) => {
         for (let i = 0, len = Data.length; i < len; i++) {
             let data = Data[i].attributes;
             // console.log(data)
-            if (!data.canonicalTitle.includes('delete') && data.ageRatingGuide != "Mild Nudity") { //
+            if (!data.canonicalTitle.includes('delete')) { // && data.ageRatingGuide != "Mild Nudity"
                 // console.log('dataid', Data[i].id)
                 let dateToMilisec = (data.nextRelease != null) ? new Date(data.nextRelease.replace(' ', 'T').replace(' ', '')).valueOf() : "";
                 let replyMarkup = bot.inlineKeyboard([
@@ -32,10 +33,9 @@ _ = (Data, nextOffset, bot, msg, userLang, count) => {
                     desc = desc.substring(0, last);
                     desc = desc + "...";
                 }
-
                 var searchResault = {
                     id: Data[i].id,
-                    title: `[${lang[userLang].KitsuStuff[Data[i].type]}] ${data.canonicalTitle}`,
+                    title: `[${lang[userLang].kitsuStuff[data.subtype]}] ${data.canonicalTitle}`, //
                     description: desc,
                     thumb_url: thumb,
                     input_message_content: {
@@ -159,47 +159,62 @@ _ = (Data, nextOffset, bot, msg, userLang, count) => {
 _.messageSent = (data, userLang, type, id) => {
     let titleEN, titleJP, titleRJ, imageCover, ageRating, ageRatingGuide, episodeCount, StartDate, EndDate, episodeLength, trailer, volumes, chapters, startDate, sday, smonth, syear, endDate, eday, emonth, eyear, status, averageScore, popularity;
     //titles - romaji english native
-    titleRJ = data.titles.en_jp != (null && undefined && '') ? `🇺🇸 [${data.titles.en_jp}](https://kitsu.io/${type}/${id})\n` : (data.canonicalTitle != (null || undefined) ? `🇺🇸 [${data.canonicalTitle}](https://kitsu.io/${type}/${id})\n` : '');
-    titleJP = data.titles.ja_jp != (null && undefined && '') ? `🇯🇵 ${data.titles.ja_jp}\n` : '';
-    titleEN = data.titles.en != (null && undefined && '') ? `🇬🇧 ${data.titles.en}\n` : '';
+    titleRJ = data.titles.en_jp ? `🇺🇸 [${data.titles.en_jp}](https://kitsu.io/${type}/${id})\n` : (data.canonicalTitle ? `🇺🇸 [${data.canonicalTitle}](https://kitsu.io/${type}/${id})\n` : '');
+    titleJP = data.titles.ja_jp ? `🇯🇵 ${data.titles.ja_jp}\n` : '';
+    titleEN = data.titles.en ? `🇬🇧 ${data.titles.en}\n` : '';
     //cover - banner
     //imageCover = data.coverImage.large != null ? `[\u200B](${data.coverImage.large})` : '';
     let pic = getPic(data, 'full')
     imageCover = pic != null ? `[\u200B](${pic})` : null;
     //trailer
-    trailer = (data.youtubeVideoId != (null && undefined && '')) ? (`🎥 [${lang[userLang].trailer}](https://youtu.be/${data.youtubeVideoId})\n`) : '';
+    trailer = data.youtubeVideoId ? (`🎥 [${lang[userLang].trailer}](https://youtu.be/${data.youtubeVideoId})\n`) : '';
     //eps 
-    episodeCount = data.episodeCount != (null && undefined && '') ? `\n- ${lang[userLang].episodes}: *${data.episodeCount}*` : '';
-    episodeLength = (data.episodeLength != (null && undefined && '') && data.episodeCount != (null && undefined && '')) ? ` (${data.episodeLength} ${lang[userLang].minutes_per_episode})` : '';
+    episodeCount = data.episodeCount ? `\n- ${lang[userLang].episodes}: *${data.episodeCount}*` : '';
+    episodeLength = (data.episodeLength && data.episodeCount) ? ` (${data.episodeLength} ${lang[userLang].minutes_per_episode})` : '';
     //volumes 
-    // these two dont work yet, need to get kitsu to search manga as well
-    volumes = data.volumes != (null && undefined && '') ? `\n- ${lang[userLang].volumes}: *${data.volumes}*` : '';
+    volumes = data.volumes ? `\n- ${lang[userLang].volumes}: *${data.volumes}*` : '';
     //chapters
-    // these two dont work yet, need to get kitsu to search manga as well
-    chapters = data.chapters != (null && undefined && '') ? `\n- ${lang[userLang].chapters}: *${data.chapters}*` : '';
+    chapters = data.chapters ? `\n- ${lang[userLang].chapters}: *${data.chapters}*` : '';
     //startDate startDate nextRelease year-month-day
-    StartDate = (data.startDate != (null && undefined && '')) ? data.startDate.split('-') : ''
-    startDate = (data.startDate != (null && undefined && '')) ? `${lang[userLang].start_date}` : '';
-    sday = (StartDate[2] != (null && undefined && '')) ? `${lang[userLang].days[StartDate[2]]}` : '';
-    smonth = (StartDate[1] != (null && undefined && '')) ? `${lang[userLang].months[StartDate[1]]}` : '';
-    syear = (StartDate[0] != (null && undefined && '')) ? `${StartDate[0]}` : '';
-    let sdate = StartDate != '' ? `\n- ${startDate}: *${userLang == 'en' ? (smonth + ' ' + sday + ', ' + syear) :  (sday + ' ' + smonth + ', ' + syear)}*` : '';
+    StartDate = data.startDate ? data.startDate.split('-') : ''
+    startDate = data.startDate ? `${lang[userLang].start_date}` : '';
+    sday = StartDate[2] ? `${lang[userLang].days[StartDate[2]]}` : '';
+    smonth = StartDate[1] ? `${lang[userLang].months[StartDate[1]]}` : '';
+    syear = StartDate[0] ? `${StartDate[0]}` : '';
+    let sdate = StartDate !== '' ? `\n- ${startDate}: *${userLang == 'en' ? (smonth + ' ' + sday + ', ' + syear) :  (sday + ' ' + smonth + ', ' + syear)}*` : '';
     //endDate endDate
-    EndDate = (data.endDate != (null || undefined)) ? data.endDate.split('-') : '';
+    EndDate = data.endDate ? data.endDate.split('-') : '';
     // console.log(EndDate, StartDate)
-    endDate = (data.endDate != (null && undefined && '')) ? `${lang[userLang].end_date}` : '';
-    eday = (EndDate[2] != (null && undefined && '')) ? `${lang[userLang].days[EndDate[2]]}` : '';
-    emonth = (EndDate[1] != (null && undefined && '')) ? `${lang[userLang].months[EndDate[1]]}` : '';
-    eyear = (EndDate[0] != (null && undefined && '')) ? `${EndDate[0]}` : '';
-    let edate = EndDate != '' ? `\n- ${endDate}: *${userLang == 'en' ? (emonth + ' ' + eday + ', ' + eyear) :  (eday + ' ' + emonth + ', ' + eyear)}*` : '';
+    endDate = data.endDate ? `${lang[userLang].end_date}` : '';
+    eday = EndDate[2] ? `${lang[userLang].days[EndDate[2]]}` : '';
+    emonth = EndDate[1] ? `${lang[userLang].months[EndDate[1]]}` : '';
+    eyear = EndDate[0] ? `${EndDate[0]}` : '';
+    let edate = EndDate !== '' ? `\n- ${endDate}: *${userLang == 'en' ? (emonth + ' ' + eday + ', ' + eyear) :  (eday + ' ' + emonth + ', ' + eyear)}*` : '';
     //en month day year
     //status
-    status = (data.status != (null && undefined && '')) ? `\n- ${lang[userLang].status}: *${lang[userLang].KitsuStuff[data.status]}*` : ''; //.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase() })
-    averageScore = (data.averageScore != (null && undefined && '')) ? `\n- ${lang[userLang].score}: *${data.averageScore}*` : '';
-    popularity = (data.popularity != (null && undefined && '')) ? `\n- ${lang[userLang].popularity}: *${data.popularity}*` : '';
+    status = data.status ? `\n- ${lang[userLang].status}: *${lang[userLang].kitsuStuff[data.status]}*` : ''; //.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase() })
+    averageScore = data.averageScore ? `\n- ${lang[userLang].score}: *${data.averageScore}*` : '';
+    popularity = data.popularity ? `\n- ${lang[userLang].popularity}: *${data.popularity}*` : '';
     //rating ageRating ageRatingGuide
-    ageRating = (data.ageRating != (null && undefined && '')) ? `\n- ${lang[userLang].rated}: *${data.ageRating}*` : '';
-    ageRatingGuide = ((data.ageRating != (null && undefined && '')) && (data.ageRatingGuide != (null && undefined && ''))) ? ` - ${data.ageRatingGuide}` : '';
+    ageRating = data.ageRating ? `\n- ${lang[userLang].rated}: *${data.ageRating}*` : '';
+    if (data.ageRating) { //ageRating
+        if (userLang === 'he') {
+            if (data.ageRatingGuide) {
+                ageRatingGuide = ageRateGuideList[data.ageRatingGuide.toLowerCase()] ? ` - ${ageRateGuideList[data.ageRatingGuide.toLowerCase()][1]}` : ` - ${data.ageRatingGuide}`;
+            } else {
+                ageRatingGuide = '';
+            }
+        } else if (userLang === 'en') {
+            if (data.ageRatingGuide) {
+                ageRatingGuide = ageRateGuideList[data.ageRatingGuide.toLowerCase()] ? ` - ${ageRateGuideList[data.ageRatingGuide.toLowerCase()][0]}` : ` - ${data.ageRatingGuide}`;
+            } else {
+                ageRatingGuide = '';
+            }
+        }
+    } else {
+        ageRatingGuide = '';
+    }
+    // console.log('logging2 ', ageRatingGuide + '\n'); //
     //description
     // description = (data.synopsis != null) ? `\n\n ${data.synopsis}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')
     //message text - removed: ${description}
