@@ -15,9 +15,12 @@ _.commandList = [
     '/search'
 ]
 _.reactToCommand = (bot, msg, userLang) => {
+    // console.log(msg)
     let msgText = msg.text.toLowerCase();
+    if (msg.text == '/cancel' || msg.text == lang['he'].cancel || msg.text == lang['en'].cancel) {
+        return bot.sendMessage(msg.chat.id, lang[userLang].cancelled, { replyMarkup: 'hide' });
+    }
     if (msgText == "/start") {
-        // console.log(msg)
         let replyMarkup = bot.inlineKeyboard([
             [bot.inlineButton(lang[userLang].check_it_out, { inlineCurrent: '' })]
         ]);
@@ -26,8 +29,10 @@ _.reactToCommand = (bot, msg, userLang) => {
         return bot.sendMessage(msg.from.id, hiText, { replyMarkup });
     }
     if (msgText == "/example") {
-        let text = lang[userLang].example
-        return bot.sendMessage(msg.from.id, text, { replyMarkup: 'hide' });
+        return bot.sendMessage(msg.from.id, lang[userLang].example, { replyMarkup: 'hide' });
+    }
+    if (msg.text == '/cancel' || msg.text == lang['he'].cancel || msg.text == lang['en'].cancel) {
+        return bot.sendMessage(msg.chat.id, lang[userLang].cancelled, { replyMarkup: 'hide' });
     }
     if (msgText == "/feedback") {
         // let replyMarkup = bot.inlineKeyboard([

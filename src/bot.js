@@ -104,12 +104,11 @@ bot.on('callbackQuery', msg => {
 
 let reactToCommand = require('./talkToBot/commands').reactToCommand;
 bot.on(['*', '/*'], (msg, self) => {
-    // console.log(msg)
+    // console.log(self)
     // console.log(msg) //lang[userLang].feedback
     if (msg.chat.type == 'private') { //!channel
-        if (self.type = ("command") && (msg.chat.id == msg.from.id)) {
+        if (msg.chat.id == msg.from.id) { //self.type == ("command") && 
             let userLang = userCache(msg);
-            // console.log("command")
             reactToCommand(bot, msg, userLang)
         }
     }
