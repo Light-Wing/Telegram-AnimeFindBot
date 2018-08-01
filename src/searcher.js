@@ -142,10 +142,10 @@ _.inline = (type, msg, bot, userLang) => {
                     nextOffset = ((msg.offset !== '') ? parseInt(msg.offset) + 1 : 1)
                     if (query.length > 0) {
                         let anilistQuery = anilist.queryAniList(query, nextOffset);
-                        console.log('nextOffset', anilistQuery)
+                        // console.log('nextOffset', anilistQuery)
                         fetch(anilistQuery.url, anilistQuery.options)
                             .then(handleResponse => {
-                                console.log(`---\nAniList fetch status: ${handleResponse.statusText}\n---`)
+                                // console.log(`---\nAniList fetch status: ${handleResponse.statusText}\n---`)
                                 return handleResponse.json().then(function(json) {
                                     return handleResponse.ok ? json : Promise.reject(json);
                                 });

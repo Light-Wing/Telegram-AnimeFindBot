@@ -11,15 +11,16 @@ _.getResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
 
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i]
+        let nextEpAir2, nextEpAir
         if (data.nextAiringEpisode) {
-            console.log(data.nextAiringEpisode)
+            // console.log(data.nextAiringEpisode)
             let timeDiff = data.nextAiringEpisode.airingAt - new Date().valueOf()
-            let nextEpAir = utils.msToTime(data.nextAiringEpisode.airingAt, userLang);
-            let nextEpAir2 = utils.msToTime(data.nextAiringEpisode.timeUntilAiring, userLang);
-            console.log(nextEpAir, i)
-            console.log(nextEpAir2, i)
+            nextEpAir = utils.msToTime(data.nextAiringEpisode.airingAt, userLang);
+            nextEpAir2 = utils.msToTime(data.nextAiringEpisode.timeUntilAiring, userLang);
+            // console.log(nextEpAir, i)
+            // console.log(nextEpAir2, i)
         } else {
-            console.log('no nextAiringEpisode', i)
+            // console.log('no nextAiringEpisode', i)
         }
 
         let dateToMilisec = (data.nextRelease) ? new Date(data.nextRelease.replace(' ', 'T').replace(' ', '')).valueOf() : "";
@@ -206,7 +207,7 @@ _.messageSent = (aniData, userLang) => {
     //eps
     episodes = aniData.episodes ? `\n- ${lang[userLang].episodes}: *${aniData.episodes}*` : '';
     let episodeLength = (aniData.episodes && aniData.duration) ? ` (${aniData.duration} ${lang[userLang].minutes_per_episode})` : '';
-    let nextAiringEpisode = aniData.nextAiringEpisode ? `\n- ${lang[userLang].nextRelease}: *${aniData.nextAiringEpisode}*` : '';
+    let nextAiringEpisode = aniData.nextAiringEpisode ? `\n- ${lang[userLang].nextRelease}: *${utils.msToTime(data.nextAiringEpisode.timeUntilAiring, userLang)}*` : '';
     //volumes
     volumes = aniData.volumes ? `\n- ${lang[userLang].volumes}: *${aniData.volumes}*` : '';
     //chapters
