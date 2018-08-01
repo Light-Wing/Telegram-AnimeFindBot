@@ -159,7 +159,7 @@ _.inline = (type, msg, bot, userLang) => {
                                 }
                                 dataTo_inline(AniData, nextOffset, bot, msg, userLang, startTime, 'anilist', count, originalQuery)
                             }).catch(handleError => {
-                                report.error(`AniList fetch error: ${JSON.stringify(handleError)}`)
+                                report.error(`AniList fetch error: ${(JSON.stringify(handleError) != {})?JSON.stringify(handleError):handleError}`)
                                 console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n---`)
                                 console.log(`---\nAniList fetch error: ${handleError}\n---`)
                             });
