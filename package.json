@@ -13,6 +13,7 @@
         "dotenv": "^6.0.0",
         "kitsu": "^5.2.0",
         "mysql": "^2.15.0",
+        "node-fetch": "^2.1.2",
         "sanitize-html": "^1.18.2",
         "telebot": "^1.2.6"
     },
