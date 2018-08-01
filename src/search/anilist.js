@@ -272,7 +272,7 @@ _.messageSent = (aniData, userLang) => {
     // genres = `${JSON.stringify(aniData.genres).replace(/","/g,', ').replace(/"/g,'')}`: '';
     //cover - banner
     //imageCover = aniData.coverImage.large  ? `[\u200B](${aniData.coverImage.large})` : '';
-    imageCover = aniData.bannerImage ? `[\u200B](${aniData.bannerImage})` : (aniData.coverImage.large ? `[\u200B](${aniData.coverImage.large})` : '');
+    imageCover = aniData.coverImage.large ? `[\u200B](${aniData.coverImage.large})` : (aniData.bannerImage ? `[\u200B](${aniData.bannerImage})` : '');
     //trailer
     trailer = (aniData.trailer) ? (`🎥 [${lang[userLang].trailer}](https://${(aniData.trailer.site == "youtube") ? 'youtu.be' : 'dai.ly'}/${aniData.trailer.id})\n`) : '';
     //eps
