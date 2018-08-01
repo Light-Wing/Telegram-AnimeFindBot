@@ -207,7 +207,7 @@ _.messageSent = (aniData, userLang) => {
     //eps
     episodes = aniData.episodes ? `\n- ${lang[userLang].episodes}: *${aniData.episodes}*` : '';
     let episodeLength = (aniData.episodes && aniData.duration) ? ` (${aniData.duration} ${lang[userLang].minutes_per_episode})` : '';
-    let nextAiringEpisode = aniData.nextAiringEpisode ? `\n- ${lang[userLang].nextRelease}: *${utils.msToTime(data.nextAiringEpisode.timeUntilAiring, userLang)}*` : '';
+    let nextAiringEpisode = aniData.nextAiringEpisode ? `\n- ${lang[userLang].nextRelease}: *${utils.msToTime(aniData.nextAiringEpisode.timeUntilAiring, userLang)}*` : '';
     //volumes
     volumes = aniData.volumes ? `\n- ${lang[userLang].volumes}: *${aniData.volumes}*` : '';
     //chapters
