@@ -253,22 +253,24 @@ _.messageSent = (aniData, userLang) => {
     titleJP = aniData.title.native ? `🇯🇵 ${aniData.title.native}\n` : '';
     titleEN = aniData.title.english ? `🇬🇧 ${aniData.title.english}\n` : '';
     //genres
+
     let genres_sting = '';
     if (aniData.genres) {
         genres_sting += lang[userLang].genres + ': '
         for (let i = 0, len = aniData.genres.length; i < len; i++) {
             let genre
             if (userLang == 'he') {
-                genre = genreList[aniData.genres[i].name][1]
+                genre = genreList[aniData.genres[i]][1]
             } else if (userLang == 'en') {
-                genre = genreList[aniData.genres[i].name][0]
+                genre = genreList[aniData.genres[i]][0]
             }
-            genres_sting += genre + (i != len - 1 ? ', ' : '.');
+            genres_sting += genre + (i != len - 1 ? ', ' : '');
         }
         genres = genres_sting
     } else {
         genres = ''
     }
+
     // genres = `${JSON.stringify(aniData.genres).replace(/","/g,', ').replace(/"/g,'')}`: '';
     //cover - banner
     //imageCover = aniData.coverImage.large  ? `[\u200B](${aniData.coverImage.large})` : '';
@@ -297,15 +299,19 @@ _.messageSent = (aniData, userLang) => {
     eyear = (aniData.endDate && aniData.endDate.year) ? `${aniData.endDate.year}` : '';
     let edate = endDate !== '' ? `\n- ${endDate}: *${userLang == 'en' ? (emonth + ' ' + eday + ', ' + eyear) :  (eday + ' ' + emonth + ', ' + eyear)}*` : '';
 
-    //status
+    console.log(aniData.status)
+        //status
     status = (aniData.status) ? `\n- ${lang[userLang].status}: *${lang[userLang].anilistStuff[aniData.status]}*` : '';
     averageScore = (aniData.averageScore) ? `\n- ${lang[userLang].score}: *${aniData.averageScore}*` : '';
     popularity = (aniData.popularity) ? `\n- ${lang[userLang].popularity}: *${aniData.popularity}*` : '';
     //description
     // description = (aniData.description) ? `\n\n ${aniData.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')}` : '';
     //message text - removed: ${description}
+    console.log(`${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`)
+
     return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`;
 };
+
 _.charMessageSent = (aniData, userLang) => {
     let imageCover = aniData.image ? `[\u200B](${aniData.image.large})` : ''; // || aniData.image.medium
     let firstname, lastname, nativename, alternative;
