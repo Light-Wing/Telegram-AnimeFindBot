@@ -73,7 +73,6 @@ function messageSent(data, type, id) {
     titleEN = data.names.en_jp ? `${data.names.en_jp}\n` : '';
     //add to aka a space after each ,
     aka = data.otherNames.toString() ? `A.K.A: ${data.otherNames.toString().replace(/,/g, ', ')}` : '';
-    console.log(data.otherNames)
 
     // let pic = getPic(data, 'full')
     image = (data.image) ? `[\u200B](${data.image.original})` : '';

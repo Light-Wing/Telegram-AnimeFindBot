@@ -59,13 +59,13 @@ _.getResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
 
 _.getCharResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
     let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 300, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
-    console.log(Data)
+    // console.log(Data.length)
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i]
         let replyMarkup = bot.inlineKeyboard([
             [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
         ]);
-
+        // console.log(data.id)
         let desc = data.description ? data.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\n{2,}/g, '\n\n').replace(/_/g, '') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
         // let desc = 'hello' //data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
         if (desc == (null || undefined || '')) {
@@ -76,11 +76,14 @@ _.getCharResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) 
             desc = desc.substring(0, last);
             desc = desc + "...";
         }
+        let firstname = data.name.first ? data.name.first : '';
+        let lastname = data.name.last ? data.name.last : '';
+        let thumb = data.image.medium || data.image.large;
         var searchResault = {
             id: data.id,
-            title: `[Character] ${data.name.first?data.name.first:''} ${data.name.last?data.name.last:''}`, //
+            title: `[Character] ${firstname} ${lastname}`, //
             description: desc,
-            thumb_url: data.image.medium || data.image.large,
+            thumb_url: thumb,
             input_message_content: {
                 message_text: _.charMessageSent(data, userLang).replace(/(`)/g, ''),
                 parse_mode: 'Markdown',
@@ -304,14 +307,14 @@ _.messageSent = (aniData, userLang) => {
     return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`;
 };
 _.charMessageSent = (aniData, userLang) => {
-    let imageCover = aniData.image ? `[\u200B](${aniData.image.large || aniData.image.medium})` : '';
-    let firstname, lastname, nativename, alternative
-    firstname = aniData.name.first ? aniData.name.first + ' ' : '';
-    lastname = aniData.name.last ? aniData.name.last + '\n' : '';
-    nativename = aniData.name.native ? aniData.name.native + '\n' : '';
-    alternative = aniData.name.alternative ? "A.K.A: " + aniData.name.alternative.replace(/,/g, ', ') : '';
+    let imageCover = aniData.image ? `[\u200B](${aniData.image.large})` : ''; // || aniData.image.medium
+    let firstname, lastname, nativename, alternative;
+    firstname = aniData.name.first ? `[${aniData.name.first}](${aniData.siteUrl}) ` : '';
+    lastname = aniData.name.last ? `[${aniData.name.last}](${aniData.siteUrl}) ` : '';
+    nativename = aniData.name.native ? `\n${aniData.name.native}\n` : '';
+    alternative = aniData.name.alternative.toString() ? "A.K.A: " + aniData.name.alternative.toString().replace(/,/g, ', ') : '';
     let description = (aniData.description) ? `\n\n${aniData.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')}` : '';
-    return `${imageCover}${firstname}${lastname}${nativename}${alternative}${description}`
+    return `${imageCover}${lastname}${firstname}${nativename}${alternative}${description}` //
 }
 
 _.getDescription = aniData => {

@@ -17,6 +17,7 @@ const fetch = require('node-fetch');
 let lang = require('./LANG');
 
 _.inline = (type, msg, bot, userLang) => {
+
     let startTime = new Date().valueOf()
     let query;
     if (type == "inline") {
@@ -35,8 +36,7 @@ _.inline = (type, msg, bot, userLang) => {
             // console.log('j', a);
         return bot.answerQuery(a);
     }
-    let sFor = (/^-m ?/.test(query) || /^@m ?/.test(query)) ? 'manga' : (/^-c ?/.test(query) || /^@c ?/.test(query)) ? 'character' : (/^-a ?/.test(query) || /^@a ?/.test(query) ? 'anilist' : (/^-b ?/.test(query) || /^@b ?/.test(query)) ? 'anilistChar' : 'anime');
-    // console.log('query1 ' + query + ' sFor ' + sFor)
+    let sFor = (/^-m ?/.test(query) || /^@m ?/.test(query)) ? 'manga' : (/^-c ?/.test(query) || /^@c ?/.test(query)) ? 'character' : (/^-a ?/.test(query) || /^@a ?/.test(query)) ? 'anilist' : (/^-b ?/.test(query) || /^@b ?/.test(query)) ? 'anilistChar' : 'anime';
 
     if (query.length >= 2 && sFor != 'anime') {
         query = query.split(/^-m ?|^-c ?|^@m ?|^@c ?|^-a ?|^@a ?|^-b ?|^@b ?/)[1]
@@ -169,7 +169,7 @@ _.inline = (type, msg, bot, userLang) => {
                     nextOffset = ((msg.offset !== '') ? parseInt(msg.offset) + 1 : 1)
                     if (query.length > 0) {
                         let anilistQuery = anilist.queryAniList(query, nextOffset, 'characters');
-                        console.log('query', query)
+                        console.log('query2', query)
                         fetch(anilistQuery.url, anilistQuery.options)
                             .then(handleResponse => {
                                 // console.log(`---\nAniList fetch status: ${handleResponse.statusText}\n---`)
@@ -179,14 +179,14 @@ _.inline = (type, msg, bot, userLang) => {
                             })
                             .then(handleData => {
                                 const AniData = handleData.data.Page.characters;
-                                console.log(handleData, handleData.data.Page.pageInfo)
+                                console.log("total res", handleData.data.Page.pageInfo.total)
                                 let count = handleData.data.Page.pageInfo.total;
                                 if (!handleData.data.Page.pageInfo.hasNextPage) {
                                     nextOffset = ""
                                 }
                                 dataTo_inline(AniData, nextOffset, bot, msg, userLang, startTime, 'anilistChar', count, originalQuery)
                             }).catch(handleError => {
-                                report.error(`AniList fetch error: ${(JSON.stringify(handleError) != {})?JSON.stringify(handleError):handleError}`)
+                                report.error(`AniList fetch error: ${(JSON.stringify(handleError) ? JSON.stringify(handleError) : handleError)}`)
                                     // console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n`)
                                     // console.log(`\nAniList fetch error: ${handleError}\n---`)
                             });
