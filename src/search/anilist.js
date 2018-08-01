@@ -40,6 +40,7 @@ _.getResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
             desc = desc.substring(0, last);
             desc = desc + "...";
         }
+        console.log(data.format)
         var searchResault = {
             id: data.id,
             title: `[${lang[userLang].anilistStuff[data.format]}] ${data.title.userPreferred}`, //
@@ -299,15 +300,15 @@ _.messageSent = (aniData, userLang) => {
     eyear = (aniData.endDate && aniData.endDate.year) ? `${aniData.endDate.year}` : '';
     let edate = endDate !== '' ? `\n- ${endDate}: *${userLang == 'en' ? (emonth + ' ' + eday + ', ' + eyear) :  (eday + ' ' + emonth + ', ' + eyear)}*` : '';
 
-    console.log(aniData.status)
-        //status
+    // console.log(aniData.status)
+    //status
     status = (aniData.status) ? `\n- ${lang[userLang].status}: *${lang[userLang].anilistStuff[aniData.status]}*` : '';
     averageScore = (aniData.averageScore) ? `\n- ${lang[userLang].score}: *${aniData.averageScore}*` : '';
     popularity = (aniData.popularity) ? `\n- ${lang[userLang].popularity}: *${aniData.popularity}*` : '';
     //description
     // description = (aniData.description) ? `\n\n ${aniData.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')}` : '';
     //message text - removed: ${description}
-    console.log(`${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`)
+    // console.log(`${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`)
 
     return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`;
 };
