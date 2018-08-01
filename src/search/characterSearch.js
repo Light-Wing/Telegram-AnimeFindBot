@@ -6,14 +6,14 @@ let lang = require('../LANG');
 let _ = {}
 
 _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
-    let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 10000, personal: false, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
-    // console.log('character serach called', nextOffset)
+    let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 300, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i].attributes;
 
         let replyMarkup = bot.inlineKeyboard([
             [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
         ]);
+        console.log(Data[i].type)
 
         var searchResault = {
             id: Data[i].id,
@@ -72,16 +72,17 @@ function messageSent(data, type, id) {
     titleJP = data.names.ja_jp ? `${data.names.ja_jp}\n` : '';
     titleEN = data.names.en_jp ? `${data.names.en_jp}\n` : '';
     //add to aka a space after each ,
-    aka = data.otherNames ? `A.K.A: ${data.otherNames.toString()}` : '';
-    // console.log(aka, data.otherNames, data.otherNames.toString())
+    aka = data.otherNames.toString() ? `A.K.A: ${data.otherNames.toString().replace(/,/g, ', ')}` : '';
+    console.log(data.otherNames)
 
     // let pic = getPic(data, 'full')
     image = (data.image) ? `[\u200B](${data.image.original})` : '';
+    // console.log(data.image)
 
     //status
     malId = (data.malId) ? `\n- MAL ID: *${data.malId}*` : '';
     //description
-    description = (data.description) ? `\n\n ${sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, ' ').replace(/&quot;/g, '\"')}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')
+    description = (data.description) ? `\n\n${sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, ' ').replace(/&quot;/g, '\"')}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')
     if (description.length >= 400) {
         description = description.substring(0, 400);
         let last = description.lastIndexOf(" ");

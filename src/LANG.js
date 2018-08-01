@@ -74,6 +74,7 @@ _.he = {
     kitsuStuff: {
         'anime': 'Anime', //אנימה
         'TV': 'TV',
+        'tv': 'TV',
         'movie': 'Movie', //סרט
         'special': 'Special', //ספיישל
         'OVA': 'OVA',
@@ -84,6 +85,7 @@ _.he = {
         'novel': 'Novel', //לייט נובל
         'manhua': 'Manhua', //מאנואה
         'manhwa': 'Manhwa', //מאנאווה
+        'characters': 'Character',
         'oel': 'OEL',
         'oneshot': 'One-Shot', //וואן-שוט
         'finished': 'סוים',
@@ -255,6 +257,7 @@ _.en = {
         'anime': 'Anime',
         'characters': 'Character',
         'TV': 'TV',
+        'tv': 'TV',
         'movie': 'Movie',
         'special': 'Special',
         'OVA': 'OVA',
@@ -265,6 +268,7 @@ _.en = {
         'novel': 'Light Novel',
         'manhua': 'Manhua',
         'manhwa': 'Manhwa',
+        'characters': 'Character',
         'oel': 'OEL',
         'oneshot': 'One shot',
         'finished': 'Finished',

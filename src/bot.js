@@ -123,6 +123,7 @@ bot.on('ask.router', msg => {
 // setInterval(() => {
 //     console.log(dataOnUser)
 // }, 1000);
+
 setInterval(() => {
     for (let userID in dataOnUser) {
         let elapsed_time = new Date().valueOf() - dataOnUser[userID]['time'];

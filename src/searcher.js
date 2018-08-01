@@ -35,11 +35,11 @@ _.inline = (type, msg, bot, userLang) => {
             // console.log('j', a);
         return bot.answerQuery(a);
     }
-    let sFor = (/^-m ?/.test(query) || /^@m ?/.test(query)) ? 'manga' : ((/^-c ?/.test(query) || /^@c ?/.test(query)) ? 'character' : ((/^-a ?/.test(query) || /^@a ?/.test(query)) ? 'anilist' : 'anime'));
+    let sFor = (/^-m ?/.test(query) || /^@m ?/.test(query)) ? 'manga' : (/^-c ?/.test(query) || /^@c ?/.test(query)) ? 'character' : (/^-a ?/.test(query) || /^@a ?/.test(query) ? 'anilist' : (/^-b ?/.test(query) || /^@b ?/.test(query)) ? 'anilistChar' : 'anime');
     // console.log('query1 ' + query + ' sFor ' + sFor)
 
     if (query.length >= 2 && sFor != 'anime') {
-        query = query.split(/^-m ?|^-c ?|^@m ?|^@c ?|^-a ?|^@a ?/)[1]
+        query = query.split(/^-m ?|^-c ?|^@m ?|^@c ?|^-a ?|^@a ?|^-b ?|^@b ?/)[1]
             // console.log('query2 ' + query + ' sFor ' + sFor)
     }
 
@@ -99,7 +99,7 @@ _.inline = (type, msg, bot, userLang) => {
                                 count = res[1].meta.count
                             }
                             let Data = res[0];
-                            // console.log(results)
+                            console.log(Data instanceof Array)
                             dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'character', count, originalQuery)
                         }).then(() => {
                             let timeDiff = new Date().valueOf() - startTime;
@@ -160,8 +160,35 @@ _.inline = (type, msg, bot, userLang) => {
                                 dataTo_inline(AniData, nextOffset, bot, msg, userLang, startTime, 'anilist', count, originalQuery)
                             }).catch(handleError => {
                                 report.error(`AniList fetch error: ${(JSON.stringify(handleError) != {})?JSON.stringify(handleError):handleError}`)
-                                console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n---`)
-                                console.log(`---\nAniList fetch error: ${handleError}\n---`)
+                                    // console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n---`)
+                                    // console.log(`---\nAniList fetch error: ${handleError}\n---`)
+                            });
+                    }
+                    break;
+                case 'anilistChar':
+                    nextOffset = ((msg.offset !== '') ? parseInt(msg.offset) + 1 : 1)
+                    if (query.length > 0) {
+                        let anilistQuery = anilist.queryAniList(query, nextOffset, 'characters');
+                        console.log('query', query)
+                        fetch(anilistQuery.url, anilistQuery.options)
+                            .then(handleResponse => {
+                                // console.log(`---\nAniList fetch status: ${handleResponse.statusText}\n---`)
+                                return handleResponse.json().then(function(json) {
+                                    return handleResponse.ok ? json : Promise.reject(json);
+                                });
+                            })
+                            .then(handleData => {
+                                const AniData = handleData.data.Page.characters;
+                                console.log(handleData, handleData.data.Page.pageInfo)
+                                let count = handleData.data.Page.pageInfo.total;
+                                if (!handleData.data.Page.pageInfo.hasNextPage) {
+                                    nextOffset = ""
+                                }
+                                dataTo_inline(AniData, nextOffset, bot, msg, userLang, startTime, 'anilistChar', count, originalQuery)
+                            }).catch(handleError => {
+                                report.error(`AniList fetch error: ${(JSON.stringify(handleError) != {})?JSON.stringify(handleError):handleError}`)
+                                    // console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n`)
+                                    // console.log(`\nAniList fetch error: ${handleError}\n---`)
                             });
                     }
                     break;
@@ -208,8 +235,12 @@ function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor, co
                 // console.log(results.list)
                 break;
             case 'anilist':
-                console.log('anilist nextOffset', nextOffset)
+                // console.log('anilist nextOffset', nextOffset)
                 results = anilist.getResults(Data, nextOffset, bot, msg, userLang, count, originalQuery);
+                break;
+            case 'anilistChar':
+                // console.log('anilist nextOffset', nextOffset)
+                results = anilist.getCharResults(Data, nextOffset, bot, msg, userLang, count, originalQuery);
                 break;
             default:
                 results = null

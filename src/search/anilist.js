@@ -7,7 +7,7 @@ let _ = {};
 
 
 _.getResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
-    let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 0, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
+    let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 300, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
 
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i]
@@ -57,119 +57,169 @@ _.getResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
     return results;
 }
 
-_.queryAniList = (mainQuery, nextOffset) => {
+_.getCharResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
+    let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 300, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
+    console.log(Data)
+    for (let i = 0, len = Data.length; i < len; i++) {
+        let data = Data[i]
+        let replyMarkup = bot.inlineKeyboard([
+            [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
+        ]);
+
+        let desc = data.description ? data.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\n{2,}/g, '\n\n').replace(/_/g, '') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
+        // let desc = 'hello' //data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
+        if (desc == (null || undefined || '')) {
+            desc = lang[userLang].desc_not_available;
+        } else if (desc.length >= 100) {
+            desc = desc.substring(0, 100);
+            let last = desc.lastIndexOf(" ");
+            desc = desc.substring(0, last);
+            desc = desc + "...";
+        }
+        var searchResault = {
+            id: data.id,
+            title: `[Character] ${data.name.first?data.name.first:''} ${data.name.last?data.name.last:''}`, //
+            description: desc,
+            thumb_url: data.image.medium || data.image.large,
+            input_message_content: {
+                message_text: _.charMessageSent(data, userLang).replace(/(`)/g, ''),
+                parse_mode: 'Markdown',
+                disable_web_page_preview: false
+            },
+            reply_markup: replyMarkup
+        }
+        results.addArticle(searchResault);
+    }
+    return results;
+}
+
+_.queryAniList = (mainQuery, nextOffset, queryWhat) => {
     let query, variables;
-    // if (msg.data != undefined) {
-    //     query = `query($id: Int) {
-    //             Media(id: $id) {
-    //                 id
-    //                 description
-    //                 title {
-    //                     romaji
-    //                     english
-    //                     native
-    //                     userPreferred
-    //                 }
-    //                 coverImage {
-    //                     large
-    //                     medium
-    //                 }
-    //                 bannerImage
-    //                 trailer {
-    //                     id
-    //                     site
-    //                 }
-    //                 siteUrl
-    //             }
-    //     }`;
-    //     variables = {
-    //         id: mainQuery,
-    //     };
-    // characters(
-    //     id: Int,
-    //     search: String,
-    //     id_not: Int,
-    //     id_in: [Int],
-    //     id_not_in: [Int],
-    //     sort: [CharacterSort]
-    //     )
-    // } else {
-    //if (!isNaN(msg.data)) 
-    //            $isAdult: Boolean = false,
-    //                        isAdult: $isAdult,
+    switch (queryWhat) {
+        case 'description':
+            query = `query (
+            $id: Int, 
+            $search: String, 
+            $asHtml: Boolean = false, 
+            $isAdult: Boolean = false, 
+            $page: Int, 
+            $perPage: Int) {
+            Page(page: $page, perPage: $perPage) {
+              pageInfo {
+                total
+                currentPage
+                lastPage
+                hasNextPage
+                perPage
+              }
 
-
-    query = `query(
-            $id: Int,
-            $asHtml: Boolean = false,
-            $search: String,
-            $page: Int,
-            $perPage: Int,
-            $isAdult: Boolean = false,
-            ) {
+              `;
+            break;
+        case 'characters':
+            query = `query (
+                $id: Int, 
+                $search: String, 
+                $page: Int, 
+                $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
-                    pageInfo {
-                        total
-                        currentPage
-                        lastPage
-                        hasNextPage
-                        perPage
+                  pageInfo {
+                    total
+                    currentPage
+                    lastPage
+                    hasNextPage
+                    perPage
+                  }
+                  characters(id: $id, search: $search) {
+                    id
+                    name {
+                      first
+                      last
+                      native
+                      alternative
                     }
-                    media(
-                        id: $id,
-                        search: $search,
-                        isAdult: $isAdult,
-                    ) {
-                        id
-                        title {
-                            romaji
-                            english
-                            native
-                            userPreferred
-                        }
-                        coverImage {
-                                large
-                                medium
-                            }
-                            startDate {
-                                year
-                                month
-                                day
-                            }
-                            endDate {
-                                year
-                                month
-                                day
-                            }
-                        description(asHtml: $asHtml)
-                        format
-                        type
-                        bannerImage
-                        duration
-                        status
-                        episodes
-                        duration
-                        chapters
-                        volumes
-                        nextAiringEpisode {
-                            id
-                            airingAt
-                            timeUntilAiring
-                            episode
-                            mediaId
-                        }
-                        averageScore
-                        genres
-                        popularity
-                        synonyms
-                        siteUrl
-                        trailer {
-                            id
-                            site
-                        }
+                    image {
+                      large
+                      medium
                     }
+                    description(asHtml: false)
+                    siteUrl
+                  }
                 }
-        }`;
+              }`;
+            break;
+        default:
+            query = `query (
+            $id: Int, 
+            $search: String, 
+            $asHtml: Boolean = false, 
+            $isAdult: Boolean = false, 
+            $page: Int, 
+            $perPage: Int) {
+            Page(page: $page, perPage: $perPage) {
+              pageInfo {
+                total
+                currentPage
+                lastPage
+                hasNextPage
+                perPage
+              }
+              media(id: $id, search: $search, isAdult: $isAdult) {
+                id
+                startDate {
+                  year
+                  month
+                  day
+                }
+                endDate {
+                  year
+                  month
+                  day
+                }
+                format
+                type
+                status
+                episodes
+                duration
+                chapters
+                volumes
+                genres
+                averageScore
+                popularity
+                tags {
+                  id
+                }
+                title {
+                  romaji
+                  english
+                  native
+                  userPreferred
+                }
+                coverImage {
+                  large
+                  medium
+                }
+                description(asHtml: $asHtml)
+                bannerImage
+                duration
+                nextAiringEpisode {
+                  id
+                  airingAt
+                  timeUntilAiring
+                  episode
+                  mediaId
+                }
+                synonyms
+                siteUrl
+                trailer {
+                  id
+                  site
+                }
+              }
+            }
+          }
+          `;
+    }
+
 
     variables = {
         search: mainQuery,
@@ -191,6 +241,8 @@ _.queryAniList = (mainQuery, nextOffset) => {
         };
     return { url: url, options: options };
 };
+const genreList = require("../langFiles/genres");
+
 _.messageSent = (aniData, userLang) => {
     let titleEN, titleJP, titleRJ, imageCover, genres, episodes, trailer, volumes, chapters, startDate, sday, smonth, syear, endDate, eday, emonth, eyear, status, averageScore, popularity, description, msgtext;
     //titles - romaji english native
@@ -198,7 +250,23 @@ _.messageSent = (aniData, userLang) => {
     titleJP = aniData.title.native ? `🇯🇵 ${aniData.title.native}\n` : '';
     titleEN = aniData.title.english ? `🇬🇧 ${aniData.title.english}\n` : '';
     //genres
-    genres = aniData.genres ? `\n- Genres: ${JSON.stringify(aniData.genres).replace(/","/g,', ').replace(/"/g,'')}` : '';
+    let genres_sting = '';
+    if (aniData.genres) {
+        genres_sting += lang[userLang].genres + ': '
+        for (let i = 0, len = aniData.genres.length; i < len; i++) {
+            let genre
+            if (userLang == 'he') {
+                genre = genreList[aniData.genres[i].name][1]
+            } else if (userLang == 'en') {
+                genre = genreList[aniData.genres[i].name][0]
+            }
+            genres_sting += genre + (i != len - 1 ? ', ' : '.');
+        }
+        genres = genres_sting
+    } else {
+        genres = ''
+    }
+    // genres = `${JSON.stringify(aniData.genres).replace(/","/g,', ').replace(/"/g,'')}`: '';
     //cover - banner
     //imageCover = aniData.coverImage.large  ? `[\u200B](${aniData.coverImage.large})` : '';
     imageCover = aniData.bannerImage ? `[\u200B](${aniData.bannerImage})` : (aniData.coverImage.large ? `[\u200B](${aniData.coverImage.large})` : '');
@@ -227,14 +295,25 @@ _.messageSent = (aniData, userLang) => {
     let edate = endDate !== '' ? `\n- ${endDate}: *${userLang == 'en' ? (emonth + ' ' + eday + ', ' + eyear) :  (eday + ' ' + emonth + ', ' + eyear)}*` : '';
 
     //status
-    status = (aniData.status) ? `\n- Status: *${aniData.status.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase() })}*` : '';
-    averageScore = (aniData.averageScore) ? `\n- Score: *${aniData.averageScore}*` : '';
-    popularity = (aniData.popularity) ? `\n- Popularity: *${aniData.popularity}*` : '';
+    status = (aniData.status) ? `\n- ${lang[userLang].status}: *${lang[userLang].anilistStuff[aniData.status]}*` : '';
+    averageScore = (aniData.averageScore) ? `\n- ${lang[userLang].score}: *${aniData.averageScore}*` : '';
+    popularity = (aniData.popularity) ? `\n- ${lang[userLang].popularity}: *${aniData.popularity}*` : '';
     //description
-    description = (aniData.description) ? `\n\n ${aniData.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')}` : '';
+    // description = (aniData.description) ? `\n\n ${aniData.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')}` : '';
     //message text - removed: ${description}
     return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`;
 };
+_.charMessageSent = (aniData, userLang) => {
+    let imageCover = aniData.image ? `[\u200B](${aniData.image.large || aniData.image.medium})` : '';
+    let firstname, lastname, nativename, alternative
+    firstname = aniData.name.first ? aniData.name.first + ' ' : '';
+    lastname = aniData.name.last ? aniData.name.last + '\n' : '';
+    nativename = aniData.name.native ? aniData.name.native + '\n' : '';
+    alternative = aniData.name.alternative ? "A.K.A: " + aniData.name.alternative.replace(/,/g, ', ') : '';
+    let description = (aniData.description) ? `\n\n${aniData.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')}` : '';
+    return `${imageCover}${firstname}${lastname}${nativename}${alternative}${description}`
+}
+
 _.getDescription = aniData => {
     let titleRJ, titleJP, titleEN, imageCover, trailer, description;
     //cover - banner

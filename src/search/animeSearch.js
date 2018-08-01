@@ -8,7 +8,7 @@ const ageRateGuideList = require("../langFiles/ageRatingGuide");
 let _ = {}
 
 _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
-        let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 10000, personal: false, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
+        let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 300, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
         // results.addArticle(
         //     reply.loadedMore
         // )

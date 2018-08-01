@@ -241,7 +241,7 @@ _.addUser = (msg) => {
         } else if (err == null) {
             // console.log('result', result);
             console.log("added user");
-            bot.sendMessage(process.env.DEV_TELEGRAM_ID, `[${msg.from.id}](tg://user?id=${msg.from.id}), User added to DB succesfully`, { notification: false })
+            bot.sendMessage(process.env.DEV_TELEGRAM_ID, `[${msg.from.id}](tg://user?id=${msg.from.id}), User added to DB succesfully`, { notification: false, parseMode: "markdown" })
         } else throw err;
     });
 };
