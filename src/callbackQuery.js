@@ -130,7 +130,7 @@ _ = (bot, msg, userPref) => {
                     message = messageSent(data, userLang, data.type, data.id)
                     bot.sendMessage(msg.from.id, message, { notification, parseMode: 'Markdown' }).catch(err => { //cant send to msg.chat.id, need to find another way    
                         if (err.error_code == 403) {
-                            report.error(err.description, '', false)
+                            // report.error(err.description, '', false)
                             report.user(msg, 'error', err.description.replace(/(`)/g, '') + ' ' + err.error_code)
                             console.log(err.description)
                         } else {

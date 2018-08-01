@@ -12,6 +12,9 @@ const kitsu = require('./search/main-kitsu-search');
 const characterSearch = require('./search/characterSearch')
 const mangaSearch = require('./search/mangaSearch')
 const animeSearch = require('./search/animeSearch')
+const anilist = require('./search/anilist')
+const fetch = require('node-fetch');
+let lang = require('./LANG');
 
 _.inline = (type, msg, bot, userLang) => {
     let startTime = new Date().valueOf()
@@ -22,19 +25,21 @@ _.inline = (type, msg, bot, userLang) => {
     } else if (type == "inchat") {
         query = msg.text.substr(msg.text.indexOf(' ') + 1);
     }
+    let originalQuery = query;
+
     if (query == null) {
         let a = bot.answerList(msg.id)
         a.addArticle(
-            reply.defaultMessage[userLang]
-        )
-        console.log('j', a);
+                reply.defaultMessage[userLang] //.replace('%s', sfor == 'anilist' ? lang[userLang].anilist : lang[userLang].kitsu)
+            )
+            // console.log('j', a);
         return bot.answerQuery(a);
     }
-    let sFor = /^-m ?/.test(query) ? 'manga' : (/^-c ?/.test(query) ? 'character' : 'anime');
+    let sFor = (/^-m ?/.test(query) || /^@m ?/.test(query)) ? 'manga' : ((/^-c ?/.test(query) || /^@c ?/.test(query)) ? 'character' : ((/^-a ?/.test(query) || /^@a ?/.test(query)) ? 'anilist' : 'anime'));
     // console.log('query1 ' + query + ' sFor ' + sFor)
 
     if (query.length >= 2 && sFor != 'anime') {
-        query = query.split(/^-m ?|^-c ?/)[1]
+        query = query.split(/^-m ?|^-c ?|^@m ?|^@c ?|^-a ?|^@a ?/)[1]
             // console.log('query2 ' + query + ' sFor ' + sFor)
     }
 
@@ -54,13 +59,14 @@ _.inline = (type, msg, bot, userLang) => {
     //      image: [Object] },
     //   relationships: { primaryMedia: [Object], castings: [Object] } },
 
-    // console.log(searchFor)
+    // console.log(sFor)
     if (type == "inline") {
         if (query.length >= 1) {
-            let nextOffset = ((msg.offset !== '') ? parseInt(msg.offset) + 10 : 0)
+            let nextOffset // = ((msg.offset !== '') ? parseInt(msg.offset) + 10 : 0)
             switch (sFor) {
                 case 'manga':
-                    // console.log('manga reach switch')
+                    nextOffset = ((msg.offset !== '') ? parseInt(msg.offset) + 10 : 0)
+                        // console.log('manga reach switch')
                     if (query.length > 0) {
                         return kitsu.searchManga(query, nextOffset).then(res => {
                             let count
@@ -71,8 +77,7 @@ _.inline = (type, msg, bot, userLang) => {
                                 count = res[1].meta.count
                             }
                             let Data = res[0];
-                            dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'manga', count)
-
+                            dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'manga', count, originalQuery)
                         }).then(() => {
                             let timeDiff = new Date().valueOf() - startTime;
                             let msgText = `Inline query of ${sFor} took ${timeDiff}ms`;
@@ -82,7 +87,8 @@ _.inline = (type, msg, bot, userLang) => {
                     }
                     break;
                 case 'character':
-                    // console.log('character reach switch')
+                    nextOffset = ((msg.offset !== '') ? parseInt(msg.offset) + 10 : 0)
+                        // console.log('character reach switch')
                     if (query.length > 0) {
                         return kitsu.findCharacter(query, nextOffset).then(res => {
                             let count
@@ -94,7 +100,7 @@ _.inline = (type, msg, bot, userLang) => {
                             }
                             let Data = res[0];
                             // console.log(results)
-                            dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'character', count)
+                            dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'character', count, originalQuery)
                         }).then(() => {
                             let timeDiff = new Date().valueOf() - startTime;
                             let msgText = `Inline query of ${sFor} took ${timeDiff}ms`;
@@ -107,7 +113,8 @@ _.inline = (type, msg, bot, userLang) => {
                     }
                     break;
                 case 'anime':
-                    // console.log('anime reach switch1')
+                    nextOffset = ((msg.offset !== '') ? parseInt(msg.offset) + 10 : 0)
+                        // console.log('anime reach switch1')
                     if (query.length > 0) {
                         return kitsu.searchAnime(query, nextOffset).then(res => { //nextOffset
                             let count
@@ -120,7 +127,7 @@ _.inline = (type, msg, bot, userLang) => {
                             let Data = res[0];
                             // console.log(res[1])
                             // console.log('anime reach switch2')
-                            dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'anime', count)
+                            dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, 'anime', count, originalQuery)
                         }).then(() => {
                             // console.log('anime reach switch3')
 
@@ -131,6 +138,33 @@ _.inline = (type, msg, bot, userLang) => {
                         }).catch(handleError => console.log(`---\nanime Fetch error: ${handleError}\n---`));
                     }
                     break;
+                case 'anilist':
+                    nextOffset = ((msg.offset !== '') ? parseInt(msg.offset) + 1 : 1)
+                    if (query.length > 0) {
+                        let anilistQuery = anilist.queryAniList(query, nextOffset);
+                        console.log('nextOffset', anilistQuery)
+                        fetch(anilistQuery.url, anilistQuery.options)
+                            .then(handleResponse => {
+                                console.log(`---\nAniList fetch status: ${handleResponse.statusText}\n---`)
+                                return handleResponse.json().then(function(json) {
+                                    return handleResponse.ok ? json : Promise.reject(json);
+                                });
+                            })
+                            .then(handleData => {
+                                const AniData = handleData.data.Page.media;
+                                // console.log(AniData)
+                                let count = handleData.data.Page.pageInfo.total;
+                                if (!handleData.data.Page.pageInfo.hasNextPage) {
+                                    nextOffset = ""
+                                }
+                                dataTo_inline(AniData, nextOffset, bot, msg, userLang, startTime, 'anilist', count, originalQuery)
+                            }).catch(handleError => {
+                                report.error(`AniList fetch error: ${JSON.stringify(handleError)}`)
+                                console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n---`)
+                                console.log(`---\nAniList fetch error: ${handleError}\n---`)
+                            });
+                    }
+                    break;
                 default:
                     console.log('default reach switch')
                     return null
@@ -139,7 +173,7 @@ _.inline = (type, msg, bot, userLang) => {
         } else {
             let a = bot.answerList(msg.id)
             a.addArticle(
-                reply.defaultMessage[userLang]
+                JSON.parse(JSON.stringify(reply.defaultMessage[userLang]).replace('%s', sFor == 'anilist' ? lang[userLang].anilist : lang[userLang].kitsu))
             )
             return bot.answerQuery(a);
         }
@@ -152,7 +186,7 @@ _.inline = (type, msg, bot, userLang) => {
 }
 
 //https://kitsu.io/api/edge/anime/6791
-function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor, count) {
+function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor, count, originalQuery) {
     //check which search to do, and get correct file
     //import file
     let results = {};
@@ -164,14 +198,18 @@ function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor, co
     } else {
         switch (sFor) {
             case 'manga':
-                results = mangaSearch(Data, nextOffset, bot, msg, userLang, count);
+                results = mangaSearch(Data, nextOffset, bot, msg, userLang, count, originalQuery);
                 break;
             case 'character':
-                results = characterSearch(Data, nextOffset, bot, msg, userLang);
+                results = characterSearch(Data, nextOffset, bot, msg, userLang, count, originalQuery);
                 break;
             case 'anime':
-                results = animeSearch(Data, nextOffset, bot, msg, userLang, count);
+                results = animeSearch(Data, nextOffset, bot, msg, userLang, count, originalQuery);
                 // console.log(results.list)
+                break;
+            case 'anilist':
+                console.log('anilist nextOffset', nextOffset)
+                results = anilist.getResults(Data, nextOffset, bot, msg, userLang, count, originalQuery);
                 break;
             default:
                 results = null

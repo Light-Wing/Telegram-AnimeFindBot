@@ -82,13 +82,13 @@ _.user = (msg, didWhat, extraInfo, time) => {
         dataToSend[userID] = {};
         dataToSend[userID]['msgBody'] = []
     }
-
+    // console.log(msg)
     let searchNum = (dataToSend[userID]['searchNum'] == null || undefined) ? 0 : dataToSend[userID]['searchNum'];
 
     dataToSend[userID]['time'] = new Date().valueOf();
     // dataToSend[userID]['action'] = didWhat;
     dataToSend[userID]['status'] = 'unprocessed'; // unprocessed || pending || done
-    dataToSend[userID]['msgHead'] = `ID: \`${userID}\` - [${getUser(msg.from, "first&last")}](tg://user?id=${userID})`;
+    dataToSend[userID]['msgHead'] = `ID: \`${userID}\` - [${getUser(msg.from, "first&last")}](tg://user?id=${userID})` // - [FROM](tg://user?id=${msg.chat.id})`;
     if (didWhat != 'lang') {
         if (dataToSend[userID]['msgBody'] === (undefined || null || [] || '')) { // || ["nothing more"]
             dataToSend[userID]['msgBody'] = [text]

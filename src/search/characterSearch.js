@@ -5,11 +5,15 @@ let lang = require('../LANG');
 
 let _ = {}
 
-_ = (Data, nextOffset, bot, msg, userLang) => {
+_ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
+    let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 10000, personal: false, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
     // console.log('character serach called', nextOffset)
-    let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 10000, personal: false, });
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i].attributes;
+
+        let replyMarkup = bot.inlineKeyboard([
+            [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
+        ]);
 
         var searchResault = {
             id: Data[i].id,
@@ -20,7 +24,8 @@ _ = (Data, nextOffset, bot, msg, userLang) => {
                 message_text: messageSent(data, Data[i].type, Data[i].id),
                 parse_mode: 'Markdown',
                 disable_web_page_preview: false
-            }
+            },
+            reply_markup: replyMarkup
         };
         // var searchResaultPhoto = {
         //     id: Data[i].id,
@@ -76,7 +81,7 @@ function messageSent(data, type, id) {
     //status
     malId = (data.malId) ? `\n- MAL ID: *${data.malId}*` : '';
     //description
-    description = (data.description) ? `\n\n ${sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, ' ')}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')
+    description = (data.description) ? `\n\n ${sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, ' ').replace(/&quot;/g, '\"')}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')
     if (description.length >= 400) {
         description = description.substring(0, 400);
         let last = description.lastIndexOf(" ");

@@ -11,7 +11,7 @@ _.defaultMessage = {
     he: {
         cacheTime: 0,
         id: 1,
-        title: "חפשו אנימה",
+        title: "חפשו אנימה ב %s",
         description: 'לחיפוש הקלידו את שם האנימה באנגלית או יפנית',
         thumb_url: searchPic,
         input_message_content: {
@@ -23,7 +23,7 @@ _.defaultMessage = {
     en: {
         cacheTime: 0,
         id: 1,
-        title: "Search Anime (on Kitsu)",
+        title: "Search Anime (%s)",
         description: 'start typing in english or japanese',
         thumb_url: searchPic,
         input_message_content: {

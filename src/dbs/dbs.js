@@ -22,8 +22,9 @@ function handleDisconnect() {
 
     con.connect(function(err) { // The server is either down
         if (err) { // or restarting (takes a while sometimes).
+            err_s(err)
             console.log('error when connecting to db:', err);
-            setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
+            setTimeout(handleDisconnect, 10000); // We introduce a delay before attempting to reconnect,
         } // to avoid a hot loop, and to allow our node script to
     }); // process asynchronous requests in the meantime.
     // If you're also serving http, display a 503 error.
@@ -240,7 +241,7 @@ _.addUser = (msg) => {
         } else if (err == null) {
             // console.log('result', result);
             console.log("added user");
-            bot.sendMessage(process.env.DEV_TELEGRAM_ID, `${msg.from.id}, User added to DB succesfully`)
+            bot.sendMessage(process.env.DEV_TELEGRAM_ID, `[${msg.from.id}](tg://user?id=${msg.from.id}), User added to DB succesfully`, { notification: false })
         } else throw err;
     });
 };

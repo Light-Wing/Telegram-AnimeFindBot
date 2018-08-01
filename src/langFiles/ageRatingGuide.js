@@ -18,5 +18,6 @@ module.exports = {
     'horror': ['Horror', 'אימה'],
     'ecchi': ['Ecchi', 'אצ׳י'],
     'kids': ['Kids', 'ילדים'],
+    '17+ adult themes': ["17+ Adult themes", "17+ בעל תוכן למבוגרים"],
     '': ['please report this', 'נא לדווח על זה']
 };

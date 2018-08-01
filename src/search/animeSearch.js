@@ -7,11 +7,12 @@ const ageRateGuideList = require("../langFiles/ageRatingGuide");
 
 let _ = {}
 
-_ = (Data, nextOffset, bot, msg, userLang, count) => {
+_ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
         let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 10000, personal: false, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
         // results.addArticle(
         //     reply.loadedMore
         // )
+
         for (let i = 0, len = Data.length; i < len; i++) {
             let data = Data[i].attributes;
             // console.log(data)
@@ -20,7 +21,8 @@ _ = (Data, nextOffset, bot, msg, userLang, count) => {
                 let dateToMilisec = (data.nextRelease != null) ? new Date(data.nextRelease.replace(' ', 'T').replace(' ', '')).valueOf() : "";
                 let replyMarkup = bot.inlineKeyboard([
                     [bot.inlineButton(lang[userLang].description, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-d' }), bot.inlineButton(lang[userLang].genres, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-g' })],
-                    (data.nextRelease != null) ? [bot.inlineButton(lang[userLang].nextRelease, { callback: (Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-nxt-' + dateToMilisec) })] : []
+                    (data.nextRelease != null) ? [bot.inlineButton(lang[userLang].nextRelease, { callback: (Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-nxt-' + dateToMilisec) })] : [],
+                    [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
                 ]);
                 let thumb = getPic(data, 'thumb');
                 let desc = data.synopsis != (null && undefined) ? data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\n{2,}/g, '\n\n') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
@@ -172,9 +174,10 @@ _.messageSent = (data, userLang, type, id) => {
     episodeCount = data.episodeCount ? `\n- ${lang[userLang].episodes}: *${data.episodeCount}*` : '';
     episodeLength = (data.episodeLength && data.episodeCount) ? ` (${data.episodeLength} ${lang[userLang].minutes_per_episode})` : '';
     //volumes 
-    volumes = data.volumes ? `\n- ${lang[userLang].volumes}: *${data.volumes}*` : '';
+    volumes = data.volumeCount ? `\n- ${lang[userLang].volumes}: *${data.volumeCount}*` : '';
+    // console.log('vols ', data.volumeCount)
     //chapters
-    chapters = data.chapters ? `\n- ${lang[userLang].chapters}: *${data.chapters}*` : '';
+    chapters = data.chapterCount ? `\n- ${lang[userLang].chapters}: *${data.chapterCount}*` : '';
     //startDate startDate nextRelease year-month-day
     StartDate = data.startDate ? data.startDate.split('-') : ''
     startDate = data.startDate ? `${lang[userLang].start_date}` : '';
@@ -218,6 +221,6 @@ _.messageSent = (data, userLang, type, id) => {
     //description
     // description = (data.synopsis != null) ? `\n\n ${data.synopsis}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')
     //message text - removed: ${description}
-    return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${episodeCount}${episodeLength}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}${ageRating}${ageRatingGuide}`;
+    return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${episodeCount}${episodeLength}${status}${volumes}${chapters}${averageScore}${popularity}${sdate}${edate}${ageRating}${ageRatingGuide}`;
 }
 module.exports = _;
