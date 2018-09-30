@@ -8,12 +8,15 @@ let _ = {};
 
 _.getResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
     let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 300, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
+    //bot.sendMessage(msg.from.id, `\`\`\`${JSON.stringify(Data)}\`\`\``, { parseMode: 'markdown' })
 
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i]
+            //data = JSON.parse(JSON.stringify(data).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\*/g, "＊").replace(/(`)/g, ''))
+            //console.log(data)
+
         let nextEpAir2, nextEpAir
         if (data.nextAiringEpisode) {
-            // console.log(data.nextAiringEpisode)
             let timeDiff = data.nextAiringEpisode.airingAt - new Date().valueOf()
             nextEpAir = utils.msToTime(data.nextAiringEpisode.airingAt, userLang);
             nextEpAir2 = utils.msToTime(data.nextAiringEpisode.timeUntilAiring, userLang);
@@ -30,7 +33,7 @@ _.getResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
             [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
         ]);
 
-        let desc = data.description ? data.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\n{2,}/g, '\n\n') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
+        let desc = data.description ? data.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
         // let desc = 'hello' //data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
         if (desc == (null || undefined || '')) {
             desc = lang[userLang].desc_not_available;
@@ -40,11 +43,12 @@ _.getResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
             desc = desc.substring(0, last);
             desc = desc + "...";
         }
-        console.log(data.format)
+        //console.log(data.format)
         var searchResault = {
             id: data.id,
             title: `[${lang[userLang].anilistStuff[data.format]}] ${data.title.userPreferred}`, //
             description: desc,
+            url: data.siteUrl,
             thumb_url: data.coverImage.medium,
             input_message_content: {
                 message_text: _.messageSent(data, userLang).replace(/(`)/g, ''),
@@ -67,7 +71,7 @@ _.getCharResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) 
             [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
         ]);
         // console.log(data.id)
-        let desc = data.description ? data.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\n{2,}/g, '\n\n').replace(/_/g, '') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
+        let desc = data.description ? data.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/_/g, '') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
         // let desc = 'hello' //data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
         if (desc == (null || undefined || '')) {
             desc = lang[userLang].desc_not_available;
@@ -84,6 +88,7 @@ _.getCharResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) 
             id: data.id,
             title: `[Character] ${firstname} ${lastname}`, //
             description: desc,
+            url: data.siteUrl,
             thumb_url: thumb,
             input_message_content: {
                 message_text: _.charMessageSent(data, userLang).replace(/(`)/g, ''),

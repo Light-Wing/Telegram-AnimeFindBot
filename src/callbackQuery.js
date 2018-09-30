@@ -104,14 +104,16 @@ _ = (bot, msg, userPref) => {
         case 'd':
             searcher.description(id, type, 195).then(function(res) {
                 let re, message, data = res.data;
-                let description = res.data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
+                data = JSON.parse(JSON.stringify(data).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\*/g, "＊").replace(/(`)/g, ''))
+                let description = res.data.synopsis;
                 if (description == (null || undefined || '')) {
                     re = lang[userLang].desc_not_available;
                 } else if (description.length >= 200) {
-                    let tempDesc = description.substring(0, 197);
-                    let last = tempDesc.lastIndexOf(" ");
-                    let descriptionFinal = description.substring(0, last);
-                    re = descriptionFinal + "...";
+                    // let tempDesc = description.substring(0, 197);
+                    // let last = tempDesc.lastIndexOf(" ");
+                    // let descriptionFinal = description.substring(0, last);
+                    // re = descriptionFinal + "...";
+                    re = lang[userLang].descLong;
                 } else re = description;
                 // console.log(dataOnUser[msg.from.id])
                 if (dataOnUser[msg.from.id]['desc'] !== 'dontSendDesc') {
@@ -238,7 +240,7 @@ function messageSent(data, userLang, type, id) {
     // these two dont work yet, need to get kitsu to search manga as well
     let chapters = data.chapters ? `\n- ${lang[userLang].chapters}: *${data.chapters}*` : '';
     //description
-    let description = (data.synopsis != null) ? `\n\n${data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')}` : '';
+    let description = (data.synopsis != null) ? `\n\n${data.synopsis}` : '';
     //message text - removed: ${description}
     return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${episodeCount}${episodeLength}${volumes}${chapters}${description}`;
 }

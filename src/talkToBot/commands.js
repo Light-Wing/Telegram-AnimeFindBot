@@ -22,14 +22,21 @@ _.reactToCommand = (bot, msg, userLang) => {
     }
     if (msgText == "/start") {
         let replyMarkup = bot.inlineKeyboard([
-            [bot.inlineButton(lang[userLang].check_it_out, { inlineCurrent: '' })]
+            [bot.inlineButton(lang[userLang].check_it_out.none, { inlineCurrent: '' })]
         ]);
         let hiText = (lang[userLang].startMsg).replace('%s', msg.from.first_name)
             // console.log(hiText)
         return bot.sendMessage(msg.from.id, hiText, { replyMarkup });
     }
-    if (msgText == "/example") {
-        return bot.sendMessage(msg.from.id, lang[userLang].example, { replyMarkup: 'hide' });
+    if (msgText == "/help") {
+        let replyMarkup = bot.inlineKeyboard([
+            [bot.inlineButton(lang[userLang].check_it_out.none, { inlineCurrent: '' })],
+            [bot.inlineButton(lang[userLang].check_it_out.manga, { inlineCurrent: '@m' })],
+            [bot.inlineButton(lang[userLang].check_it_out.anilist, { inlineCurrent: '@a' })],
+            [bot.inlineButton(lang[userLang].check_it_out.character, { inlineCurrent: '@c' })],
+            [bot.inlineButton(lang[userLang].check_it_out.person, { inlineCurrent: '@p' })]
+        ]);
+        return bot.sendMessage(msg.from.id, lang[userLang].example, { replyMarkup, parseMode: 'markdown' });
     }
     if (msg.text == '/cancel' || msg.text == lang['he'].cancel || msg.text == lang['en'].cancel) {
         return bot.sendMessage(msg.chat.id, lang[userLang].cancelled, { replyMarkup: 'hide' });

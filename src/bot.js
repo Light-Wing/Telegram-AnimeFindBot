@@ -143,7 +143,7 @@ setInterval(() => {
     }
 }, 60000 * 2 * 60);
 
-//a one time function that runs at bot strt to update cache from db
+//a one time function that runs at bot strt to update cache from db - not done yet
 
 // Call API
 bot.start();

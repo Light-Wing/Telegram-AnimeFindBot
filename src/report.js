@@ -54,7 +54,7 @@ _.user = (msg, didWhat, extraInfo, time) => {
 
     switch (didWhat) {
         case "search":
-            text = `searched "*${msg.query}*" and got: ${extraInfo} results`
+            text = `searched "\`${msg.query}\`" and got: ${extraInfo} results`
             searchTime = new Date().valueOf() - time;
             break;
         case 'genre':

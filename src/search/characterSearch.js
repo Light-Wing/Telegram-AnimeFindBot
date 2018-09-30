@@ -9,6 +9,7 @@ _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
     let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 300, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i].attributes;
+        //data = JSON.parse(JSON.stringify(data).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\*/g, "＊").replace(/(`)/g, ''))
 
         let replyMarkup = bot.inlineKeyboard([
             [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
@@ -18,7 +19,8 @@ _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
         var searchResault = {
             id: Data[i].id,
             title: `[${lang[userLang].kitsuStuff[Data[i].type]}] ${data.canonicalName}`,
-            description: ((data.description)) ? sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, " ").replace(/\n{2,}/g, ' ') : lang[userLang].desc_not_available, //.replace(/<(?:.|\n)*?>/gm, '')
+            description: ((data.description)) ? sanitizeHtml(data.description) : lang[userLang].desc_not_available, //.replace(/<(?:.|\n)*?>/gm, '')
+            //url: Data[i].links.self, //kitsu dosent have individual pages for charachters
             thumb_url: (data.image) ? data.image.original : undefined,
             input_message_content: {
                 message_text: messageSent(data, Data[i].type, Data[i].id),

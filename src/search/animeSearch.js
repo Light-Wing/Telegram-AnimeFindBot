@@ -14,10 +14,13 @@ _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
         // )
 
         for (let i = 0, len = Data.length; i < len; i++) {
-            let data = Data[i].attributes;
+            let data = Data[i].attributes
+            data = JSON.parse(JSON.stringify(data).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\*/g, "＊").replace(/(`)/g, ''))
+
             // console.log(data)
             if (!data.canonicalTitle.includes('delete')) { // && data.ageRatingGuide != "Mild Nudity"
                 // console.log('dataid', Data[i].id)
+
                 let dateToMilisec = (data.nextRelease != null) ? new Date(data.nextRelease.replace(' ', 'T').replace(' ', '')).valueOf() : "";
                 let replyMarkup = bot.inlineKeyboard([
                     [bot.inlineButton(lang[userLang].description, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-d' }), bot.inlineButton(lang[userLang].genres, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-g' })],
@@ -25,7 +28,7 @@ _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
                     [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
                 ]);
                 let thumb = getPic(data, 'thumb');
-                let desc = data.synopsis != (null && undefined) ? data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\n{2,}/g, '\n\n') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
+                let desc = data.synopsis != (null && undefined) ? data.synopsis : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
                 // let desc = 'hello' //data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
                 if (desc == (null || undefined || '')) {
                     desc = lang[userLang].desc_not_available;
@@ -39,6 +42,7 @@ _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
                     id: Data[i].id,
                     title: `[${lang[userLang].kitsuStuff[data.subtype]}] ${data.canonicalTitle}`, //
                     description: desc,
+                    url: Data[i].links.self.replace("api/edge/", ""),
                     thumb_url: thumb,
                     input_message_content: {
                         message_text: _.messageSent(data, userLang, Data[i].type, Data[i].id).replace(/(`)/g, ''),

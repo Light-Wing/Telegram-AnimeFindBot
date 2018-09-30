@@ -1,12 +1,9 @@
 node_modules
 .env
 dist
-dist/
-idea/
 temp
-temp/
 todo
 .editorconfig
 src/dbs/connectionString.js
-src/dbs/connectionString.js
-src/dbs/connectionString.js
+img-src-files
+*.svg

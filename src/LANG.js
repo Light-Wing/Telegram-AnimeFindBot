@@ -5,11 +5,17 @@
 let _ = {};
 
 _.he = {
-    startMsg: `שלום %s\nבוט זה מחפש אנימות במצב אינליין (לדוגמאות -> /example או בלחיצה על הכפתור "נסו עכשיו")\n` +
+    startMsg: `שלום %s\nבוט זה מחפש אנימות במצב אינליין (לדוגמאות -> /help או בלחיצה על הכפתור "נסו עכשיו")\n` +
         `להגדרת שפה -> /settings\nלפידבאק (שיתוף דעתכם על הבוט, מה אפשר לשפר מה אפשר להוסיף או לתקן משהו שלא עובד כמו שצריך) -> /feedback`,
     cancel: 'בַטֵל ❌',
     cancelled: 'הפעולה האחרונה בוטלה', //maybe add diif answers to diff cancels like cancelled_idea (within this one)
-    check_it_out: "נסו עכשיו",
+    check_it_out: {
+        none: "חיפוש אנימה בקיטסו",
+        anilist: "חיפוש אנימה ומנגה באניליסט",
+        manga: "חיפוש מנגה בקיטסו",
+        character: "חיפוש דמות בקיטסו",
+        person: "חיפוש דמות באניליסט"
+    },
     feedback: `יש לכם הצעה לשיפור, נתקלתם בתקלה או  אולי יש לכם חוות דעת כללית?\nבחרו באחת האפשרויות...`,
     see_keyboard_below: "הנה מקלדת",
     setLang: {
@@ -61,8 +67,9 @@ _.he = {
     genres: "ז׳אנרים",
     description: "תקציר",
     desc_not_available: "לא נמצא תקציר",
+    descLong: "התקציר ארוך מידי להופיע בבועה הזאת.\nהתקציר ישלח בצ׳אט הפרטי.",
     no_genres: "לא נמצאו ז׳אנרים",
-    trailer: "Trailer",
+    trailer: "טריילר",
     episodes: "מס׳ פרקים",
     minutes_per_episode: "דקות/לפרק",
     chapters: "צ'אפטרים",
@@ -189,19 +196,68 @@ _.he = {
         '30': '30',
         '31': '31'
     },
-    example: 'עדיין לא הכנתי דוגמאות, אבל ברעיון אם כותבים `-m` או `-c` או `@m` או `@c` או לפני החיפוש, זה מחפש מנגה או דמות',
+    example: `דוגמאות:\n` +
+        `חיפוש בקיסטו - 🦊\n` +
+        `1. רשמו בתיבת ההודעה @AniFinderBot\n` +
+        `2. רשמו את שם האנימה שאותה אתם מחפשים.\n` +
+        `(לדוגמא:\n` +
+        `\`@AniFinderBot\`\n` +
+        `ואחרי זה את שם האנימה לחיפוש בקיטסו...)\n` +
+        `\n` +
+        `3. בחרו מתוך האופציות את האנימה הרצויה.\n` +
+        `חיפוש באנליסט (מנגה ואנימה) - 📝\n` +
+        `1. רשמו בתיבת ההודעה @AniFinderBot\n` +
+        `2. הוסיפו @a לאחר מכן.\n` +
+        `3. רשמו את מה שאתם מעוניינים לחפש באנליסט.\n` +
+        `(לדוגמא:\n` +
+        `\`@AniFinderBot @a\` - anilist\n` +
+        `ואחרי זה את שם האנימה או מנגה לחיפוש באניליסט...)\n` +
+        `4. בחרו מתוך האופציות \n` +
+        `\n` +
+        `חיפוש מנגה (בקיסטו) 📚\n` +
+        `1. רשמו בתיבת ההודעה @AniFinderBot\n` +
+        `2. הוסיפו @m לאחר מכן.\n` +
+        `3. רשמו את שם המנגה שאותה אתם מחפשים.\n` +
+        `(לדוגמא:\n` +
+        `\`@AniFinderBot @m\` - manga\n` +
+        `ואחרי זה את שם המנגה לחיפוש בקיטסו...)\n` +
+        `4. בחרו מתוך האופציות את המנגה הרצויה.\n` +
+        `\n` +
+        `חיפוש דמויות 👱👱‍♀️ - בקיסטו - 🦊\n` +
+        `1. רשמו בתיבת ההודעה @AniFinderBot\n` +
+        `2. הוסיפו @c לאחר מכן.\n` +
+        `3. רשמו את שם הדמות שאותה אתם מחפשים.\n` +
+        `(לדוגמא:\n` +
+        `\`@AniFinderBot @c\` - character\n` +
+        `ואחרי זה את שם הדמות לחיפוש בקיטסו...)\n` +
+        `4. בחרו מתוך האופציות את הדמות הרצויה.\n` +
+        `\n` +
+        `חיפוש דמויות 👱👱‍♀️ - באניליסט - 📝\n` +
+        `1. רשמו בתיבת ההודעה @AniFinderBot\n` +
+        `2. הוסיפו @p לאחר מכן.\n` +
+        `3. רשמו את שם הדמות שאותה אתם מחפשים.\n` +
+        `(לדוגמא:\n` +
+        `\`@AniFinderBot @p\` - person\n` +
+        `ואחרי זה את שם הדמות לחיפוש באניליסט...)\n` +
+        `4. בחרו מתוך האופציות את הדמות הרצויה.`,
     searchAgain: 'חיפוש נוסף',
     kitsu: 'קיטסו',
     anilist: 'אניליסט'
 }
 _.en = {
     startMsg: `Hello %s!\n` +
-        `This bot searches for anime in inline mode (for examples press /example or press the "Check me out Now" button below)\n` +
-        `for setting press /settings\n` +
+        `This bot searches for anime in inline mode (for examples -> /help or press the "Check me out Now" button below)\n` +
+        `for setting -> /settings\n` +
         `and if you want to share your thoughts about the bot, please press /feedback`,
     cancel: '❌ Cancel',
     cancelled: 'Cancelled',
-    check_it_out: "Check it out Now",
+    check_it_out: {
+        none: "Kitsu Anime Search",
+        anilist: "Anilist Anime & Manga Search",
+        manga: "Kitsu Manga Search",
+        character: "Kitsu Character Search",
+        person: "Anilist Character Search"
+    },
     feedback: 'Do you have an idea, an issue or just general feedback to tell me about?',
     see_keyboard_below: "See keyboard below",
     setLang: {
@@ -247,6 +303,7 @@ _.en = {
     genres: "Genres",
     description: 'Description',
     desc_not_available: "Description not Available",
+    descLong: "Description is too long to show up in this box.\nit will be sent to the Private Chat.",
     no_genres: "no Genres found",
     trailer: "Trailer",
     episodes: "Episodes",
@@ -376,7 +433,50 @@ _.en = {
         '30': '30',
         '31': '31'
     },
-    example: 'i havent made a proper example message yet, though the idea is that if you put `-m` or `-c` or `@m` or `@c` before the inline search, the bot will search for manga or characters...',
+    example: `Examples:\n` +
+        `Search Kitsu (anime) - 🦊\n` +
+        `1. Type in any chat @AniFinderBot\n` +
+        `2. Type a name of an anime you're looking for\n` +
+        `(For example:\n` +
+        `\`@AniFinderBot\`\n` +
+        `Then the name of the anime you want to find...)\n` +
+        `3. Choose one of the matching answers to send to your current chat.\n` +
+        `\n` +
+        `Search Anilist (anime & manga) - 📝\n` +
+        `1. Type in any chat @AniFinderBot\n` +
+        `2. Add @a after the bot's name\n` +
+        `3. Type a name of an anime you're looking for\n` +
+        `(For example:\n` +
+        `\`@AniFinderBot @a\` - anilist\n` +
+        `Then the name of the anime or manga you want to find on Anilist ..)\n` +
+        `4. Choose one of the matching answers to send to your current chat.\n` +
+        `\n` +
+        `Search Kitsu (manga) - 📚\n` +
+        `1. Type in any chat @AniFinderBot\n` +
+        `2. Add @m after the bot's name\n` +
+        `3. Type a name of an anime you're looking for\n` +
+        `(For example:\n` +
+        `\`@AniFinderBot @m\` - manga\n` +
+        `Then the name of the anime you want to find...)\n` +
+        `4. Choose one of the matching answers to send to your current chat.\n` +
+        `\n` +
+        `Search Characters - 👱👱‍ - Kitsu  - 🦊\n` +
+        `1. Type in any chat @AniFinderBot\n` +
+        `2. Add @c after the bot's name\n` +
+        `3. Type a name of an anime you're looking for\n` +
+        `(For example:\n` +
+        `\`@AniFinderBot @c\` - character\n` +
+        `Then the name of the character you want to find...)\n` +
+        `4. Choose one of the matching answers to send to your current chat.\n` +
+        `\n` +
+        `Search Characters - 👱👱‍ - Anilist - 📝\n` +
+        `1. Type in any chat @AniFinderBot\n` +
+        `2. Add @p after the bot's name\n` +
+        `3. Type a name of an anime you're looking for\n` +
+        `(For example:\n` +
+        `\`@AniFinderBot @p\` - person\n` +
+        `Then the name of the character you want to find...)\n` +
+        `4. Choose one of the matching answers to send to your current chat.`,
     searchAgain: 'Search Again',
     kitsu: 'Kitsu',
     anilist: 'AniList'

@@ -13,6 +13,8 @@ _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => { //nextOffs
     // )
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i].attributes;
+        data = JSON.parse(JSON.stringify(data).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\*/g, "＊").replace(/(`)/g, ''))
+
         console.log(originalQuery)
 
         if (!data.canonicalTitle.includes('delete')) { // && data.ageRatingGuide != "Mild Nudity"
@@ -24,7 +26,7 @@ _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => { //nextOffs
                 [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery.toString() })]
             ]);
             let thumb = getPic(data, 'thumb');
-            let desc = data.synopsis != (null && undefined) ? data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\n{2,}/g, '\n\n') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
+            let desc = data.synopsis != (null && undefined) ? data.synopsis : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
             if (desc == (null || undefined || '')) {
                 desc = lang[userLang].desc_not_available;
             } else if (desc.length >= 100) {
@@ -37,6 +39,7 @@ _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => { //nextOffs
                 id: Data[i].id,
                 title: `[${lang[userLang].kitsuStuff[data.subtype]}] ${data.canonicalTitle}`,
                 description: desc,
+                url: Data[i].links.self.replace("api/edge/", ""),
                 thumb_url: thumb,
                 input_message_content: {
                     message_text: animeSearch.messageSent(data, userLang, Data[i].type, Data[i].id),
