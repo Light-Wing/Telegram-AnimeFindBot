@@ -5,6 +5,9 @@ const errorPic = "https://emojipedia-us.s3.amazonaws.com/thumbs/120/apple/129/fa
 const emoji1 = "https://emoji.beeimg.com/%F0%9F%A4%94/200/apple" //🤔
 const emoji2 = "https://emoji.beeimg.com/%F0%9F%A4%94/200/apple" //🤔
 const emoji3 = "https://emoji.beeimg.com/%F0%9F%A4%94/200/apple" //🤔
+const charNormal = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter.png"
+const charThink = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-thinking.png"
+const charHappy = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-happy.png"
 
 let _ = {};
 _.defaultMessage = {
@@ -13,7 +16,7 @@ _.defaultMessage = {
         id: 1,
         title: "חפשו אנימה ב %s",
         description: 'לחיפוש הקלידו את שם האנימה באנגלית או יפנית',
-        thumb_url: searchPic,
+        thumb_url: charNormal,
         input_message_content: {
             message_text: "(ಥ_ಥ)",
             // parse_mode: 'Markdown',
@@ -25,7 +28,7 @@ _.defaultMessage = {
         id: 1,
         title: "Search Anime (%s)",
         description: 'start typing in english or japanese',
-        thumb_url: searchPic,
+        thumb_url: charThink,
         input_message_content: {
             message_text: "(ಥ_ಥ)",
             // parse_mode: 'Markdown',
@@ -89,7 +92,7 @@ _.englishSearchOnly = {
         id: 3,
         title: "החיפוש לא עובד בעברית",
         description: "נסו לחפש באנגלית או יפנית",
-        thumb_url: "https://emojipedia-us.s3.amazonaws.com/thumbs/120/apple/129/sleepy-face_1f62a.png", //😴",
+        thumb_url: charHappy, //😴",
         input_message_content: {
             message_text: "ಥ‿ಥ",
             parse_mode: 'Markdown',
@@ -101,7 +104,7 @@ _.englishSearchOnly = {
         id: 3,
         title: "searching only works in english",
         description: "sorry, please search in english",
-        thumb_url: "https://emojipedia-us.s3.amazonaws.com/thumbs/120/apple/129/sleepy-face_1f62a.png", //😴",
+        thumb_url: charHappy, //😴",
         input_message_content: {
             message_text: "ಥ‿ಥ",
             parse_mode: 'Markdown',
