@@ -49,6 +49,7 @@ _.getResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
             title: `[${lang[userLang].anilistStuff[data.format]}] ${data.title.userPreferred}`, //
             description: desc,
             url: data.siteUrl,
+            hide_url: true,
             thumb_url: data.coverImage.medium,
             input_message_content: {
                 message_text: _.messageSent(data, userLang).replace(/(`)/g, ''),
@@ -71,7 +72,7 @@ _.getCharResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) 
             [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
         ]);
         // console.log(data.id)
-        let desc = data.description ? data.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/_/g, '') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
+        let desc = data.description ? data.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/_/g, '').replace(/\*/g, '\n') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
         // let desc = 'hello' //data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
         if (desc == (null || undefined || '')) {
             desc = lang[userLang].desc_not_available;
@@ -89,6 +90,7 @@ _.getCharResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) 
             title: `[Character] ${firstname} ${lastname}`, //
             description: desc,
             url: data.siteUrl,
+            hide_url: true,
             thumb_url: thumb,
             input_message_content: {
                 message_text: _.charMessageSent(data, userLang).replace(/(`)/g, ''),
@@ -126,7 +128,7 @@ _.queryAniList = (mainQuery, nextOffset, queryWhat) => {
             break;
         case 'characters':
             query = `query (
-                $id: Int, 
+                $id: Int,
                 $search: String, 
                 $page: Int, 
                 $perPage: Int) {
@@ -321,12 +323,13 @@ _.messageSent = (aniData, userLang) => {
 _.charMessageSent = (aniData, userLang) => {
     let imageCover = aniData.image ? `[\u200B](${aniData.image.large})` : ''; // || aniData.image.medium
     let firstname, lastname, nativename, alternative;
-    firstname = aniData.name.first ? `[${aniData.name.first}](${aniData.siteUrl}) ` : '';
-    lastname = aniData.name.last ? `[${aniData.name.last}](${aniData.siteUrl}) ` : '';
+    firstname = aniData.name.first ? aniData.name.first : '';
+    lastname = aniData.name.last ? ' ' + aniData.name.last : '';
+    let bothnames = `[${firstname}${lastname}](${aniData.siteUrl})`
     nativename = aniData.name.native ? `\n${aniData.name.native}\n` : '';
     alternative = aniData.name.alternative.toString() ? "A.K.A: " + aniData.name.alternative.toString().replace(/,/g, ', ') : '';
-    let description = (aniData.description) ? `\n\n${aniData.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')}` : '';
-    return `${imageCover}${lastname}${firstname}${nativename}${alternative}${description}` //
+    let description = (aniData.description) ? `\n\n${aniData.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').substring(0,3900)}` : '';
+    return `${imageCover}${bothnames}${nativename}${alternative}${description}` //
 }
 
 _.getDescription = aniData => {
@@ -340,7 +343,7 @@ _.getDescription = aniData => {
     //trailer
     trailer = (aniData.trailer) ? (`🎥 <a href="https://${(aniData.trailer.site == "youtube") ? 'youtu.be' : 'dai.ly'}/${aniData.trailer.id}">Trailer</a>`) : '';
     // description = (aniData.description ) ? `\n\n${aniData.description}` : '';
-    description = (aniData.description) ? `\n\n${aniData.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')}` : '';
+    description = (aniData.description) ? `\n\n${aniData.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').substring(0,3900)}` : '';
     return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${description}`
 }
 

@@ -29,20 +29,20 @@ _.inline = (type, msg, bot, userLang) => {
     let originalQuery = query;
 
     if (query == null) {
-        let a = bot.answerList(msg.id)
+        //let a = bot.answerList(msg.id)
+        let a = bot.answerList(msg.id, { cacheTime: 100, personal: false, pmText: lang[userLang].howToSearch, pmParameter: 'help' });
         a.addArticle(
                 reply.defaultMessage[userLang] //.replace('%s', sfor == 'anilist' ? lang[userLang].anilist : lang[userLang].kitsu)
             )
             // console.log('j', a);
         return bot.answerQuery(a);
     }
-    let sFor = (/^-m ?/.test(query) || /^@m ?/.test(query)) ? 'manga' : (/^-c ?/.test(query) || /^@c ?/.test(query)) ? 'character' : (/^-a ?/.test(query) || /^@a ?/.test(query)) ? 'anilist' : (/^-p ?/.test(query) || /^@p ?/.test(query)) ? 'anilistChar' : 'anime';
+    let sFor = (/^-m ?/.test(query) || /^@m ?/.test(query)) ? 'manga' : (/^-p ?/.test(query) || /^@p ?/.test(query)) ? 'character' : (/^-a ?/.test(query) || /^@a ?/.test(query)) ? 'anilist' : (/^-c ?/.test(query) || /^@c ?/.test(query)) ? 'anilistChar' : (/^-k ?/.test(query) || /^@k ?/.test(query)) ? 'kitsu' : 'anime';
 
     if (query.length >= 2 && sFor != 'anime') {
-        query = query.split(/^-m ?|^-c ?|^@m ?|^@c ?|^-a ?|^@a ?|^-p ?|^@p ?/)[1]
+        query = query.split(/^-m ?|^-c ?|^@m ?|^@c ?|^-a ?|^@a ?|^-p ?|^@p ?|^-k ?|^@k ?/)[1]
             // console.log('query2 ' + query + ' sFor ' + sFor)
     }
-
     // { id: '90214',
     //   type: 'characters',
     //   links: { self: 'https://kitsu.io/api/edge/characters/90214' },
@@ -71,6 +71,8 @@ _.inline = (type, msg, bot, userLang) => {
                         return kitsu.searchManga(query, nextOffset).then(res => {
                             let count
                             if (res[1].errors) {
+                                console.log('hebrew search most likely')
+                                count = -1;
                                 //report.error(res[1].errors[0].title, res[1].errors[0].code) //this just sends an error 500 bcz of diffrent letters, dont need to know everytime anymore                                count = -1
                             } else {
                                 count = res[1].meta.count
@@ -92,6 +94,8 @@ _.inline = (type, msg, bot, userLang) => {
                         return kitsu.findCharacter(query, nextOffset).then(res => {
                             let count
                             if (res[1].errors) {
+                                console.log('hebrew search most likely')
+                                count = -1;
                                 //report.error(res[1].errors[0].title, res[1].errors[0].code) //this just sends an error 500 bcz of diffrent letters, dont need to know everytime anymore                                count = -1
                             } else {
                                 count = res[1].meta.count
@@ -112,12 +116,17 @@ _.inline = (type, msg, bot, userLang) => {
                     break;
                 case 'anime':
                     nextOffset = ((msg.offset !== '') ? parseInt(msg.offset) + 10 : 0)
-                        // console.log('anime reach switch1')
-                    if (query.length > 0) {
+                        //console.log('anime reach switch1')
+
+                    if (query.toString().length > 0) {
                         return kitsu.searchAnime(query, nextOffset).then(res => { //nextOffset
                             let count
+
                             if (res[1].errors) {
-                                //report.error(res[1].errors[0].title, res[1].errors[0].code) //this just sends an error 500 bcz of diffrent letters, dont need to know everytime anymore                                count = -1
+                                console.log('hebrew search most likely')
+                                count = -1;
+                                //console.log(res[1])
+                                // report.error(res[1].errors[0].title, res[1].errors[0].code) //this just sends an error 500 bcz of diffrent letters, dont need to know everytime anymore                                count = -1
                             } else {
                                 count = res[1].meta.count
                             }
@@ -156,8 +165,8 @@ _.inline = (type, msg, bot, userLang) => {
                                 }
                                 dataTo_inline(AniData, nextOffset, bot, msg, userLang, startTime, 'anilist', count, originalQuery)
                             }).catch(handleError => {
-                                report.error(`AniList fetch error: ${(JSON.stringify(handleError) === undefined || null || false || {})?handleError:JSON.stringify(handleError)}`)
-                                    // report.error(`AniList fetch error: ${handleError}`)
+                                report.error(`AniList fetch error: ${(JSON.stringify(handleError) === undefined || null || false || {})?handleError:JSON.stringify(handleError)}`, handleError)
+                                report.error(`AniList fetch error: ${handleError}`)
                                 console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n---`)
                                 console.log(`---\nAniList fetch error: ${handleError}\n---`)
                             });
@@ -184,9 +193,10 @@ _.inline = (type, msg, bot, userLang) => {
                                 }
                                 dataTo_inline(AniData, nextOffset, bot, msg, userLang, startTime, 'anilistChar', count, originalQuery)
                             }).catch(handleError => {
-                                report.error(`AniList fetch error: ${(JSON.stringify(handleError) === undefined || null || false || {})?handleError:JSON.stringify(handleError)}`)
-                                    // console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n`)
-                                console.log(`\nAniList fetch error: ${handleError}\n---`)
+                                report.error(`AniList fetch error: ${(JSON.stringify(handleError) === undefined || null || false || {})?handleError:JSON.stringify(handleError)}`, handleError)
+                                    //report.error(`AniList fetch error: ${handleError}`,"")
+                                console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n---`)
+                                console.log(`---\nAniList fetch error: ${handleError}\n---`)
                             });
                     }
                     break;
@@ -216,7 +226,7 @@ function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor, co
     //import file
     let results = {};
     if (count == -1) {
-        results = bot.answerList(msg.id, { nextOffset: '', cacheTime: 100, personal: false });
+        results = bot.answerList(msg.id, { nextOffset: '', cacheTime: 100, personal: false, pmText: lang[userLang].howToError, pmParameter: 'help' });
         results.addArticle(
             reply.englishSearchOnly[userLang]
         )
@@ -252,7 +262,7 @@ function dataTo_inline(Data, nextOffset, bot, msg, userLang, startTime, sFor, co
     report.user(msg, "search", resultsNumber, startTime)
 
     if (JSON.stringify(results.list.length) == "0") {
-        results = bot.answerList(msg.id, { nextOffset: '', cacheTime: 100, personal: false });
+        results = bot.answerList(msg.id, { nextOffset: '', cacheTime: 100, personal: true, pmText: lang[userLang].howToError, pmParameter: 'help' });
         if (nextOffset == 0) {
             results.addArticle(
                 reply.errorMessage[userLang]

@@ -225,24 +225,26 @@ _.he = {
         `\n` +
         `חיפוש דמויות 👱👱‍♀️ - בקיסטו - 🦊\n` +
         `1. רשמו בתיבת ההודעה @AniFinderBot\n` +
-        `2. הוסיפו @c לאחר מכן.\n` +
+        `2. הוסיפו @p לאחר מכן.\n` +
         `3. רשמו את שם הדמות שאותה אתם מחפשים.\n` +
         `(לדוגמא:\n` +
-        `\`@AniFinderBot @c\` - character\n` +
+        `\`@AniFinderBot @p\` - person\n` +
         `ואחרי זה את שם הדמות לחיפוש בקיטסו...)\n` +
         `4. בחרו מתוך האופציות את הדמות הרצויה.\n` +
         `\n` +
         `חיפוש דמויות 👱👱‍♀️ - באניליסט - 📝\n` +
         `1. רשמו בתיבת ההודעה @AniFinderBot\n` +
-        `2. הוסיפו @p לאחר מכן.\n` +
+        `2. הוסיפו @c לאחר מכן.\n` +
         `3. רשמו את שם הדמות שאותה אתם מחפשים.\n` +
         `(לדוגמא:\n` +
-        `\`@AniFinderBot @p\` - person\n` +
+        `\`@AniFinderBot @c\` - character\n` +
         `ואחרי זה את שם הדמות לחיפוש באניליסט...)\n` +
         `4. בחרו מתוך האופציות את הדמות הרצויה.`,
     searchAgain: 'חיפוש נוסף',
     kitsu: 'קיטסו',
-    anilist: 'אניליסט'
+    anilist: 'אניליסט',
+    howToSearch: 'איך להשתמש בבוט?',
+    howToError: 'איך לחפש?'
 }
 _.en = {
     startMsg: `Hello %s!\n` +
@@ -296,8 +298,8 @@ _.en = {
         idea: 'Thank you for your knowladge, I\'ll see what I can do with it',
         g_feedback: 'Thank you for your feedback, I\'ll make sure to read it when I can'
     },
-    found: 'found',
-    results: 'results',
+    found: 'Found',
+    results: 'Results',
     choose_one_or_cancel: 'Please choose an option, or press /cancel',
     not_start: "not start",
     genres: "Genres",
@@ -462,23 +464,25 @@ _.en = {
         `\n` +
         `Search Characters - 👱👱‍ - Kitsu  - 🦊\n` +
         `1. Type in any chat @AniFinderBot\n` +
-        `2. Add @c after the bot's name\n` +
-        `3. Type a name of an anime you're looking for\n` +
-        `(For example:\n` +
-        `\`@AniFinderBot @c\` - character\n` +
-        `Then the name of the character you want to find...)\n` +
-        `4. Choose one of the matching answers to send to your current chat.\n` +
-        `\n` +
-        `Search Characters - 👱👱‍ - Anilist - 📝\n` +
-        `1. Type in any chat @AniFinderBot\n` +
         `2. Add @p after the bot's name\n` +
         `3. Type a name of an anime you're looking for\n` +
         `(For example:\n` +
         `\`@AniFinderBot @p\` - person\n` +
         `Then the name of the character you want to find...)\n` +
+        `4. Choose one of the matching answers to send to your current chat.\n` +
+        `\n` +
+        `Search Characters - 👱👱‍ - Anilist - 📝\n` +
+        `1. Type in any chat @AniFinderBot\n` +
+        `2. Add @c after the bot's name\n` +
+        `3. Type a name of an anime you're looking for\n` +
+        `(For example:\n` +
+        `\`@AniFinderBot @c\` - character\n` +
+        `Then the name of the character you want to find...)\n` +
         `4. Choose one of the matching answers to send to your current chat.`,
     searchAgain: 'Search Again',
     kitsu: 'Kitsu',
-    anilist: 'AniList'
+    anilist: 'AniList',
+    howToSearch: 'Click Here to know how to Search!',
+    howToError: 'How To Search?'
 }
 module.exports = _;

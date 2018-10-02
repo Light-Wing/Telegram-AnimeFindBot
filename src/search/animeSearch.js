@@ -43,6 +43,7 @@ _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
                     title: `[${lang[userLang].kitsuStuff[data.subtype]}] ${data.canonicalTitle}`, //
                     description: desc,
                     url: Data[i].links.self.replace("api/edge/", ""),
+                    hide_url: true,
                     thumb_url: thumb,
                     input_message_content: {
                         message_text: _.messageSent(data, userLang, Data[i].type, Data[i].id).replace(/(`)/g, ''),

@@ -5,9 +5,9 @@ const errorPic = "https://emojipedia-us.s3.amazonaws.com/thumbs/120/apple/129/fa
 const emoji1 = "https://emoji.beeimg.com/%F0%9F%A4%94/200/apple" //🤔
 const emoji2 = "https://emoji.beeimg.com/%F0%9F%A4%94/200/apple" //🤔
 const emoji3 = "https://emoji.beeimg.com/%F0%9F%A4%94/200/apple" //🤔
-const charNormal = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter.png"
-const charThink = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-thinking.png"
-const charHappy = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-happy.png"
+const charNormal = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter.png?raw=true"
+const charThink = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-thinking.png?raw=true"
+const charHappy = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-happy.png?raw=true"
 
 let _ = {};
 _.defaultMessage = {
@@ -28,7 +28,7 @@ _.defaultMessage = {
         id: 1,
         title: "Search Anime (%s)",
         description: 'start typing in english or japanese',
-        thumb_url: charThink,
+        thumb_url: charNormal,
         input_message_content: {
             message_text: "(ಥ_ಥ)",
             // parse_mode: 'Markdown',
@@ -42,7 +42,7 @@ _.errorMessage = {
         id: 4,
         title: "לא נמצאו תוצאות",
         description: "בדקו שגיאות ונסו שוב",
-        thumb_url: errorPic,
+        thumb_url: charThink,
         input_message_content: {
             message_text: "(ಥ﹏ಥ)",
             parse_mode: 'Markdown',
@@ -54,7 +54,7 @@ _.errorMessage = {
         id: 4,
         title: "Nothing was Found",
         description: "look for typos and try again",
-        thumb_url: errorPic,
+        thumb_url: charThink,
         input_message_content: {
             message_text: "(ಥ﹏ಥ)",
             parse_mode: 'Markdown',
@@ -92,7 +92,7 @@ _.englishSearchOnly = {
         id: 3,
         title: "החיפוש לא עובד בעברית",
         description: "נסו לחפש באנגלית או יפנית",
-        thumb_url: charHappy, //😴",
+        thumb_url: charThink, //😴",
         input_message_content: {
             message_text: "ಥ‿ಥ",
             parse_mode: 'Markdown',
@@ -102,9 +102,9 @@ _.englishSearchOnly = {
     en: {
         cacheTime: 100,
         id: 3,
-        title: "searching only works in english",
-        description: "sorry, please search in english",
-        thumb_url: charHappy, //😴",
+        title: "Searching only works in English",
+        description: "Sorry, please search in english",
+        thumb_url: charThink, //😴",
         input_message_content: {
             message_text: "ಥ‿ಥ",
             parse_mode: 'Markdown',

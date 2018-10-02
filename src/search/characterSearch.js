@@ -2,6 +2,7 @@
 
 var sanitizeHtml = require('sanitize-html');
 let lang = require('../LANG');
+const charHappy = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-happy.png?raw=true"
 
 let _ = {}
 
@@ -21,7 +22,7 @@ _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
             title: `[${lang[userLang].kitsuStuff[Data[i].type]}] ${data.canonicalName}`,
             description: ((data.description)) ? sanitizeHtml(data.description) : lang[userLang].desc_not_available, //.replace(/<(?:.|\n)*?>/gm, '')
             //url: Data[i].links.self, //kitsu dosent have individual pages for charachters
-            thumb_url: (data.image) ? data.image.original : undefined,
+            thumb_url: (data.image) ? data.image.original : charHappy,
             input_message_content: {
                 message_text: messageSent(data, Data[i].type, Data[i].id),
                 parse_mode: 'Markdown',

@@ -40,6 +40,7 @@ _ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => { //nextOffs
                 title: `[${lang[userLang].kitsuStuff[data.subtype]}] ${data.canonicalTitle}`,
                 description: desc,
                 url: Data[i].links.self.replace("api/edge/", ""),
+                hide_url: true,
                 thumb_url: thumb,
                 input_message_content: {
                     message_text: animeSearch.messageSent(data, userLang, Data[i].type, Data[i].id),

@@ -28,7 +28,7 @@ _.reactToCommand = (bot, msg, userLang) => {
             // console.log(hiText)
         return bot.sendMessage(msg.from.id, hiText, { replyMarkup });
     }
-    if (msgText == "/help") {
+    if (msgText == "/help" || msgText.split(' ')[1] == 'help') {
         let replyMarkup = bot.inlineKeyboard([
             [bot.inlineButton(lang[userLang].check_it_out.none, { inlineCurrent: '' })],
             [bot.inlineButton(lang[userLang].check_it_out.manga, { inlineCurrent: '@m' })],
