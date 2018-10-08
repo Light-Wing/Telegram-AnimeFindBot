@@ -2,21 +2,8 @@
 
 require('dotenv').config()
 const token = process.env.TELEGRAM_TOKEN;
-// const port = process.env.PORT || 443;
-// const host = process.env.HOST;
 
-const searcher = require('./searcher');
-// let getUser = require("./search/getUserName").verifyUser;
-let report = require("./report");
-// let can_i = require("./can_i");
-// let utils = require("./utils");
-let callbackQuery = require("./callbackQuery");
-let lang = require('./LANG');
-
-// const dbs1 = require("./dbs/DBtest");
-const dbs = require("./dbs/dbs");
-
-const url = `https://${process.env.HEROKU_NAME}.herokuapp.com/bot${token}/`;
+// const url = `https://${process.env.HEROKU_NAME}.herokuapp.com/bot${token}/`;
 
 // const DEV_TELEGRAM_ID = parseInt(process.env.DEV_TELEGRAM_ID) || 0;
 const ERR_CHNL_CHAT_ID = process.env.ERR_CHNL_CHAT_ID;
@@ -26,23 +13,33 @@ const axios = require('axios');
 // const fetch = require('node-fetch');
 const baseUrl = `https://api.telegram.org/bot${token}/`;
 
-let bot = require('./botSetup')
+let bot = require('./botSetup').bot;
 
-let dataOnUser = require("./userCache");
-let userCache = require('./utils').userCache;
+let dataOnUser = require('./botSetup').dataOnUser;
+let userCache = require('./utils/utils').userCache;
+
+let report = require("./utils/report");
+const searcher = require('./respond/search');
+
+let askRouter = require('./respond/ask').ask;
+let commandRouter = require('./respond/commands').reactToCommand;
+let callbackQuery = require("./respond/callbackQuery");
+
+// let lang = require('./LANG');
+
 let rmFrom_dataOnUser = [];
-const DELAY = 60000 * 60 * 24;
+const DELAY = 60000 * 60 * 24; //one day
+
+// setInterval(() => {
+//     console.log(dataOnUser)
+// }, 3000)
 
 bot.getMe().then(function(me) { //self check
-        const botName = me.username;
-        console.log('---\nHello! My name is %s!', me.first_name);
-        console.log(`And my username is @${ botName }\n---`);
-        return botName;
-    }) //.then(() => {
-    //update usercache from db
-    // let userLang = userCache(msg);
-    //need to make a function to check for db users and fill cache with the info from there...
-    // });
+    const botName = me.username;
+    console.log('---\nHello! My name is %s!', me.first_name);
+    console.log(`And my username is @${ botName }\n---`);
+    return botName;
+})
 bot.on("error", err => { //most telegram errors should get caught here
     console.log("Telegram Error " + err.error.error_code + "\nDescription: " + err.error.description + "\nfull report " + JSON.stringify(err))
     return axios.post(baseUrl + "sendMessage", {
@@ -70,64 +67,55 @@ process.on('unhandledRejection', function(reason, p) {
     // application specific logging here
 });
 
-// bot.on('/genre', async msg => {
-//     let list = await searcher.getGenres2()
-//     console.log(list)
-//     bot.sendMessage(process.env.DEV_TELEGRAM_ID, list.toString()) //.replace(/,/g, '\n'))
-// })
 bot.on('inlineQuery', (msg) => {
-    let userLang = userCache(msg);
-    let lang;
-    if (dataOnUser[msg.from.id]['lang'] !== (undefined && null)) {
-        lang = dataOnUser[msg.from.id]['lang']
-    } else {
-        lang = (msg.from != undefined && msg.from.language_code != null) ? msg.from.language_code : "en";
-    }
+    userCache(msg);
+    let lang = (dataOnUser[msg.from.id]['lang'] !== (undefined && null)) ? dataOnUser[msg.from.id]['lang'] : msg.from.language_code;
     report.user(msg, 'lang', lang)
         // console.log(userLang)
 
     let type = "inline";
-    searcher.inline(type, msg, bot, userLang)
-});
-bot.on('callbackQuery', msg => {
-    let userPref = userCache(msg, 'both');
-    // console.log('------------', userPref)
-    let lang;
-    if (dataOnUser[msg.from.id]['lang'] !== (undefined && null)) {
-        lang = dataOnUser[msg.from.id]['lang']
-    } else {
-        lang = (msg.from != undefined && msg.from.language_code != null) ? msg.from.language_code : "en";
-    }
-    report.user(msg, 'lang', lang)
-    callbackQuery(bot, msg, userPref)
+    searcher.inline(msg, type)
 });
 
-let reactToCommand = require('./talkToBot/commands').reactToCommand;
+
+
+
+
+bot.on('callbackQuery', msg => {
+    userCache(msg);
+    // console.log('------------', msg)
+    // return bot.answerCallbackQuery(msg.id, { text: msg.data })
+    let lang = (dataOnUser[msg.from.id]['lang'] !== (undefined && null)) ? dataOnUser[msg.from.id]['lang'] : msg.from.language_code;
+    report.user(msg, 'lang', lang)
+    callbackQuery(msg)
+});
+
 bot.on(['*', '/*'], (msg, self) => {
     // console.log(self)
     // console.log(msg) //lang[userLang].feedback
     if (msg.chat.type == 'private') { //!channel
         if (msg.chat.id == msg.from.id) { //self.type == ("command") && 
-            let userLang = userCache(msg);
-            reactToCommand(bot, msg, userLang)
+            userCache(msg)
+            commandRouter(msg)
         }
     }
 });
-let ask = require('./talkToBot/ask').ask;
 bot.on('ask.router', msg => {
-    let userLang = userCache(msg);
-    // console.log('ask any', msg.ask)
+    userCache(msg);
     let askWhat = msg.ask
-    ask(bot, msg, askWhat, userLang)
+    askRouter(msg, askWhat)
 });
-// setInterval(() => {
-//     console.log(dataOnUser)
-// }, 1000);
+
+
+
+
+
+
 
 setInterval(() => {
     for (let userID in dataOnUser) {
         let elapsed_time = new Date().valueOf() - dataOnUser[userID]['time'];
-        if (elapsed_time > DELAY) {
+        if (elapsed_time > DELAY) { //if its more then a day
             try {
                 rmFrom_dataOnUser.push(userID);
                 console.log('removing user $s from cache', userID)
@@ -141,11 +129,7 @@ setInterval(() => {
             rmFrom_dataOnUser.splice(i, 1);
         }
     }
-}, 60000 * 2 * 60);
-
-//a one time function that runs at bot strt to update cache from db - not done yet
+}, 60000 * 2 * 60); //2 hours
 
 // Call API
 bot.start();
-
-// https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=jjj%40gmail%2ecom&lc=US&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHostedGuest

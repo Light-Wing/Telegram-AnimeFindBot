@@ -1,40 +1,39 @@
 'use strict';
 
-let lang = require('../LANG');
-let utils = require("../utils");
+let lang = require('../langFiles/LANG');
+let utils = require("../utils/utils");
+let anilistQuerys = require("./anilistQuerys");
+
+let bot = require('../botSetup').bot;
+let dataOnUser = require('../botSetup').dataOnUser;
+const genreList = require("../langFiles/genres");
 
 let _ = {};
 
 
-_.getResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
+_.getResults = (Data, nextOffset, msg, count) => {
+    let userID = msg.from.id;
+    let userLang = dataOnUser[userID]['lang'];
+    let originalQuery = msg.query;
+
     let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 300, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
-    //bot.sendMessage(msg.from.id, `\`\`\`${JSON.stringify(Data)}\`\`\``, { parseMode: 'markdown' })
 
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i]
-            //data = JSON.parse(JSON.stringify(data).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\*/g, "＊").replace(/(`)/g, ''))
-            //console.log(data)
-
-        let nextEpAir2, nextEpAir
+        let dateToMilisec, nextEpNum, nextEpAir;
         if (data.nextAiringEpisode) {
-            let timeDiff = data.nextAiringEpisode.airingAt - new Date().valueOf()
-            nextEpAir = utils.msToTime(data.nextAiringEpisode.airingAt, userLang);
-            nextEpAir2 = utils.msToTime(data.nextAiringEpisode.timeUntilAiring, userLang);
-            // console.log(nextEpAir, i)
-            // console.log(nextEpAir2, i)
-        } else {
-            // console.log('no nextAiringEpisode', i)
-        }
+            nextEpNum = (data.nextAiringEpisode.episode) ? data.nextAiringEpisode.episode : "";
 
-        let dateToMilisec = (data.nextRelease) ? new Date(data.nextRelease.replace(' ', 'T').replace(' ', '')).valueOf() : "";
+            // nextEpAir = utils.msToTime(data.nextAiringEpisode.airingAt * 1000 - new Date().getTime(), userLang);
+        }
+        let plainQuery = /^@m ?|^@c ?|^@a ?|^@p ?|^@k ?/.test(originalQuery) ? originalQuery.split(/^@m ?|^@c ?|^@a ?|^@p ?|^@k ?/)[1] : originalQuery;
         let replyMarkup = bot.inlineKeyboard([
-            //[bot.inlineButton(lang[userLang].description, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-d' })],
-            //(data.nextRelease ) ? [bot.inlineButton(lang[userLang].nextRelease, { callback: (Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-nxt-' + dateToMilisec) })] : [],
+            [bot.inlineButton(lang[userLang].description, { callback: data.id + '-anilist' + '-d' }), bot.inlineButton(lang[userLang].findMoreCharacters, { inlineCurrent: "@c " + plainQuery })],
+            (data.nextAiringEpisode) ? [bot.inlineButton(lang[userLang].nextRelease, { callback: data.id + '-anilist' + '-nxt-' + data.nextAiringEpisode.airingAt + '-' + nextEpNum })] : [],
             [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
         ]);
 
-        let desc = data.description ? data.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
-        // let desc = 'hello' //data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
+        let desc = data.description ? utils.md2tgmd(data.description).replace(/_/g, "") : lang[userLang].desc_not_available;
         if (desc == (null || undefined || '')) {
             desc = lang[userLang].desc_not_available;
         } else if (desc.length >= 100) {
@@ -63,7 +62,11 @@ _.getResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
     return results;
 }
 
-_.getCharResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
+_.getCharResults = (Data, nextOffset, msg, count) => {
+    let userID = msg.from.id;
+    let userLang = dataOnUser[userID]['lang'];
+    let originalQuery = msg.query;
+
     let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 300, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
     // console.log(Data.length)
     for (let i = 0, len = Data.length; i < len; i++) {
@@ -72,8 +75,7 @@ _.getCharResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) 
             [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
         ]);
         // console.log(data.id)
-        let desc = data.description ? data.description.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/_/g, '').replace(/\*/g, '\n') : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');
-        // let desc = 'hello' //data.synopsis.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n');
+        let desc = data.description ? utils.md2tgmd(data.description).replace(/_(.+?)_/g, `$1`) : lang[userLang].desc_not_available;
         if (desc == (null || undefined || '')) {
             desc = lang[userLang].desc_not_available;
         } else if (desc.length >= 100) {
@@ -83,11 +85,11 @@ _.getCharResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) 
             desc = desc + "...";
         }
         let firstname = data.name.first ? data.name.first : '';
-        let lastname = data.name.last ? data.name.last : '';
+        let lastname = data.name.last ? ' ' + data.name.last : '';
         let thumb = data.image.medium || data.image.large;
         var searchResault = {
             id: data.id,
-            title: `[Character] ${firstname} ${lastname}`, //
+            title: `[Character] ${firstname}${lastname}`, //
             description: desc,
             url: data.siteUrl,
             hide_url: true,
@@ -107,137 +109,23 @@ _.getCharResults = (Data, nextOffset, bot, msg, userLang, count, originalQuery) 
 _.queryAniList = (mainQuery, nextOffset, queryWhat) => {
     let query, variables;
     switch (queryWhat) {
-        case 'description':
-            query = `query (
-            $id: Int, 
-            $search: String, 
-            $asHtml: Boolean = false, 
-            $isAdult: Boolean = false, 
-            $page: Int, 
-            $perPage: Int) {
-            Page(page: $page, perPage: $perPage) {
-              pageInfo {
-                total
-                currentPage
-                lastPage
-                hasNextPage
-                perPage
-              }
-
-              `;
-            break;
+        // case 'description':
+        //     query = anilistQuerys.queryDescription;
+        //     break;
         case 'characters':
-            query = `query (
-                $id: Int,
-                $search: String, 
-                $page: Int, 
-                $perPage: Int) {
-                Page(page: $page, perPage: $perPage) {
-                  pageInfo {
-                    total
-                    currentPage
-                    lastPage
-                    hasNextPage
-                    perPage
-                  }
-                  characters(id: $id, search: $search) {
-                    id
-                    name {
-                      first
-                      last
-                      native
-                      alternative
-                    }
-                    image {
-                      large
-                      medium
-                    }
-                    description(asHtml: false)
-                    siteUrl
-                  }
-                }
-              }`;
+            query = anilistQuerys.queryCharacter;
             break;
+            // case 'airdate':
+            //     query = anilistQuerys.queryNextAirDate;
+            //     break;
         default:
-            query = `query (
-            $id: Int, 
-            $search: String, 
-            $asHtml: Boolean = false, 
-            $isAdult: Boolean = false, 
-            $page: Int, 
-            $perPage: Int) {
-            Page(page: $page, perPage: $perPage) {
-              pageInfo {
-                total
-                currentPage
-                lastPage
-                hasNextPage
-                perPage
-              }
-              media(id: $id, search: $search, isAdult: $isAdult) {
-                id
-                startDate {
-                  year
-                  month
-                  day
-                }
-                endDate {
-                  year
-                  month
-                  day
-                }
-                format
-                type
-                status
-                episodes
-                duration
-                chapters
-                volumes
-                genres
-                averageScore
-                popularity
-                tags {
-                  id
-                }
-                title {
-                  romaji
-                  english
-                  native
-                  userPreferred
-                }
-                coverImage {
-                  large
-                  medium
-                }
-                description(asHtml: $asHtml)
-                bannerImage
-                duration
-                nextAiringEpisode {
-                  id
-                  airingAt
-                  timeUntilAiring
-                  episode
-                  mediaId
-                }
-                synonyms
-                siteUrl
-                trailer {
-                  id
-                  site
-                }
-              }
-            }
-          }
-          `;
+            query = anilistQuerys.queryNormal;
     }
-
-
     variables = {
         search: mainQuery,
         page: nextOffset,
         perPage: 10,
     };
-    // }
     var url = 'https://graphql.anilist.co',
         options = {
             method: 'POST',
@@ -252,7 +140,36 @@ _.queryAniList = (mainQuery, nextOffset, queryWhat) => {
         };
     return { url: url, options: options };
 };
-const genreList = require("../langFiles/genres");
+
+_.queryAnilistByID = (ID, queryWhat) => {
+    let query, variables;
+    switch (queryWhat) {
+        case 'description':
+            query = anilistQuerys.queryDescription;
+            break
+        case 'airdate':
+            query = anilistQuerys.queryNextAirDate;
+            break
+        default:
+            console.log("problem with queryAnilistByID")
+    }
+    variables = {
+        id: ID
+    };
+    var url = 'https://graphql.anilist.co',
+        options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                query: query,
+                variables: variables
+            })
+        };
+    return { url: url, options: options };
+};
 
 _.messageSent = (aniData, userLang) => {
     let titleEN, titleJP, titleRJ, imageCover, genres, episodes, trailer, volumes, chapters, startDate, sday, smonth, syear, endDate, eday, emonth, eyear, status, averageScore, popularity, description, msgtext;
@@ -317,7 +234,7 @@ _.messageSent = (aniData, userLang) => {
     //message text - removed: ${description}
     // console.log(`${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`)
 
-    return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`;
+    return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}\n${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`;
 };
 
 _.charMessageSent = (aniData, userLang) => {
@@ -332,10 +249,10 @@ _.charMessageSent = (aniData, userLang) => {
     return `${imageCover}${bothnames}${nativename}${alternative}${description}` //
 }
 
-_.getDescription = aniData => {
+_.getDescription = (aniData, userLang) => {
     let titleRJ, titleJP, titleEN, imageCover, trailer, description;
     //cover - banner
-    imageCover = aniData.bannerImage ? `<a href="${aniData.bannerImage}">\u200B</a>` : (aniData.coverImage.large ? `<a href="${aniData.coverImage.large}">\u200B</a>` : '');
+    imageCover = aniData.bannerImage ? `[\u200B](${aniData.bannerImage})` : (aniData.coverImage.large ? `[\u200B](${aniData.image.large})` : '');
     //titles - romaji english native
     titleRJ = aniData.title.romaji ? `🇺🇸 <a href="${aniData.siteUrl}">${aniData.title.romaji}</a>\n` : '';
     titleJP = aniData.title.native ? `🇯🇵 ${aniData.title.native}\n` : '';

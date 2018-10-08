@@ -1,12 +1,21 @@
 'use strict';
 
 let _ = {};
-let lang = require('../LANG');
-let report = require("../report");
+let lang = require('../langFiles/LANG');
+let report = require("../utils/report");
 let commandList = require('./commands').commandList;
 
+let bot = require('../botSetup').bot;
+let dataOnUser = require('../botSetup').dataOnUser;
+
 let sendTo_userID
-_.ask = (bot, msg, askWhat, userLang, pref) => {
+
+_.ask = (msg, askWhat) => {
+    let userID = msg.from.id;
+    let userLang = dataOnUser[userID]['lang'];
+    //let userDesc = dataOnUser[userID]['desc'];
+    //let userSource = dataOnUser[userID]['src'];
+
     if (msg.text == '/cancel' || commandList.includes(msg.text) || msg.text == lang['he'].cancel || msg.text == lang['en'].cancel) {
         //console.log("canceld")
         return bot.sendMessage(msg.chat.id, lang[userLang].cancelled, { replyMarkup: 'hide' });

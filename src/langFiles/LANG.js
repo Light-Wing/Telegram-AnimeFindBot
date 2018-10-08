@@ -30,6 +30,7 @@ _.he = {
             `\n(כשלוחצים על כפתור ״תקציר״ הבוט שולח חלק מהתקציר בבועה... לפעמים אין מספיק מקום בבועה ויכול ליהיות מצב שחלק מהתקציר לא מופיע שם... לכן יש את האפשרות שהתקציר ישלח (בנוסף לבועה) לכאן...`,
         setDesc: 'הגדרות תקציר',
         setLang: 'הגדרות שפה',
+        setSource: 'הגדרת מקור'
     },
     setDesc: {
         desc: `כדי לקבל תקציר מלא שישלח כאן בפרטי, בחרו ב - ״כן״`,
@@ -77,7 +78,11 @@ _.he = {
     start_date: "תאריך התחלה",
     end_date: "תאריך סיום",
     nextRelease: "פרק הבא יצא בעוד",
+    episode: 'פרק',
+    airsOn: 'יצא בעוד',
     status: "סטטוס",
+    anime: "אנימה",
+    character: 'דמות',
     kitsuStuff: {
         'anime': 'Anime', //אנימה
         'TV': 'TV',
@@ -116,7 +121,7 @@ _.he = {
         'manhwa': 'Manhwa',
         'manhua': 'Manhua',
         'FINISHED': 'סוים',
-        'RELEASING': 'עדיין לא יוצא',
+        'RELEASING': 'בשידור',
         'NOT_YET_RELEASED': 'עדיין לא יצא',
         'CANCELLED': 'בוטל',
         // 'finished_airing': 'סוים',
@@ -243,8 +248,12 @@ _.he = {
     searchAgain: 'חיפוש נוסף',
     kitsu: 'קיטסו',
     anilist: 'אניליסט',
+    setSource: 'בחרו מקור חדש לחיפוש אנימות. \n(תמיד אפשר להשתמש ב @a או @k כדי לחפש במקור אחר)',
+    newSrcKitsu: 'קיטסו הוגדר כמקור ברירת מחדל',
+    newSrcAnilist: 'אניליסט הוגדר כמקור ברירת מחדל',
     howToSearch: 'איך להשתמש בבוט?',
-    howToError: 'איך לחפש?'
+    howToError: 'איך לחפש?',
+    findMoreCharacters: 'דמויות'
 }
 _.en = {
     startMsg: `Hello %s!\n` +
@@ -271,6 +280,7 @@ _.en = {
         settings: 'Which settings do you want to change?',
         setDesc: 'Description settings',
         setLang: 'Language settings',
+        setSource: 'Source Settings'
     },
     setDesc: {
         desc: 'Do you want anime and manga descriptions sent here?',
@@ -315,7 +325,11 @@ _.en = {
     start_date: "Start date",
     end_date: "End date",
     nextRelease: "Next Ep Airs in",
+    episode: 'Episode',
+    airsOn: 'Airs in',
     status: "Status",
+    anime: 'an Anime',
+    character: 'a Character',
     kitsuStuff: {
         'anime': 'Anime',
         'characters': 'Character',
@@ -482,7 +496,11 @@ _.en = {
     searchAgain: 'Search Again',
     kitsu: 'Kitsu',
     anilist: 'AniList',
-    howToSearch: 'Click Here to know how to Search!',
-    howToError: 'How To Search?'
+    setSource: 'Choose the default source fot the bot to use.\n(you can always use @a or @k to temporarily use a different source)',
+    newSrcKitsu: 'Kitsu set to default Source!',
+    newSrcAnilist: 'Anilist set to default Source!',
+    howToSearch: 'Click Here to Learn how to Search!',
+    howToError: 'How To Search?',
+    findMoreCharacters: 'Find Characters'
 }
 module.exports = _;

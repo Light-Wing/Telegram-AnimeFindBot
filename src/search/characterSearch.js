@@ -1,12 +1,20 @@
 'use strict';
 
 var sanitizeHtml = require('sanitize-html');
-let lang = require('../LANG');
+let lang = require('../langFiles/LANG');
 const charHappy = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-happy.png?raw=true"
+
+let bot = require('../botSetup').bot;
+let dataOnUser = require('../botSetup').dataOnUser;
 
 let _ = {}
 
-_ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => {
+_ = (Data, nextOffset, msg, count) => {
+
+    let userID = msg.from.id;
+    let userLang = dataOnUser[userID]['lang'];
+    let originalQuery = msg.query;
+
     let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 300, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i].attributes;

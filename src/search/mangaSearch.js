@@ -1,12 +1,20 @@
 'use strict';
 
-let getPic = require('./getPic')
-let lang = require('../LANG');
+let getPic = require('../utils/getPic')
+let lang = require('../langFiles/LANG');
 const animeSearch = require('./animeSearch')
+
+let bot = require('../botSetup').bot;
+let dataOnUser = require('../botSetup').dataOnUser;
 
 let _ = {}
 
-_ = (Data, nextOffset, bot, msg, userLang, count, originalQuery) => { //nextOffset: nextOffset, 
+_ = (Data, nextOffset, msg, count) => {
+
+    let userID = msg.from.id;
+    let userLang = dataOnUser[userID]['lang'];
+    let originalQuery = msg.query;
+
     let results = bot.answerList(msg.id, { nextOffset: nextOffset, cacheTime: 300, personal: true, pmText: lang[userLang].found + ' ' + count + ' ' + lang[userLang].results, pmParameter: 'setting' });
     // results.addArticle(
     //     reply.loadedMore

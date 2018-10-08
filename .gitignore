@@ -7,3 +7,4 @@ todo
 src/dbs/connectionString.js
 img-src-files
 *.svg
+src-old

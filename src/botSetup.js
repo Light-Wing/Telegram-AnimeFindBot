@@ -37,7 +37,8 @@ if (process.env.NPM_CONFIG_PRODUCTION) {
         polling: true
     });
 };
-bot.plug(require('./talkToBot/askUsers'))
+bot.plug(require('./utils/askUsers'))
 
+let dataOnUser = {};
 
-module.exports = bot;
+module.exports = { bot, dataOnUser };

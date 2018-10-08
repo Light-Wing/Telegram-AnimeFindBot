@@ -5,8 +5,11 @@ let _ = {};
 const ERR_CHNL_CHAT_ID = process.env.ERR_CHNL_CHAT_ID;
 const USERS_CNL = process.env.USERS_CNL;
 const FEEDBACK_CHNL = process.env.FEEDBACK_CHNL;
-let getUser = require("./search/getUserName").verifyUser;
-let bot = require('./botSetup')
+
+let getUser = require("./getUserName").verifyUser;
+let bot = require('../botSetup').bot;
+let dataOnUser = require('../botSetup').dataOnUser;
+
 
 const ops = {
     parseMode: "Markdown",
@@ -30,13 +33,13 @@ _.error = (errMsg, error, markdown) => {
         replyMarkup: null
     };
     bot.sendMessage(ERR_CHNL_CHAT_ID, errMsg + error, opsErr);
-}
+};
 _.feedback = (msg, feedback) => {
     let userID = msg.from.id;
     let head = `ID: \`${userID}\` - [${getUser(msg.from, "first&last")}](tg://user?id=${userID})`;
     let msgText = msg.text;
     bot.sendMessage(FEEDBACK_CHNL, `${head}\nHas some ${feedback}:\n${msgText}`, ops);
-}
+};
 let dataToSend = {};
 let rmFrom_dataToSend = [];
 const DELAY = 20000;
@@ -61,7 +64,7 @@ _.user = (msg, didWhat, extraInfo, time) => {
             text = 'Genres took ' + time + 'ms';
             break;
         case 'lang':
-            lang = `language code = \`${extraInfo}\``;
+            lang = `language code = \`${extraInfo}\``; //dataOnUser[userID]['lang']
             break;
         case 'desc':
             text = 'Description took ' + time + 'ms';
@@ -100,6 +103,7 @@ _.user = (msg, didWhat, extraInfo, time) => {
         dataToSend[userID]['lang'] = lang;
         // dataToSend[userID]['msgBody'].push(""); //"nothing more"
     }
+    dataToSend[userID]['src'] = dataOnUser[userID]['src'];
     let biggestSearchTime;
 
     if (didWhat == 'search') {
@@ -126,7 +130,8 @@ function sendReport(bot) {
                 let searchNum = dataToSend[userID]['searchNum'] > 0 ? `\nnumber of searches: ${dataToSend[userID]['searchNum']}` : '';
                 let searchTime = dataToSend[userID]['searchTime'] != null || undefined ? `\n(longest search time: ${dataToSend[userID]['searchTime']}ms)` : '';
                 let text = uniqBy(dataToSend[userID]['msgBody'], JSON.stringify).toString().replace(/,/g, '\n');
-                let msgText = `${dataToSend[userID]['msgHead']}\n${dataToSend[userID]['lang']}${searchNum}\n${text}${searchTime}`
+                let src = `Source: ${dataToSend[userID]['src'].charAt(0).toUpperCase() + dataToSend[userID]['src'].slice(1)}`
+                let msgText = `${dataToSend[userID]['msgHead']}\n${dataToSend[userID]['lang']}${searchNum}\n${src}\n${text}${searchTime}`
                 bot.sendMessage(USERS_CNL, msgText, ops).then(() => {
                     dataToSend[userID]['status'] = 'done';
                     rmFrom_dataToSend.push(userID);

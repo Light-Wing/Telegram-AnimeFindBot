@@ -1,9 +1,14 @@
 'use strict';
 
 let _ = {};
-let lang = require('../LANG');
+
 require('dotenv').config()
-const dbs = require("../dbs/dbs");
+
+let lang = require('../langFiles/LANG');
+const dbs = require("../utils/dbs");
+
+let bot = require('../botSetup').bot;
+let dataOnUser = require('../botSetup').dataOnUser;
 
 // require('util')  util.format
 _.commandList = [
@@ -14,7 +19,10 @@ _.commandList = [
     '/test',
     '/search'
 ]
-_.reactToCommand = (bot, msg, userLang) => {
+_.reactToCommand = (msg) => {
+    let userID = msg.from.id;
+    let userLang = dataOnUser[userID]['lang'];
+    let userDesc = dataOnUser[userID]['desc'];
     // console.log(msg)
     let msgText = msg.text.toLowerCase();
     if (msg.text == '/cancel' || msg.text == lang['he'].cancel || msg.text == lang['en'].cancel) {
@@ -57,6 +65,7 @@ _.reactToCommand = (bot, msg, userLang) => {
         //should show a language button a description button and a cancel button
         let replyMarkup = bot.inlineKeyboard([
             [bot.inlineButton(lang[userLang].settings.setLang, { callback: 'setLang' })],
+            [bot.inlineButton(lang[userLang].settings.setSource, { callback: 'setSource' })],
             [bot.inlineButton(lang[userLang].settings.setDesc, { callback: 'descSetting' })],
             [bot.inlineButton(lang[userLang].cancel, { callback: 'cancel' })]
         ]);

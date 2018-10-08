@@ -12,10 +12,9 @@ const charHappy = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/
 let _ = {};
 _.defaultMessage = {
     he: {
-        cacheTime: 0,
         id: 1,
-        title: "חפשו אנימה ב %s",
-        description: 'לחיפוש הקלידו את שם האנימה באנגלית או יפנית',
+        title: "חיפוש %d ב%s",
+        description: 'לחיפוש הקלידו את שם ה%d באנגלית או יפנית',
         thumb_url: charNormal,
         input_message_content: {
             message_text: "(ಥ_ಥ)",
@@ -24,10 +23,9 @@ _.defaultMessage = {
         }
     },
     en: {
-        cacheTime: 0,
         id: 1,
-        title: "Search Anime (%s)",
-        description: 'start typing in english or japanese',
+        title: "Search %d (in %s)",
+        description: 'Now type in %d name in English or Japanese',
         thumb_url: charNormal,
         input_message_content: {
             message_text: "(ಥ_ಥ)",
@@ -36,9 +34,32 @@ _.defaultMessage = {
         }
     }
 };
+_.defaultAt = {
+    he: {
+        id: 2,
+        title: "הוסיפו קידומת חיפוש",
+        description: `@k, @m, @p - קיטסו\n@a, @c - אניליסט`,
+        thumb_url: charNormal,
+        input_message_content: {
+            message_text: `@k חיפוש אנימה בקיטסו\n@m חיפוש מנגה בקיטסו\n@a חיפוש אנימה או מנגה באניליסט \n@c חיפוש דמות באניליסט\n@p חיפוש דמות בקיטסו`,
+            parse_mode: 'Markdown',
+            // disable_web_page_preview: true
+        }
+    },
+    en: {
+        id: 2,
+        title: "Add a Search Modifier:",
+        description: `@k, @m, @p - Kitsu \n@a, @c - Anilist`,
+        thumb_url: charNormal,
+        input_message_content: {
+            message_text: `@k Kitsu Anime Search\n@m Kitsu Manga Search\n@a Anilist Anime or Manga Search\n@c Anilist Character Search\n@p Kitsu Character Search`,
+            parse_mode: 'Markdown',
+            // disable_web_page_preview: true
+        }
+    }
+};
 _.errorMessage = {
     he: {
-        cacheTime: 10,
         id: 4,
         title: "לא נמצאו תוצאות",
         description: "בדקו שגיאות ונסו שוב",
@@ -50,7 +71,6 @@ _.errorMessage = {
         }
     },
     en: {
-        cacheTime: 10,
         id: 4,
         title: "Nothing was Found",
         description: "look for typos and try again",
@@ -88,7 +108,6 @@ _.errorMessage = {
 // }
 _.englishSearchOnly = {
     he: {
-        cacheTime: 100,
         id: 3,
         title: "החיפוש לא עובד בעברית",
         description: "נסו לחפש באנגלית או יפנית",
@@ -100,7 +119,6 @@ _.englishSearchOnly = {
         }
     },
     en: {
-        cacheTime: 100,
         id: 3,
         title: "Searching only works in English",
         description: "Sorry, please search in english",

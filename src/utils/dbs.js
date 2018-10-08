@@ -3,8 +3,10 @@
 const mysql = require("mysql");
 
 require('dotenv').config()
-let bot = require('../botSetup')
-let report = require("../report");
+let bot = require('../botSetup').bot;
+let dataOnUser = require('../botSetup').dataOnUser;
+
+let report = require("./report");
 
 let con;
 
@@ -82,39 +84,25 @@ let errors = {
 //     // setTimeout(() => { con.end() }, 100)
 // }
 _.checkUserPrefs = (msg) => {
-    // connectFunc()
-    // switch (checkWaht) {
-    //     case 'lang':
-    //         checkWaht = 'langPref'
-    //         break;
-    //     case 'desc':
-    //         checkWaht = 'descPref'
-    //         break;
-    //     default:
-    //         checkWaht = 'default'
-    //         break;
-    // }
-    // console.log('checking')
     return new Promise(function(resolve, reject) {
         console.log('user db check start')
         const check = `SELECT * FROM userPrefs WHERE id = ${msg.from.id} LIMIT 1` //WHERE id = ${msg.from.id}
         con.query(check, function(err, result) {
-                if (err != null) { // && err.errno == 1062
-                    err_s(err)
-                    reject(err)
-                } else if (result == '') {
-                    _.addUser(msg)
-                    resolve(null)
-                    return report.user(msg, 'addedToDB', `added user to database`) //add addedToDB to user report switch
-                } else if (result[0] != null) { // && checkWaht == 'langPref'
-                    resolve([result[0].langPref, result[0].descPref])
-                } else {
-                    // err_s(err)
-                    reject(err)
-                    throw err;
-                }
-            })
-            // return lang
+            if (err != null) { // && err.errno == 1062
+                err_s(err)
+                reject(err)
+            } else if (result == '') {
+                _.addUser(msg)
+                resolve(null)
+                return report.user(msg, 'addedToDB', `added user to database`) //add addedToDB to user report switch
+            } else if (result[0] != null) { // && checkWaht == 'langPref'
+                resolve([result[0].langPref, result[0].descPref, result[0].srcPref])
+            } else {
+                // err_s(err)
+                reject(err)
+                throw err;
+            }
+        })
     })
 }
 
@@ -139,6 +127,7 @@ _.changeUserLangPrefs = (msg, ops) => {
         } else if (err == null) {
             // console.log('result', result);
             // console.log("lang changed");
+            dataOnUser[msg.from.id]['lang'] = lang;
             return report.user(msg, 'DB_langChange', `Language changed to ${lang}`) //add DB_langChange to user report switch
                 // bot.sendMessage(msg.from.id, 'lang changed')
         } else {
@@ -159,7 +148,27 @@ _.changeUserDescPrefs = (msg, descSetting) => {
         } else if (err == null) {
             // console.log('result', result);
             // console.log("lang changed");
+            dataOnUser[msg.from.id]['desc'] = descSetting;
             return report.user(msg, 'DB_descChange', `Description changed to ${descSetting.replace('_','-')}`) //add DB_descChange to user report switch
+                // bot.sendMessage(msg.from.id, 'desc changed')
+        } else {
+            // console.log('\n\n\n-------9')
+
+            err_s(err)
+            console.error(err.message);
+            // throw err;
+        }
+    });
+};
+_.changeUserSrcPrefs = (msg, srcSetting) => {
+    let changeDesc = `UPDATE userPrefs SET descPref = ${mysql.escape(srcSetting)} WHERE id = ${mysql.escape(msg.from.id)}`;
+    con.query(changeDesc, function(err, result) {
+        if (err != null && err.errno == 1062) {
+            console.log(JSON.stringify(err));
+            // bot.sendMessage(msg.from.id, 'desc exits?')
+        } else if (err == null) {
+            dataOnUser[msg.from.id]['src'] = srcSetting;
+            return report.user(msg, 'DB_srcChange', `Source changed to ${srcSetting}`) //add DB_descChange to user report switch
                 // bot.sendMessage(msg.from.id, 'desc changed')
         } else {
             // console.log('\n\n\n-------9')
