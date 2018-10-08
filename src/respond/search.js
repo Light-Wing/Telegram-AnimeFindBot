@@ -60,14 +60,14 @@ _.inline = (msg, type) => {
     if ((/^@c ?|^@p ?/.test(originalQuery)) && !query) {
         let a = bot.answerList(msg.id, { cacheTime: 0, personal: true, pmText: lang[userLang].howToSearch, pmParameter: 'help' });
         a.addArticle(
-            JSON.parse((JSON.stringify(reply.defaultMessage[userLang])).replace(/%d/g, lang[userLang].character).replace('%s', (sFor == 'anilistAnimanga' || userSource == 'anilist') ? lang[userLang].anilist : lang[userLang].kitsu))
+            JSON.parse((JSON.stringify(reply.defaultMessage[userLang])).replace(/%d/g, lang[userLang].character).replace('%s', (sFor == 'anilistAnimanga') ? lang[userLang].anilist : lang[userLang].kitsu))
         )
         return bot.answerQuery(a);
     }
     if ((/^@m ?/.test(originalQuery)) && !query) {
         let a = bot.answerList(msg.id, { cacheTime: 0, personal: true, pmText: lang[userLang].howToSearch, pmParameter: 'help' });
         a.addArticle(
-            JSON.parse((JSON.stringify(reply.defaultMessage[userLang])).replace(/%d/g, lang[userLang].manga).replace('%s', (sFor == 'anilistAnimanga' || userSource == 'anilist') ? lang[userLang].anilist : lang[userLang].kitsu))
+            JSON.parse((JSON.stringify(reply.defaultMessage[userLang])).replace(/%d/g, lang[userLang].manga).replace('%s', (sFor == 'anilistAnimanga') ? lang[userLang].anilist : lang[userLang].kitsu))
         )
         return bot.answerQuery(a);
     }
@@ -122,7 +122,7 @@ _.inline = (msg, type) => {
                 case 'anilistCharacter':
                     nextOffset = ((msg.offset !== '') ? parseInt(msg.offset) + 1 : 1)
                     let anilistQuery = anilist.queryAniList(query, nextOffset, 'characters');
-                    console.log('query2', query)
+                    //console.log('query2', query)
                     fetch(anilistQuery.url, anilistQuery.options)
                         .then(handleResponse => {
                             // console.log(`---\nAniList fetch status: ${handleResponse.statusText}\n---`)
@@ -159,6 +159,7 @@ _.inline = (msg, type) => {
             a.addArticle(
                 JSON.parse(JSON.stringify(reply.defaultMessage[userLang]).replace(/%d/g, lang[userLang].anime).replace('%s', (sFor == 'anilistAnimanga' || userSource == 'anilist') ? lang[userLang].anilist : lang[userLang].kitsu))
             )
+            console.log("figure why this gets here");
             return bot.answerQuery(a);
         }
     }

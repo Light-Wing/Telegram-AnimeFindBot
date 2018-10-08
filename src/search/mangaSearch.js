@@ -23,7 +23,7 @@ _ = (Data, nextOffset, msg, count) => {
         let data = Data[i].attributes;
         data = JSON.parse(JSON.stringify(data).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\*/g, "＊").replace(/(`)/g, ''))
 
-        console.log(originalQuery)
+        //console.log(originalQuery)
 
         if (!data.canonicalTitle.includes('delete')) { // && data.ageRatingGuide != "Mild Nudity"
             // console.log(data.id)
