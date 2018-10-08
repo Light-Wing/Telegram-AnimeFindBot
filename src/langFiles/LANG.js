@@ -82,6 +82,7 @@ _.he = {
     airsOn: 'יצא בעוד',
     status: "סטטוס",
     anime: "אנימה",
+    manga: 'מנגה',
     character: 'דמות',
     kitsuStuff: {
         'anime': 'Anime', //אנימה
@@ -329,6 +330,7 @@ _.en = {
     airsOn: 'Airs in',
     status: "Status",
     anime: 'an Anime',
+    manga: 'manga',
     character: 'a Character',
     kitsuStuff: {
         'anime': 'Anime',

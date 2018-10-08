@@ -29,7 +29,7 @@ let lang = require('../langFiles/LANG');
 _.inline = (msg, type) => {
     let userID = msg.from.id;
     let userLang = dataOnUser[userID]['lang'];
-    console.log(userLang, msg.from.first_name)
+    // console.log(userLang, msg.from.first_name)
     let userSource = dataOnUser[userID]['src'];
     let startTime = new Date().valueOf()
     let query;
@@ -60,7 +60,14 @@ _.inline = (msg, type) => {
     if ((/^@c ?|^@p ?/.test(originalQuery)) && !query) {
         let a = bot.answerList(msg.id, { cacheTime: 0, personal: true, pmText: lang[userLang].howToSearch, pmParameter: 'help' });
         a.addArticle(
-            JSON.parse((JSON.stringify(reply.defaultMessage[userLang])).replace(/%d/g, lang[userLang].character).replace('%s', userSource != 'kitsu' ? lang[userLang].anilist : lang[userLang].kitsu))
+            JSON.parse((JSON.stringify(reply.defaultMessage[userLang])).replace(/%d/g, lang[userLang].character).replace('%s', (sFor == 'anilistAnimanga' || userSource == 'anilist') ? lang[userLang].anilist : lang[userLang].kitsu))
+        )
+        return bot.answerQuery(a);
+    }
+    if ((/^@m ?/.test(originalQuery)) && !query) {
+        let a = bot.answerList(msg.id, { cacheTime: 0, personal: true, pmText: lang[userLang].howToSearch, pmParameter: 'help' });
+        a.addArticle(
+            JSON.parse((JSON.stringify(reply.defaultMessage[userLang])).replace(/%d/g, lang[userLang].manga).replace('%s', (sFor == 'anilistAnimanga' || userSource == 'anilist') ? lang[userLang].anilist : lang[userLang].kitsu))
         )
         return bot.answerQuery(a);
     }
