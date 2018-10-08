@@ -29,6 +29,7 @@ let lang = require('../langFiles/LANG');
 _.inline = (msg, type) => {
     let userID = msg.from.id;
     let userLang = dataOnUser[userID]['lang'];
+    console.log(userLang, msg.from.first_name)
     let userSource = dataOnUser[userID]['src'];
     let startTime = new Date().valueOf()
     let query;
@@ -40,7 +41,7 @@ _.inline = (msg, type) => {
     if (!query) {
         let a = bot.answerList(msg.id, { cacheTime: 0, personal: true, pmText: lang[userLang].howToSearch, pmParameter: 'help' });
         a.addArticle(
-            JSON.parse(JSON.stringify(reply.defaultMessage[userLang]).replace(/%d/g, lang[userLang].anime).replace('%s', userSource != 'kitsu' ? lang[userLang].anilist : lang[userLang].kitsu))
+            JSON.parse((JSON.stringify(reply.defaultMessage[userLang])).replace(/%d/g, lang[userLang].anime).replace('%s', userSource != 'kitsu' ? lang[userLang].anilist : lang[userLang].kitsu))
         )
         return bot.answerQuery(a);
     }
@@ -56,7 +57,13 @@ _.inline = (msg, type) => {
     if (query.length >= 2 && sFor != 'anime') {
         query = query.split(/^@m ?|^@k ?|^@a ?|^@c ?|^@p ?/)[1]
     }
-
+    if ((/^@c ?|^@p ?/.test(originalQuery)) && !query) {
+        let a = bot.answerList(msg.id, { cacheTime: 0, personal: true, pmText: lang[userLang].howToSearch, pmParameter: 'help' });
+        a.addArticle(
+            JSON.parse((JSON.stringify(reply.defaultMessage[userLang])).replace(/%d/g, lang[userLang].character).replace('%s', userSource != 'kitsu' ? lang[userLang].anilist : lang[userLang].kitsu))
+        )
+        return bot.answerQuery(a);
+    }
     if (type == "inline") {
         if (query.length >= 1) {
             let nextOffset
@@ -143,7 +150,7 @@ _.inline = (msg, type) => {
         } else {
             let a = bot.answerList(msg.id, { cacheTime: 0, personal: true });
             a.addArticle(
-                JSON.parse(JSON.stringify(reply.defaultMessage[userLang]).replace('%s', (sFor == 'anilistAnimanga' || userSource == 'anilist') ? lang[userLang].anilist : lang[userLang].kitsu))
+                JSON.parse(JSON.stringify(reply.defaultMessage[userLang]).replace(/%d/g, lang[userLang].anime).replace('%s', (sFor == 'anilistAnimanga' || userSource == 'anilist') ? lang[userLang].anilist : lang[userLang].kitsu))
             )
             return bot.answerQuery(a);
         }
