@@ -10,7 +10,7 @@ _.he = {
     cancel: 'בַטֵל ❌',
     cancelled: 'הפעולה האחרונה בוטלה', //maybe add diif answers to diff cancels like cancelled_idea (within this one)
     check_it_out: {
-        none: "חיפוש אנימה בקיטסו",
+        none: "חיפוש אנימה במקור ברירת המחדל",
         anilist: "חיפוש אנימה ומנגה באניליסט",
         manga: "חיפוש מנגה בקיטסו",
         character: "חיפוש דמות בקיטסו",
@@ -30,7 +30,7 @@ _.he = {
             `\n(כשלוחצים על כפתור ״תקציר״ הבוט שולח חלק מהתקציר בבועה... לפעמים אין מספיק מקום בבועה ויכול ליהיות מצב שחלק מהתקציר לא מופיע שם... לכן יש את האפשרות שהתקציר ישלח (בנוסף לבועה) לכאן...`,
         setDesc: 'הגדרות תקציר',
         setLang: 'הגדרות שפה',
-        setSource: 'הגדרת מקור'
+        setSource: 'הגדרת מקור ברירת מחדל'
     },
     setDesc: {
         desc: `כדי לקבל תקציר מלא שישלח כאן בפרטי, בחרו ב - ״כן״`,
@@ -264,7 +264,7 @@ _.en = {
     cancel: '❌ Cancel',
     cancelled: 'Cancelled',
     check_it_out: {
-        none: "Kitsu Anime Search",
+        none: "Default Anime Search",
         anilist: "Anilist Anime & Manga Search",
         manga: "Kitsu Manga Search",
         character: "Kitsu Character Search",
@@ -281,7 +281,7 @@ _.en = {
         settings: 'Which settings do you want to change?',
         setDesc: 'Description settings',
         setLang: 'Language settings',
-        setSource: 'Source Settings'
+        setSource: 'Default Source Settings'
     },
     setDesc: {
         desc: 'Do you want anime and manga descriptions sent here?',
