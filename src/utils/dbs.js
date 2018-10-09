@@ -161,7 +161,7 @@ _.changeUserDescPrefs = (msg, descSetting) => {
     });
 };
 _.changeUserSrcPrefs = (msg, srcSetting) => {
-    let changeDesc = `UPDATE userPrefs SET descPref = ${mysql.escape(srcSetting)} WHERE id = ${mysql.escape(msg.from.id)}`;
+    let changeDesc = `UPDATE userPrefs SET srcPref = ${mysql.escape(srcSetting)} WHERE id = ${mysql.escape(msg.from.id)}`;
     con.query(changeDesc, function(err, result) {
         if (err != null && err.errno == 1062) {
             console.log(JSON.stringify(err));
