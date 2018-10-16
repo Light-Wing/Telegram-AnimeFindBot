@@ -15,7 +15,6 @@ _.commandList = [
     '/start',
     '/feedback',
     '/setting',
-    'hello',
     '/test',
     '/search'
 ]
@@ -24,7 +23,7 @@ _.reactToCommand = (msg) => {
     let userLang = dataOnUser[userID]['lang'];
     let userDesc = dataOnUser[userID]['desc'];
     // console.log(msg)
-    let msgText = msg.text.toLowerCase();
+    let msgText = msg.text ? msg.text.toLowerCase() : "";
     if (msg.text == '/cancel' || msg.text == lang['he'].cancel || msg.text == lang['en'].cancel) {
         return bot.sendMessage(msg.chat.id, lang[userLang].cancelled, { replyMarkup: 'hide' });
     }
@@ -39,7 +38,8 @@ _.reactToCommand = (msg) => {
     if (msgText == "/help" || msgText.split(' ')[1] == 'help') {
         let replyMarkup = bot.inlineKeyboard([
             [bot.inlineButton(lang[userLang].check_it_out.none, { inlineCurrent: '' })],
-            [bot.inlineButton(lang[userLang].check_it_out.manga, { inlineCurrent: '@m' })],
+            [bot.inlineButton(lang[userLang].check_it_out.manga, { inlineCurrent: '@k' })],
+            [bot.inlineButton(lang[userLang].check_it_out.kitsu, { inlineCurrent: '@m' })],
             [bot.inlineButton(lang[userLang].check_it_out.anilist, { inlineCurrent: '@a' })],
             [bot.inlineButton(lang[userLang].check_it_out.character, { inlineCurrent: '@c' })],
             [bot.inlineButton(lang[userLang].check_it_out.person, { inlineCurrent: '@p' })]
@@ -88,8 +88,24 @@ _.reactToCommand = (msg) => {
                 bot.start()
             }, 2000)
         };
-        if (msgText == '/sendpm') {
-            return bot.sendMessage(msg.chat.id, "send pm to who? (chad id or forwarded message)", { ask: 'sendTo' });
+        if (msgText.includes('/pm')) { // /send chatname/id text
+            // console.log(msg)
+            if (msgText == '/pm') {
+                bot.sendMessage(msg.from.id, "Format as \`/pm <chat_id or @chatname> | <text to send>\`", { parseMode: 'markdown' })
+            } else {
+                let msgText = msg.text.substr(4)
+                let sendTo = msgText.split(/ (.+)/)[0]
+                let sendText = msgText.split(/ (.+)/)[1]
+                    // bot.sendMessage()
+                bot.sendMessage(sendTo, sendText)
+                    .then(() => {
+                        // console.log(res)
+                        bot.sendMessage(msg.chat.id, 'sent', { replyToMessage: msg.message_id })
+                    }).catch(err => {
+                        // console.log(err)
+                        bot.sendMessage(msg.chat.id, 'Error - Code: ' + err.error_code + '\n' + err.description)
+                    });
+            }
         };
         if (msg.forward_from) {
             bot.sendMessage(msg.chat.id, `User ID: \`${msg.forward_from.id}\``, { replyToMessage: msg.message_id, parseMode: 'markdown' });

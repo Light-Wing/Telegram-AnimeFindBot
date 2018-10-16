@@ -31,11 +31,11 @@ function handleDisconnect() {
     }); // process asynchronous requests in the meantime.
     // If you're also serving http, display a 503 error.
     con.on('error', function(err) {
-        console.log('db error', err.message, err.code, err.errno);
+        console.log('db error', err.message, err.code, err.errno ? err.errno : "");
         if (err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
             handleDisconnect(); // lost due to either server restart, or a
-        } else { // connnection idle timeout (the wait_timeout
-            throw err; // server variable configures this)
+        } else { // connnection idle timeout (the wait_timeout server variable configures this)
+            throw err;
         }
     });
 }
@@ -123,6 +123,7 @@ _.changeUserLangPrefs = (msg, ops) => {
     con.query(changeLang, function(err, result) {
         if (err != null && err.errno == 1062) {
             console.log(JSON.stringify(err));
+            console.log("err.errno == 1062");
             // bot.sendMessage(msg.from.id, 'lang exits?')
         } else if (err == null) {
             // console.log('result', result);
@@ -144,6 +145,8 @@ _.changeUserDescPrefs = (msg, descSetting) => {
             // console.log('\n\n\n-------1062')
 
             console.log(JSON.stringify(err));
+            console.log("err.errno == 1062");
+
             // bot.sendMessage(msg.from.id, 'desc exits?')
         } else if (err == null) {
             // console.log('result', result);
@@ -165,6 +168,8 @@ _.changeUserSrcPrefs = (msg, srcSetting) => {
     con.query(changeDesc, function(err, result) {
         if (err != null && err.errno == 1062) {
             console.log(JSON.stringify(err));
+            console.log("err.errno == 1062");
+
             // bot.sendMessage(msg.from.id, 'desc exits?')
         } else if (err == null) {
             dataOnUser[msg.from.id]['src'] = srcSetting;
@@ -306,6 +311,8 @@ function err_s(err) {
     console.log('\n\n\n-------')
     if (err.errno == 1045) {
         console.log(err.message)
+        console.log("err.errno == 1045");
+
         let ipRegex = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
         let parseMode = 'Markdown';
         let host = err.sqlMessage.match(ipRegex)
@@ -320,6 +327,7 @@ function err_s(err) {
         console.log(err.message)
             // con.end()
     } else {
+        console.log('getting err')
         console.log(err)
     }
 }

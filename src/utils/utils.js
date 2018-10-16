@@ -147,15 +147,14 @@ _.md2html = (text) => {
 _.md2tgmd = (text) => {
     return text
         .replace(/__(.+?)__/g, `_$1_`)
-        .replace(/<br\s*[\/]?>/gi, "\n")
         .replace(/\*/g, "＊")
         .replace(/(`)/g, '')
+        .replace(/`/g, '')
         .replace(/<i>(.+?)<\/i>/g, `_$1_`)
         .replace(/<b>(.+?)<\/b>/g, `*$1*`)
-        .replace(/<br>/g, `\n`)
-        .replace(/<br \/>/g, `\n`)
+        .replace(/<br\s*[\/]?>/gi, "\n")
+        .replace(/&quot;/g, '\"')
         .replace(/\n{2,}/g, `\n\n`);
-
     //.replace(/\\"/g, '"')
 };
 

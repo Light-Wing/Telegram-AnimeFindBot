@@ -47,14 +47,14 @@ _.inline = (msg, type) => {
         )
         return bot.answerQuery(a);
     }
-    if (query.includes("@") && !(/^@m ?|^@k ?|^@a ?|^@c ?|^@p ?/.test(query))) {
+    if (query.includes("@") && !(/^@m ?|^@k ?|^@a ?|^@c ?|^@p ?/i.test(query))) {
         let a = bot.answerList(msg.id, { cacheTime: 0, personal: true, pmText: lang[userLang].howToSearch, pmParameter: 'help' });
         a.addArticle(
             reply.defaultAt[userLang]
         )
         return bot.answerQuery(a);
     }
-    let sFor = (/^@m ?/.test(query)) ? 'kitsuManga' : (/^@p ?/.test(query)) ? 'kitsuCharacter' : (/^@a ?/.test(query)) ? 'anilistAnimanga' : (/^@c ?/.test(query)) ? 'anilistCharacter' : (/^@k ?/.test(query)) ? 'kitsuAnime' : 'anime';
+    let sFor = (/^@m ?/i.test(query)) ? 'kitsuManga' : (/^@p ?/i.test(query)) ? 'kitsuCharacter' : (/^@a ?/i.test(query)) ? 'anilistAnimanga' : (/^@c ?/i.test(query)) ? 'anilistCharacter' : (/^@k ?/i.test(query)) ? 'kitsuAnime' : 'anime';
 
     let source
     switch (sFor) {
@@ -77,17 +77,17 @@ _.inline = (msg, type) => {
             source = defaultSrc;
     }
     if (query.length >= 2 && sFor != 'anime') {
-        query = query.split(/^@m ?|^@k ?|^@a ?|^@c ?|^@p ?/)[1]
+        query = query.split(/^@m ?|^@k ?|^@a ?|^@c ?|^@p ?/i)[1]
     }
-    console.log('anilistAnimanga', (source == "anilist"))
-    if ((/^@c ?|^@p ?/.test(originalQuery)) && !query) {
+    //console.log('anilistAnimanga', (source == "anilist"))
+    if ((/^@c ?|^@p ?/i.test(originalQuery)) && !query) {
         let a = bot.answerList(msg.id, { cacheTime: 0, personal: true, pmText: lang[userLang].howToSearch, pmParameter: 'help' });
         a.addArticle(
             JSON.parse((JSON.stringify(reply.defaultMessage[userLang])).replace(/%d/g, lang[userLang].character).replace('%s', source == "anilist" ? lang[userLang].anilist : lang[userLang].kitsu))
         )
         return bot.answerQuery(a);
     }
-    if ((/^@m ?/.test(originalQuery)) && !query) {
+    if ((/^@m ?/i.test(originalQuery)) && !query) {
         let a = bot.answerList(msg.id, { cacheTime: 0, personal: true, pmText: lang[userLang].howToSearch, pmParameter: 'help' });
         a.addArticle(
             JSON.parse((JSON.stringify(reply.defaultMessage[userLang])).replace(/%d/g, lang[userLang].manga).replace('%s', source == "anilist" ? lang[userLang].anilist : lang[userLang].kitsu))
@@ -233,8 +233,8 @@ function anilistAnimanga(msg, query, startTime, nextOffset, sFor) {
             }
             dataTo_inline(AniData, nextOffset, msg, sFor, startTime, count)
         }).catch(handleError => {
-            report.error(`AniList fetch error: ${(JSON.stringify(handleError) === undefined || null || false || {})?handleError:JSON.stringify(handleError)}`, handleError)
-            report.error(`AniList fetch error: ${handleError}`)
+            report.error(`AniList fetch error5: ${(JSON.stringify(handleError) === undefined || null || false || {})?handleError:JSON.stringify(handleError)}`, handleError)
+            report.error(`AniList fetch error6: ${handleError}`)
             console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n---`)
             console.log(`---\nAniList fetch error: ${handleError}\n---`)
         });

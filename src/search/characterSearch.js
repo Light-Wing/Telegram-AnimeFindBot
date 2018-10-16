@@ -6,6 +6,7 @@ const charHappy = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/
 
 let bot = require('../botSetup').bot;
 let dataOnUser = require('../botSetup').dataOnUser;
+let utils = require("../utils/utils");
 
 let _ = {}
 
@@ -23,12 +24,12 @@ _ = (Data, nextOffset, msg, count) => {
         let replyMarkup = bot.inlineKeyboard([
             [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
         ]);
-        console.log(Data[i].type)
+        //console.log(Data[i].type)
 
         var searchResault = {
             id: Data[i].id,
             title: `[${lang[userLang].kitsuStuff[Data[i].type]}] ${data.canonicalName}`,
-            description: ((data.description)) ? sanitizeHtml(data.description) : lang[userLang].desc_not_available, //.replace(/<(?:.|\n)*?>/gm, '')
+            description: ((data.description)) ? utils.md2tgmd(data.description) : lang[userLang].desc_not_available, //.replace(/<(?:.|\n)*?>/gm, '')
             //url: Data[i].links.self, //kitsu dosent have individual pages for charachters
             thumb_url: (data.image) ? data.image.original : charHappy,
             input_message_content: {
@@ -92,7 +93,7 @@ function messageSent(data, type, id) {
     //status
     malId = (data.malId) ? `\n- MAL ID: *${data.malId}*` : '';
     //description
-    description = (data.description) ? `\n\n${sanitizeHtml(data.description).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, ' ').replace(/&quot;/g, '\"')}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')
+    description = (data.description) ? `\n\n${utils.md2tgmd(data.description)}` : ''; //.replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n')
     if (description.length >= 400) {
         description = description.substring(0, 400);
         let last = description.lastIndexOf(" ");

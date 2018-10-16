@@ -37,15 +37,15 @@
     },
     "engineStrict": true,
     "name": "heroku-deploy-telegram-bot-master",
-    "version": "1.5.0",
+    "version": "3.0.0",
     "main": "bot.js",
-    "author": "lightwing",
+    "author": "LightWing",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/LightWing-IsMe/heroku2.git"
+        "url": "git+https://github.com/LightWing-IsMe/Telegram-AnimeFindBot.git"
     },
     "bugs": {
-        "url": "https://github.com/LightWing-IsMe/heroku2/issues"
+        "url": "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/issues"
     },
-    "homepage": "https://github.com/LightWing-IsMe/heroku2#readme"
+    "homepage": "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot#readme"
 }

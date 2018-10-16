@@ -25,6 +25,7 @@ Media(id: $id) {
         large
         medium
     }
+    source
     bannerImage
     siteUrl
     }
@@ -190,6 +191,7 @@ $perPage: Int) {
         averageScore
         popularity
         siteUrl
+        source
         nextAiringEpisode {
             id
             airingAt

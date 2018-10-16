@@ -178,7 +178,31 @@ _.messageSent = (aniData, userLang) => {
     titleJP = aniData.title.native ? `🇯🇵 ${aniData.title.native}\n` : '';
     titleEN = aniData.title.english ? `🇬🇧 ${aniData.title.english}\n` : '';
     //genres
+    let type = aniData.type ? (aniData.type == "ANIME" ? "📺" : "📘") : '';
+    let format;
+    if (aniData.format) {
+        if (userLang == 'he') {
+            format = genreList[aniData.format][1]
+        } else if (userLang == 'en') {
+            format = genreList[aniData.format][0]
+        }
+    } else {
+        format = "";
+    }
+    let adaptedFrom;
+    if (aniData.source) { // != ('ORIGINAL' || 'OTHER'()
+        if (userLang == 'he') {
+            adaptedFrom = "מקור אדפטציה: " + genreList[aniData.source][1]
+        } else if (userLang == 'en') {
+            adaptedFrom = "Adapted from: " + genreList[aniData.source][0]
+        }
+    } else {
+        adaptedFrom = "";
+    }
+    //let src = aniData.source ? `${aniData.source}` : ''; //check if ORIGINAL, if true, then dont write adapted from...
 
+    let typeAndSrc = (format || adaptedFrom) ? '\n' + type + ' ' + format + ' ' + adaptedFrom : '';
+    //  Adapted from
     let genres_sting = '';
     if (aniData.genres) {
         genres_sting += lang[userLang].genres + ': '
@@ -205,7 +229,7 @@ _.messageSent = (aniData, userLang) => {
     //eps
     episodes = aniData.episodes ? `\n- ${lang[userLang].episodes}: *${aniData.episodes}*` : '';
     let episodeLength = (aniData.episodes && aniData.duration) ? ` (${aniData.duration} ${lang[userLang].minutes_per_episode})` : '';
-    let nextAiringEpisode = aniData.nextAiringEpisode ? `\n- ${lang[userLang].nextRelease}: *${utils.msToTime(((aniData.nextAiringEpisode.timeUntilAiring)*1000), userLang)}*` : '';
+    //let nextAiringEpisode = aniData.nextAiringEpisode ? `\n- ${lang[userLang].nextRelease}: *${utils.msToTime(((aniData.nextAiringEpisode.timeUntilAiring)*1000), userLang)}*` : '';
     //volumes
     volumes = aniData.volumes ? `\n- ${lang[userLang].volumes}: *${aniData.volumes}*` : '';
     //chapters
@@ -234,7 +258,7 @@ _.messageSent = (aniData, userLang) => {
     //message text - removed: ${description}
     // console.log(`${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`)
 
-    return `${imageCover}${titleRJ}${titleJP}${titleEN}${trailer}\n${genres}${episodes}${episodeLength}${nextAiringEpisode}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`;
+    return `${imageCover}${titleRJ}${titleJP}${titleEN}${typeAndSrc}${trailer}\n${genres}${episodes}${episodeLength}${volumes}${chapters}${status}${averageScore}${popularity}${sdate}${edate}`;
 };
 
 _.charMessageSent = (aniData, userLang) => {

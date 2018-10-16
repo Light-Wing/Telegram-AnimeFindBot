@@ -5,10 +5,17 @@ const errorPic = "https://emojipedia-us.s3.amazonaws.com/thumbs/120/apple/129/fa
 const emoji1 = "https://emoji.beeimg.com/%F0%9F%A4%94/200/apple" //🤔
 const emoji2 = "https://emoji.beeimg.com/%F0%9F%A4%94/200/apple" //🤔
 const emoji3 = "https://emoji.beeimg.com/%F0%9F%A4%94/200/apple" //🤔
-const charNormal = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter.png?raw=true"
-const charThink = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-thinking.png?raw=true"
-const charHappy = "https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-happy.png?raw=true"
+    // images from imugar, testing how long it lasts https://lightwing61.imgur.com/all/
+const charNormal = "https://i.imgur.com/dB0Pkz4.png"; //https://i.imgur.com/dB0Pkz4b.png
+//"https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter.png?raw=true"
+const charThink = "https://i.imgur.com/OYVDZRH.png"; //https://i.imgur.com/OYVDZRHb.png
+//"https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-thinking.png?raw=true"
+const charHappy = "https://i.imgur.com/26NXUUS.png"; // https://i.imgur.com/26NXUUSb.png
+//"https://github.com/LightWing-IsMe/Telegram-AnimeFindBot/blob/master/img/charachter-happy.png?raw=true"
 
+// [Imgur](https://i.imgur.com/26NXUUS.png)
+// [Imgur](https://i.imgur.com/dB0Pkz4.png)
+// [Imgur](https://i.imgur.com/OYVDZRH.png)
 let _ = {};
 _.defaultMessage = {
     he: {

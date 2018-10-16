@@ -183,8 +183,8 @@ _ = msg => {
                         let msgText = 'Description took ' + timeDiff + 'ms';
                         report.user(msg, "desc", msgText, timeDiff);
                     }).catch(handleError => {
-                        report.error(`AniList fetch error: ${(JSON.stringify(handleError) === undefined || null || false || {})?handleError:JSON.stringify(handleError)}`, handleError)
-                        report.error(`AniList fetch error: ${handleError}`)
+                        report.error(`AniList fetch error1: ${(JSON.stringify(handleError) === undefined || null || false || {})?handleError:JSON.stringify(handleError)}`, handleError)
+                        report.error(`AniList fetch error2: ${handleError}`)
                         console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n---`)
                         console.log(`---\nAniList fetch error: ${handleError}\n---`)
                     });
@@ -274,8 +274,8 @@ _ = msg => {
                             let extraInfo = true; // 'Next Ep Air Date took ' + timeDiff + 'ms (with extra lookup)😔';
                             report.user(msg, "next", extraInfo, timeDiff);
                         }).catch(handleError => {
-                            report.error(`AniList fetch error: ${(JSON.stringify(handleError) === undefined || null || false || {})?handleError:JSON.stringify(handleError)}`, handleError)
-                            report.error(`AniList fetch error: ${handleError}`)
+                            report.error(`AniList fetch error3: ${(JSON.stringify(handleError) === undefined || null || false || {})?handleError:JSON.stringify(handleError)}`, handleError)
+                            report.error(`AniList fetch error4: ${handleError}`)
                             console.log(`---\nAniList fetch error: ${JSON.stringify(handleError)}\n---`)
                             console.log(`---\nAniList fetch error: ${handleError}\n---`)
                         });

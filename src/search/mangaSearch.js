@@ -6,6 +6,7 @@ const animeSearch = require('./animeSearch')
 
 let bot = require('../botSetup').bot;
 let dataOnUser = require('../botSetup').dataOnUser;
+let utils = require("../utils/utils");
 
 let _ = {}
 
@@ -21,7 +22,7 @@ _ = (Data, nextOffset, msg, count) => {
     // )
     for (let i = 0, len = Data.length; i < len; i++) {
         let data = Data[i].attributes;
-        data = JSON.parse(JSON.stringify(data).replace(/<br\s*[\/]?>/gi, "\n").replace(/\n{2,}/g, '\n\n').replace(/\*/g, "＊").replace(/(`)/g, ''))
+        data = JSON.parse(utils.md2tgmd(JSON.stringify(data)))
 
         //console.log(originalQuery)
 

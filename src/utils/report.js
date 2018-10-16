@@ -76,6 +76,12 @@ _.user = (msg, didWhat, extraInfo, time) => {
                 text = 'Next Ep Air Date took ' + time + 'ms (w/o extra lookup)😁';
             }
             break;
+        case 'tgAnimeSearch':
+            text = 'Searched for the channel' + extraInfo;
+            break;
+        case 'tgAnimeFound':
+            text = 'Found the channel' + extraInfo;
+            break;
         default:
             text = extraInfo;
     }

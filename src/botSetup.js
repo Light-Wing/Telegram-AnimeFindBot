@@ -9,13 +9,10 @@ const TeleBot = require('telebot');
 const usePlugins = ['commandButton']; //, 'namedButtons', 'commandButton' , 'floodProtection'
 // const pluginFolder = '../plugins/';
 // const pluginConfig = {
-//     floodProtection: {'askUsers',
-//         interval: 5,
+//     floodProtector: {
+//         interval: 2,
 //         message: 'Too many messages, relax!'
 //     }
-//     //     namedButtons: {
-//     //         buttons: BUTTONS
-//     //     }
 // };
 //const BUTTONS = require('./buttons').buttons; //not realy needed
 
@@ -25,7 +22,7 @@ if (process.env.NPM_CONFIG_PRODUCTION) {
     bot = new TeleBot({
         token,
         usePlugins,
-        // pluginConfig, pluginFolder,
+        // pluginConfig,
         webHook: { port: port, host: host }
     });
 } else {
@@ -38,6 +35,7 @@ if (process.env.NPM_CONFIG_PRODUCTION) {
     });
 };
 bot.plug(require('./utils/askUsers'))
+bot.plug(require('./utils/floodProtector'))
 
 let dataOnUser = {};
 

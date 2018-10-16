@@ -23,6 +23,7 @@ const searcher = require('./respond/search');
 
 let askRouter = require('./respond/ask').ask;
 let commandRouter = require('./respond/commands').reactToCommand;
+let channelFinder = require('./respond/channelFinder');
 let callbackQuery = require("./respond/callbackQuery");
 
 // let lang = require('./LANG');
@@ -59,6 +60,12 @@ bot.on("error", err => { //most telegram errors should get caught here
         })
 });
 process.on('unhandledRejection', function(reason, p) {
+    if (reason.error_code == 429) {
+        return setTimeout(() => {
+            let errMsg = `OK: ${reason.ok}\nError Code: ${reason.error_code}\nReason: ${reason.description}`
+            report.error(errMsg, '', false)
+        }, 60000)
+    }
     console.log("Possibly Unhandled Rejection at: Promise reason: ", reason.description, p); //  ", " p,
     try {
         let errMsg = `OK: ${reason.ok}\nError Code: ${reason.error_code}\nReason: ${reason.description}`
@@ -75,6 +82,7 @@ bot.on('inlineQuery', (msg) => {
 
     let type = "inline";
     searcher.inline(msg, type)
+    return
 });
 
 
@@ -88,24 +96,38 @@ bot.on('callbackQuery', msg => {
     let lang = (dataOnUser[msg.from.id]['lang'] !== (undefined && null)) ? dataOnUser[msg.from.id]['lang'] : msg.from.language_code;
     report.user(msg, 'lang', lang)
     callbackQuery(msg)
+    return
 });
 
-bot.on(['*', '/*'], (msg, self) => {
-    // console.log(self)
-    // console.log(msg) //lang[userLang].feedback
-    if (msg.chat.type == 'private') { //!channel
-        if (msg.chat.id == msg.from.id) { //self.type == ("command") && 
-            userCache(msg)
-            commandRouter(msg)
-        }
-    }
+// { id: -1001295220327,title: 'ערוצי אנימה',username: 'channel_animes',type: 'channel' }
+
+
+bot.on('forward', (msg) => {
+    userCache(msg);
+    return channelFinder.reactToForward(msg);
 });
 bot.on('ask.router', msg => {
     userCache(msg);
     let askWhat = msg.ask
     askRouter(msg, askWhat)
+    return
 });
-
+bot.on(/\/\w+/, (msg, self) => {
+    if (msg.chat.type == 'supergroup') {
+        userCache(msg)
+        return channelFinder.searchText(msg);
+    }
+    // console.log(self);
+    // console.log('/command', msg);
+    if (msg.chat.type == 'private') {
+        userCache(msg)
+        commandRouter(msg)
+    };
+    //lang[userLang].feedback
+});
+//bot.on(['*'], msg => {
+//  console.log(msg)
+//})
 
 
 
