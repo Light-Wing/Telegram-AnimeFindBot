@@ -61,7 +61,7 @@ _.searchText = (msg) => {
             if (res[0] == null) {
                 //nothing found
                 report.user(msg, 'tgAnimeFound', "Nothing Found");
-                bot.sendPhoto(msg.chat.id, "AgADBAADMq4xGyY2MVLxCImLkFvJ2uVpmhoABE9tBdieh4tCosEFAAEC", { caption: `Nothing Found (self destruct in ${ counter.toString() } secounds)`, replyToMessage: msg.message_id })
+                bot.sendPhoto(msg.chat.id, process.env.ERR_PHOTO_FILE_ID.toString(), { caption: `Nothing Found (self destruct in ${ counter.toString() } secounds)`, replyToMessage: msg.message_id })
                     .then(re => {
                         let chatId = re.chat.id,
                             messageId = re.message_id;

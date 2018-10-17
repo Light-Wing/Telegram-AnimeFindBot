@@ -77,10 +77,10 @@ _.user = (msg, didWhat, extraInfo, time) => {
             }
             break;
         case 'tgAnimeSearch':
-            text = 'Searched for the channel' + extraInfo;
+            text = 'Searched for the channel ' + extraInfo;
             break;
         case 'tgAnimeFound':
-            text = 'Found the channel' + extraInfo;
+            text = 'Found the channel ' + extraInfo;
             break;
         default:
             text = extraInfo;
