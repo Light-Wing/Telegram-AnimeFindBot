@@ -1,7 +1,7 @@
-//require('dotenv').config()
+require('dotenv').config()
 
 const userList = {};
-//const userExclude = [parseInt(process.env.DEV_TELEGRAM_ID)]
+const userExclude = [parseInt(process.env.DEV_TELEGRAM_ID)]
 module.exports = {
 
     id: 'floodProtector',
@@ -18,6 +18,7 @@ module.exports = {
         bot.mod('message', (data) => {
             const msg = data.message;
             if (msg.chat.type == 'private') return data;
+            if (!msg.from) return data;
             const id = msg.from.id;
             const user = userList[id];
             const now = new Date(msg.date);
