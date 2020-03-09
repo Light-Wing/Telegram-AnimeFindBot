@@ -70,6 +70,25 @@ let errors = {
 //             let parseMode = 'Markdown';
 //             let host = err.sqlMessage.match(ipRegex)
 //             let addlink = `https://cpanel-box5167.bluehost.com/cpsess3967134238/frontend/bluehost/sql/addhost.html?host=${host}`
+// %.eu-west-1.compute.amazonaws.com	
+// 141.226.10.165	
+// 141.226.10.93	
+// 141.226.11.164	
+// 141.226.11.69	
+// 141.226.12.38	
+// 141.226.13.198	
+// 141.226.14.178	
+// 141.226.8.24	
+// 162.241.224.74	
+// 188.120.129.234	
+// 188.120.129.58	
+// 188.120.129.99	
+// 37.26.146.161	
+// 37.26.146.185	
+// 37.26.146.209	
+// 46.165.228.114	
+// 5.102.238.223	
+// telegram.org
 //             bot.sendMessage(process.env.DEV_TELEGRAM_ID, `${err.errno}\n[add host](${addlink})\nhost: ${host}`, { parseMode })
 //         } else if (err != null && err.errno != 1045) {
 //             console.log(err);
@@ -96,7 +115,7 @@ _.checkUserPrefs = (msg) => {
                 resolve(null)
                 return report.user(msg, 'addedToDB', `added user to database`) //add addedToDB to user report switch
             } else if (result[0] != null) { // && checkWaht == 'langPref'
-                resolve([result[0].langPref, result[0].descPref, result[0].srcPref])
+                resolve([result[0].langPref, result[0].descPref, result[0].srcPref, result[0].tachiPref])
             } else {
                 // err_s(err)
                 reject(err)
@@ -152,11 +171,33 @@ _.changeUserDescPrefs = (msg, descSetting) => {
             // console.log('result', result);
             // console.log("lang changed");
             dataOnUser[msg.from.id]['desc'] = descSetting;
-            return report.user(msg, 'DB_descChange', `Description changed to ${descSetting.replace('_','-')}`) //add DB_descChange to user report switch
+            return report.user(msg, 'DB_descChange', `Description Pref changed to: ${descSetting.replace('_','-')}`) //add DB_descChange to user report switch
                 // bot.sendMessage(msg.from.id, 'desc changed')
         } else {
             // console.log('\n\n\n-------9')
-
+            err_s(err)
+            console.error(err.message);
+            // throw err;
+        }
+    });
+};
+_.changeUserTachiLinkPrefs = (msg, tachiSetting) => {
+    let tachiPref = (tachiSetting == "noShowTachiLink" ? 0 : (tachiSetting == "showTachiLink" ? 1 : null))
+    // console.log(`TachiPref changed to: ${tachiSetting} - ${tachiPref}`)
+    let changeTachi = `UPDATE userPrefs SET tachiPref = ${mysql.escape(tachiPref)} WHERE id = ${mysql.escape(msg.from.id)}`;
+    con.query(changeTachi, function(err, result) {
+        if (err != null && err.errno == 1062) {
+            // console.log('\n\n\n-------1062')
+            console.log(JSON.stringify(err));
+            console.log("err.errno == 1062");
+        } else if (err == null) {
+            // console.log('result', result);
+            // console.log("lang changed");
+            dataOnUser[msg.from.id]['tachi'] = tachiPref;
+            return report.user(msg, 'DB_tachiChange', `Tachiyomi Pref changed to: ${tachiSetting} - ${tachiPref}`) //add DB_tachiChange to user report switch
+                // bot.sendMessage(msg.from.id, 'desc changed')
+        } else {
+            // console.log('\n\n\n-------9')
             err_s(err)
             console.error(err.message);
             // throw err;
@@ -173,7 +214,7 @@ _.changeUserSrcPrefs = (msg, srcSetting) => {
             // bot.sendMessage(msg.from.id, 'desc exits?')
         } else if (err == null) {
             dataOnUser[msg.from.id]['src'] = srcSetting;
-            return report.user(msg, 'DB_srcChange', `Source changed to ${srcSetting}`) //add DB_descChange to user report switch
+            return report.user(msg, 'DB_srcChange', `Source Pref changed to: ${srcSetting}`) //add DB_descChange to user report switch
                 // bot.sendMessage(msg.from.id, 'desc changed')
         } else {
             // console.log('\n\n\n-------9')
@@ -259,6 +300,65 @@ _.addUser = (msg) => {
         } else throw err;
     });
 };
+
+_.getUserNum = () => {
+    return new Promise(function(resolve, reject) {
+        const getUsers = `SELECT ID, UserName FROM userPrefs`// LIMIT 1 OFFSET ${offset}` // LIMIT 5 WHERE id = ${msg.from.id}
+        con.query(getUsers, function(err, result) {
+            if (err != null) { // && err.errno == 1062
+                err_s(err)
+                reject(err)
+            } else if (result != null) { // && checkWaht == 'langPref'
+                bot.sendMessage(process.env.DEV_TELEGRAM_ID, `there are ${result.length} users in DB`, { parseMode: "markdown" })
+            } else {
+                // err_s(err)
+                reject(err)
+                throw err;
+            }
+        })
+    })
+};
+
+_.getUserList = (offset) => {
+    //might need to check somewhere if the message wasent recived, then put that id in a new group so that i know how many users have the bot working...
+    // const getUsers = `SELECT * FROM userPrefs` // LIMIT 5 WHERE id = ${msg.from.id}
+    // con.connect(function(err) { //ER_NO_SUCH_TABLE
+    //     if (err) throw err;
+    //     console.log("Connected!");
+    //     con.query(getUsers, function(err, result, fields) {
+    //         if (err) throw err;
+    //         bot.sendMessage(msg.from.id, 'x' + JSON.stringify(result))
+    //         console.log("added" + JSON.stringify(result));
+    //     });
+    // });
+
+    return new Promise(function(resolve, reject) {
+        console.log('get users for broadcast')
+        const getUsers = `SELECT ID, UserName FROM userPrefs`// LIMIT 1 OFFSET ${offset}` // LIMIT 5 WHERE id = ${msg.from.id}
+        con.query(getUsers, function(err, result) {
+            if (err != null) { // && err.errno == 1062
+                err_s(err)
+                reject(err)
+            } else if (result == '') {
+                resolve(null)
+                return bot.sendMessage(process.env.DEV_TELEGRAM_ID, `no more user results`, { parseMode: "markdown" })
+            } else if (result != null) { // && checkWaht == 'langPref'
+            // bot.sendMessage(process.env.DEV_TELEGRAM_ID, `there are ${result.length} users in DB`, { parseMode: "markdown" })
+            // console.log(result.length)
+                var idArray = []
+                result.forEach(element => {
+                    idArray.push(element.ID)
+                });
+                resolve(idArray)
+            } else {
+                // err_s(err)
+                reject(err)
+                throw err;
+            }
+        })
+    })
+};
+
 // _.addTable = (msg) => {
 //     var create_table = `CREATE TABLE IF NOT EXISTS userPrefs (
 //         ID int NOT NULL,
@@ -315,9 +415,9 @@ function err_s(err) {
 
         let ipRegex = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
         let parseMode = 'Markdown';
-        let host = err.sqlMessage.match(ipRegex)
+        let host = err.sqlMessage.match(ipRegex) ? err.sqlMessage.match(ipRegex) : err.sqlMessage.split("\'")[3]
             // reject(err)
-        console.log('sent link to open port')
+        console.log(`sent link to open port ${host}`)
             // con.end()
 
         let addlink = `https://cpanel-box5167.bluehost.com/cpsess3967134238/frontend/bluehost/sql/addhost.html?host=${host}`

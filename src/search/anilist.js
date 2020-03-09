@@ -30,7 +30,10 @@ _.getResults = (Data, nextOffset, msg, count) => {
         let replyMarkup = bot.inlineKeyboard([
             [bot.inlineButton(lang[userLang].description, { callback: data.id + '-anilist' + '-d' }), bot.inlineButton(lang[userLang].findMoreCharacters, { inlineCurrent: "@c " + plainQuery })],
             (data.nextAiringEpisode) ? [bot.inlineButton(lang[userLang].nextRelease, { callback: data.id + '-anilist' + '-nxt-' + data.nextAiringEpisode.airingAt + '-' + nextEpNum })] : [],
-            [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery })]
+            (data.format == ("MANGA" || "ONE_SHOT") && dataOnUser[userID]['tachi'] == 1 
+            ? [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery.toString() }), 
+            bot.inlineButton(lang[userLang].tachiLink, { url: `${utils.tachiyomiLink}${data.title.userPreferred}` })] 
+            : [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery.toString() })])
         ]);
 
         let desc = data.description ? utils.md2tgmd(data.description).replace(/_/g, "") : lang[userLang].desc_not_available;

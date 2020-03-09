@@ -20,7 +20,11 @@ _.reactToForward = (msg) => {
     //console.log(msg.from.username, allowedForwardrs.includes(parseInt(msg.from.id)))
 
     if (!allowedForwardrs.includes(parseInt(msg.from.id))) return;
-    if (msg.forward_from_chat) {
+    if (msg.forward_from){
+        // if (msg.from.id == process.env.DEV_TELEGRAM_ID){//making sure it me using this
+            bot.sendMessage(msg.chat.id, `User ID: \`${msg.forward_from.id}\``, { replyToMessage: msg.message_id, parseMode: 'markdown' });
+        // } else return
+    } else if (msg.forward_from_chat) {
         if (!animeChannelSrcs.includes(msg.forward_from_chat.id)) return;
         let messageID = msg.forward_from_chat.id
             //console.log(messageID);

@@ -10,6 +10,7 @@ let getUser = require("./getUserName").verifyUser;
 let bot = require('../botSetup').bot;
 let dataOnUser = require('../botSetup').dataOnUser;
 
+// console.log(mdEscape("name"))//i have no idea why this doesnt work and i dont have time no to figure it out
 
 const ops = {
     parseMode: "Markdown",
@@ -36,7 +37,7 @@ _.error = (errMsg, error, markdown) => {
 };
 _.feedback = (msg, feedback) => {
     let userID = msg.from.id;
-    let head = `ID: \`${userID}\` - [${getUser(msg.from, "first&last")}](tg://user?id=${userID})`;
+    let head = `ID: \`${userID}\` - [${mdEscaped(getUser(msg.from, "first&last"))}](tg://user?id=${userID})`;//TODO check that this escaping works
     let msgText = msg.text;
     bot.sendMessage(FEEDBACK_CHNL, `${head}\nHas some ${feedback}:\n${msgText}`, ops);
 };
@@ -97,7 +98,9 @@ _.user = (msg, didWhat, extraInfo, time) => {
     dataToSend[userID]['time'] = new Date().valueOf();
     // dataToSend[userID]['action'] = didWhat;
     dataToSend[userID]['status'] = 'unprocessed'; // unprocessed || pending || done
-    dataToSend[userID]['msgHead'] = `ID: \`${userID}\` - [${getUser(msg.from, "first&last")}](tg://user?id=${userID})` // - [FROM](tg://user?id=${msg.chat.id})`;
+    
+    //TODO check that this escaping works
+    dataToSend[userID]['msgHead'] = `ID: \`${userID}\` - [${mdEscaped(getUser(msg.from, "first&last"))}](tg://user?id=${userID})` // - [FROM](tg://user?id=${msg.chat.id})`;
     if (didWhat != 'lang') {
         if (dataToSend[userID]['msgBody'] === (undefined || null || [] || '')) { // || ["nothing more"]
             dataToSend[userID]['msgBody'] = [text]
@@ -161,6 +164,16 @@ function uniqBy(a, key) {
         return seen.hasOwnProperty(k) ? false : (seen[k] = true);
     })
 };
+
+function mdEscaped(text) {
+    return text
+        .replace(/_(.+?)_/g, `\_$1\_`)
+        .replace(/\((.+?)\)/g, `\($1\)`)
+        .replace(/\*(.+?)\*/g, `\*$1\*`)
+        .replace(/`(.+?)`/g, `\`$1\``)
+        .replace(/\[(.+?)\]/g, `\[$1\]`);
+};
+
 
 
 

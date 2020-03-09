@@ -30,9 +30,13 @@ _ = (Data, nextOffset, msg, count) => {
             // console.log(data.id)
             let dateToMilisec = (data.nextRelease != null) ? new Date(data.nextRelease.replace(' ', 'T').replace(' ', '')).valueOf() : "";
             let replyMarkup = bot.inlineKeyboard([
-                [bot.inlineButton(lang[userLang].description, { callback: Data[i].id + (Data[i].type == 'manga' ? '-m' : '-a') + '-d' }), bot.inlineButton(lang[userLang].genres, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-g' })],
+                [bot.inlineButton(lang[userLang].description, { callback: Data[i].id + (Data[i].type == 'manga' ? '-m' : '-a') + '-d' }), 
+                bot.inlineButton(lang[userLang].genres, { callback: Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-g' })],
                 (data.nextRelease != null) ? [bot.inlineButton(lang[userLang].nextRelease, { callback: (Data[i].id + (Data[i].type == 'anime' ? '-a' : '-m') + '-nxt-' + dateToMilisec) })] : [],
-                [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery.toString() })]
+                (dataOnUser[userID]['tachi'] == 1 
+                ? [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery.toString() }),
+                bot.inlineButton(lang[userLang].tachiLink, { url: `${utils.tachiyomiLink}${data.canonicalTitle}` }) ]
+                : [bot.inlineButton(lang[userLang].searchAgain, { inlineCurrent: originalQuery.toString() })])
             ]);
             let thumb = getPic(data, 'thumb');
             let desc = data.synopsis != (null && undefined) ? data.synopsis : lang[userLang].desc_not_available; //.replace(/<(?:.|\n)*?>/gm, '');

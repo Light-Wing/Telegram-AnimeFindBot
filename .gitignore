@@ -1,10 +1,6 @@
 node_modules
 .env
 dist
-temp
-todo
 .editorconfig
-src/dbs/connectionString.js
-img-src-files
 *.svg
-src-old
+package-lock.json

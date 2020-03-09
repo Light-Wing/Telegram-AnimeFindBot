@@ -182,7 +182,7 @@ _.inline = (msg, type) => {
             a.addArticle(
                 JSON.parse(JSON.stringify(reply.defaultMessage[userLang]).replace(/%d/g, lang[userLang].anime).replace('%s', (source == "anilist" || userSource == 'anilist') ? lang[userLang].anilist : lang[userLang].kitsu))
             )
-            console.log("figure why this gets here");
+            console.log("figure why this gets here");//maybe bcz only @ was input without k or a etc.
             return bot.answerQuery(a);
         }
     }

@@ -67,6 +67,7 @@ _.reactToCommand = (msg) => {
             [bot.inlineButton(lang[userLang].settings.setLang, { callback: 'setLang' })],
             [bot.inlineButton(lang[userLang].settings.setSource, { callback: 'setSource' })],
             [bot.inlineButton(lang[userLang].settings.setDesc, { callback: 'descSetting' })],
+            [bot.inlineButton(lang[userLang].settings.setTachiLinkVisibility, { callback: 'tachiSetting' })],
             [bot.inlineButton(lang[userLang].cancel, { callback: 'cancel' })]
         ]);
         // console.log('settings');
@@ -123,6 +124,50 @@ _.reactToCommand = (msg) => {
             let type = "inchat";
             console.log(`inchat search for ${msg.text.substr(msg.text.indexOf(' ') + 1)}`)
             searcher.inline(type, msg, bot, fetch, kitsu);
+        };
+        if (msgText.includes('/users')) { // /send chatname/id text
+            dbs.getUserNum()
+        };
+        if (msgText.includes('/broadcast')) { // /send chatname/id text
+            // console.log(msg)
+            if (msgText == '/broadcast') {
+                bot.sendMessage(msg.from.id, "Format as \`/broadcast <text to send>\` using markdown", { parseMode: 'markdown' })
+            } else {
+                let msgText = msg.text.substr(10)
+                var numberOfSentMessages = 0 
+                
+                dbs.getUserList(0)
+                    .then(res => {
+                        res.forEach(id => {
+                            setTimeout(function () {
+                                bot.sendMessage(id, msgText, { parseMode: 'markdown' }).then(_ => {
+                                    numberOfSentMessages++
+                                }).catch(err => {
+                                    //catch reason why message was not sent, or id not valid or user blocked bot
+                                    if (err.ok == 400) {
+                                        //user not found, user probably was deleted, may as well remove this user permenatly from db
+                                        //TODO 
+                                    } else if (err.ok == 403){
+                                        // "Forbidden: bot can't initiate conversation with a user" probably blocked by user
+
+                                    } else if (err.ok == 420){
+                                        //bot was flodded, need to wait FLOOD_WAIT_X time...
+
+                                    }
+                                    // bot.sendMessage(msg.chat.id, 'Error - Code: ' + err.error_code + '\n' + err.description)
+                                    // console.log(err);
+                                })
+                                }, 100);
+                        });
+                }).catch(function(err) {
+                    if (err = 'error') {
+                        console.log('getUserList error ' + err);
+                    } else {
+                        console.log(err);
+                    }
+                });
+                bot.sendMessage(msg.chat.id, `sent ${numberOfSentMessages} messages`, { replyToMessage: msg.message_id })
+            }
         };
     }
 }

@@ -5,6 +5,7 @@ const dbs = require("./dbs");
 
 let defaultDesc = 'sendDesc_silent'
 let defaultSrc = 'anilist';
+let defaultTachi = 1; //TODO for now so people can get to know the option
 
 let _ = {}
 
@@ -93,10 +94,11 @@ _.userCache = async(msg) => {
         //then get it ready for next time, but dont wait now...
         dbs.checkUserPrefs(msg)
             .then(res => {
-                console.log(res);
+                // console.log(res);
                 //res[0] -> lang
                 //res[1] -> desc
                 //res[2] -> src
+                //res[3] -> tachi
                 if (res[0] !== null && res[0] !== '') {
                     dataOnUser[userID]['lang'] = res[0];
                 } else {
@@ -112,6 +114,11 @@ _.userCache = async(msg) => {
                 } else {
                     dataOnUser[userID]['src'] = defaultSrc;
                 }
+                if (res[3] !== null && res[3] !== '') {
+                    dataOnUser[userID]['tachi'] = res[3];
+                } else {
+                    dataOnUser[userID]['tachi'] = defaultTachi;
+                }
             }).catch(function(err) {
                 if (err = 'error') {
                     dataOnUser[userID]['lang'] = getUserLanguage(msg)
@@ -126,6 +133,9 @@ _.userCache = async(msg) => {
         if (dataOnUser[userID]['src'] === undefined) {
             dataOnUser[userID]['src'] = defaultSrc;
         }
+        if (dataOnUser[userID]['tachi'] === undefined) {
+            dataOnUser[userID]['tachi'] = defaultTachi;
+        }
     } else {
         // cache[0] = dataOnUser[userID]['lang']
         // cache[1] = dataOnUser[userID]['desc']
@@ -135,14 +145,23 @@ _.userCache = async(msg) => {
     }
     return dataOnUser[userID]
 }
-_.md2html = (text) => {
-    return text
-        .replace(/_(.+?)_/g, `<i>$1</i>`)
-        .replace(/\*(.+?)\*/g, `<b>$1</b>`)
-        .replace(/`{3}\w*\n(.+?)\n`{3}/gs, `<pre>$1</pre>`)
-        .replace(/`(.+?)`/g, `<code>$1</code>`)
-        .replace(/\[(.+?)\]\((.+?)\)/g, `<a href="$2">$1</a>`);
-};
+// _.md2html = (text) => {
+//     return text
+//         .replace(/_(.+?)_/g, `<i>$1</i>`)
+//         .replace(/\*(.+?)\*/g, `<b>$1</b>`)
+//         .replace(/`{3}\w*\n(.+?)\n`{3}/gs, `<pre>$1</pre>`)
+//         .replace(/`(.+?)`/g, `<code>$1</code>`)
+//         .replace(/\[(.+?)\]\((.+?)\)/g, `<a href="$2">$1</a>`);
+// };
+
+// _.mdEscaped = (text) => {
+//     return text
+//         .replace(/_(.+?)_/g, `\_$1\_`)
+//         .replace(/\((.+?)\)/g, `\($1\)`)
+//         .replace(/\*(.+?)\*/g, `\*$1\*`)
+//         .replace(/`(.+?)`/g, `\`$1\``)
+//         .replace(/\[(.+?)\]/g, `\[$1\]`);
+// };
 
 _.md2tgmd = (text) => {
     return text
@@ -160,20 +179,20 @@ _.md2tgmd = (text) => {
 
 //.replace(/<(?:.|\n)*?>/gm, '');
 
-_.html2md = (text) => {
-    return text
-        .replace(/<i>(.+?)<\/i>/g, `_$1_`)
-        .replace(/<b>(.+?)<\/b>/g, `*$1*`)
-        .replace(/<pre>(.+?)<\/pre>/gs, `\`\`\`$1\`\`\``)
-        .replace(/<code>(.+?)<\/code>/g, `\`$1\``)
-        .replace(/<strong>(.+?)<\/strong>/g, `*$1*`)
-        .replace(/__(.+?)__/g, `_$1_`)
-        .replace(/<br>/g, `\n`)
-        .replace(/<br>(.+?)<br \/>/gs, `_$1_`)
-        .replace(/<p>(.+?)<\/p>/gs, `_$1_`)
-        .replace(/<a href="(.+?)">(.+?)<\/a>/g, `[$2]($1)`)
-        .replace(/<span(.+?)>(.+?)<\/span>/g, `$2`);
-};
+// _.html2md = (text) => {
+//     return text
+//         .replace(/<i>(.+?)<\/i>/g, `_$1_`)
+//         .replace(/<b>(.+?)<\/b>/g, `*$1*`)
+//         .replace(/<pre>(.+?)<\/pre>/gs, `\`\`\`$1\`\`\``)
+//         .replace(/<code>(.+?)<\/code>/g, `\`$1\``)
+//         .replace(/<strong>(.+?)<\/strong>/g, `*$1*`)
+//         .replace(/__(.+?)__/g, `_$1_`)
+//         .replace(/<br>/g, `\n`)
+//         .replace(/<br>(.+?)<br \/>/gs, `_$1_`)
+//         .replace(/<p>(.+?)<\/p>/gs, `_$1_`)
+//         .replace(/<a href="(.+?)">(.+?)<\/a>/g, `[$2]($1)`)
+//         .replace(/<span(.+?)>(.+?)<\/span>/g, `$2`);
+// };
 
 function getUserLanguage(msg) {
     let lang = (msg.from != undefined && msg.from.language_code != (undefined || null)) ? msg.from.language_code.split("-")[0] : "en";
@@ -186,6 +205,10 @@ function getUserLanguage(msg) {
             return 'en'
     }
 };
+
+_.googleLink = "http://google.com/search?q="
+_.tachiyomiLink = "http://open.in.tachiyomi.app/"
+
 // setInterval(() => {
 //     console.log(dataOnUser)
 // }, 1000);

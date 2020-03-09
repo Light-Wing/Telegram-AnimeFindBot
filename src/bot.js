@@ -85,10 +85,6 @@ bot.on('inlineQuery', (msg) => {
     return
 });
 
-
-
-
-
 bot.on('callbackQuery', msg => {
     userCache(msg);
     // console.log('------------', msg)

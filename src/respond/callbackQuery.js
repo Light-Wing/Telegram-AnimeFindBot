@@ -112,6 +112,35 @@ _ = msg => {
             dataOnUser[msg.from.id]['src'] = 'kitsu'
             return dbs.changeUserSrcPrefs(msg, 'kitsu')
         }
+        if (msg.data == 'tachiSetting') {
+            let replyMarkup = bot.inlineKeyboard([
+                [bot.inlineButton(lang[userLang].setTachiLinkVisibility.showTachiLink, { callback: 'showTachiLink' }), bot.inlineButton(lang[userLang].setTachiLinkVisibility.noShowTachiLink, { callback: 'noShowTachiLink' })],
+                [bot.inlineButton(lang[userLang].setTachiLinkVisibility.tryLink, { url: 'http://open.in.tachiyomi.app/naruto' })],
+                [bot.inlineButton(lang[userLang].cancel, { callback: 'cancel' })]
+            ]);
+            bot.editMessageText({ chatId, messageId }, lang[userLang].setTachiLinkVisibility.desc, { replyMarkup, parseMode: 'markdown' })
+            bot.answerCallbackQuery(msg.id);
+            return
+        }
+        if (msg.data == 'showTachiLink') {
+            // let replyMarkup = bot.inlineKeyboard([
+            //     [bot.inlineButton(lang[userLang].setDesc.descNotiSilent, { callback: 'sendDesc_silent' })],
+            //     [bot.inlineButton(lang[userLang].setDesc.deskNotiNonSilent, { callback: 'sendDesc_nonsilent' })]
+            // ]);
+            bot.editMessageText({ chatId, messageId }, lang[userLang].setTachiLinkVisibility.showTachiLink_done)//, { replyMarkup }
+            bot.answerCallbackQuery(msg.id);
+            dataOnUser[msg.from.id]['tachi'] = 1 //'showTachiLink'
+            return dbs.changeUserTachiLinkPrefs(msg, 'showTachiLink')
+        }
+        if (msg.data == 'noShowTachiLink') {
+            let replyMarkup = bot.inlineKeyboard([
+                [bot.inlineButton(lang[userLang].setTachiLinkVisibility.showChannel, { url: 'https://t.me/joinchat/DSbB3hfUwVZOcFeohQIgkA' })],
+            ]);
+            bot.editMessageText({ chatId, messageId }, lang[userLang].setTachiLinkVisibility.noShowTachiLink_done, { replyMarkup })
+            bot.answerCallbackQuery(msg.id);
+            dataOnUser[msg.from.id]['tachi'] = 0 //'noShowTachiLink'
+            return dbs.changeUserTachiLinkPrefs(msg, 'noShowTachiLink')
+        }
     }
     let startTime = new Date().valueOf()
     let callbackOps = msg.data.split('-'); //id-m/a-d/g/nxt-secounds  id-anilist-d/nxt-secounds-epNum
@@ -132,7 +161,7 @@ _ = msg => {
             break;
     }
     switch (callbackOps[2]) {
-        case 'd':
+        case 'd': //description
             if (type == 'anilist') {
                 let anilistQuery = anilist.queryAnilistByID(id, 'description');
                 fetch(anilistQuery.url, anilistQuery.options)
@@ -238,7 +267,7 @@ _ = msg => {
                 });
             }
             break;
-        case 'nxt':
+        case 'nxt': //next air date
             if (type == 'anilist') {
                 let timeToAir = callbackOps[3];
                 if ((timeToAir * 1000 - new Date().getTime()) > 0) {
@@ -310,7 +339,7 @@ _ = msg => {
                 }
             }
             break;
-        case 'g':
+        case 'g': //gengre
             // console.log("genre lookup")
             searcher.getGenres(id, type).then(res => {
                     // console.log(res)

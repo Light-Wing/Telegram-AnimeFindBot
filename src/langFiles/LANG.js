@@ -31,7 +31,8 @@ _.he = {
             `\n(כשלוחצים על כפתור ״תקציר״ הבוט שולח חלק מהתקציר בבועה... לפעמים אין מספיק מקום בבועה ויכול ליהיות מצב שחלק מהתקציר לא מופיע שם... לכן יש את האפשרות שהתקציר ישלח (בנוסף לבועה) לכאן...`,
         setDesc: 'הגדרות תקציר',
         setLang: 'הגדרות שפה',
-        setSource: 'הגדרת מקור ברירת מחדל'
+        setSource: 'הגדרת מקור ברירת מחדל',
+        setTachiLinkVisibility: 'הגדרות חיפוש בטאצ׳יומי'
     },
     setDesc: {
         desc: `כדי לקבל תקציר מלא שישלח כאן בפרטי, בחרו ב - ״כן״`,
@@ -43,6 +44,15 @@ _.he = {
         dontSendDesc_done: 'אוקיי, אני לא אשלח לכאן תקצירים.',
         SendDescSilent_done: 'אוקיי, אני אשלח לכאן תקצירים ללא התראה.',
         SendDescNonSilent_done: 'אוקיי, אני אשלח לכאן תקצירים (אם התראה).'
+    },
+    setTachiLinkVisibility: {
+        desc: `אם יש לכם את האפליקציה של טאצ׳יומי (רק למשתמשי אנדרויד) והקישור (נסו אותי!) עובד לכם, אז תהנו מההגדרה הזאת... (אפשר למצוא את האפליקציה  [כאן](https://t.me/joinchat/DSbB3hfUwVZOcFeohQIgkA))\n\nההגדרה הזאת משפיעה רק על תוצאות מנגה...`,
+        tryLink: 'נסו אותי!',
+        showChannel: 'קישור לערוץ',
+        showTachiLink: 'הקישור עובד לי',
+        noShowTachiLink: 'לא עובד לי',
+        showTachiLink_done: 'מצוין, הכפתור שישלח אותכם לחיפוש של טאצ׳יומי יופיע על כל תוצאות של מנגה.\nתבחרו לפתוח את הקישור זה תמיד דרך טאצ׳יומי כדי שהכפתור תמיד ישלח אותכם לטאצ׳יומי ולא בטעות לדפדפן הרגיל...',
+        noShowTachiLink_done: 'אוקיי, מעכשיו הקישור לטאצ׳יומי לא יופיע בתוצאות שלך.\nלניסוי האפליקציה, תבדקו את הערוץ שמקושר למטה, יש שם את הקובץ הכי מעודכן לאפקליקציה של טאצ׳יומי שיעבוד אם הבוט הזה.'
     },
     feedbackOps: {
         issue: '⚠️ תקלה',
@@ -257,6 +267,7 @@ _.he = {
         `ואחרי זה את שם הדמות לחיפוש באניליסט...)\n` +
         `4. בחרו מתוך האופציות את הדמות הרצויה.`,
     searchAgain: 'חיפוש נוסף',
+    tachiLink: 'פתח בטאצ׳יומי',
     kitsu: 'קיטסו',
     anilist: 'אניליסט',
     setSource: 'בחרו מקור חדש לחיפוש אנימות. \n(תמיד אפשר להשתמש ב @a או @k כדי לחפש במקור אחר)',
@@ -292,7 +303,8 @@ _.en = {
         settings: 'Which settings do you want to change?',
         setDesc: 'Description settings',
         setLang: 'Language settings',
-        setSource: 'Default Source Settings'
+        setSource: 'Default Source Settings',
+        setTachiLinkVisibility: 'Tachiyomi Link Settings'
     },
     setDesc: {
         desc: 'Do you want anime and manga descriptions sent here?',
@@ -304,6 +316,15 @@ _.en = {
         dontSendDesc_done: 'Ok, You wont get any descriptions sent here.',
         SendDescSilent_done: 'Ok, I\'ll send descriptions without a notification',
         SendDescNonSilent_done: 'Ok, I\'ll send descriptions with a notification'
+    },
+    setTachiLinkVisibility: {
+        desc: `If you have Tachiyomi (Android Users Only) and the link below (Try me!) works with the Tachiyomi you have installed... then you can enjoy this setting... (the app can be found [here](https://t.me/joinchat/DSbB3hfUwVZOcFeohQIgkA))\n\nThis Setting only affects Manga results...`,
+        tryLink: 'Try me!',
+        showChannel: 'Open Channel',
+        showTachiLink: 'Works for me',
+        noShowTachiLink: 'Turn Setting Off',
+        showTachiLink_done: 'Awesome, you\'ll get an extra button that would link to the Tachiyomi search.\nMake sure to select "Always Open with Tachiyomi", and then everytime you find a manga here, you can open it directly in the Tachiyomi search bar',
+        noShowTachiLink_done: 'Ok, from now on, you won\'t get the button linking to Tachiyomi app.\nIf you want to try the app, check the channel linked below, it has the latest APK file for the app works with this setting.'
     },
     feedbackOps: {
         issue: '⚠️ Issues',
@@ -516,6 +537,7 @@ _.en = {
         `Then the name of the character you want to find...)\n` +
         `4. Choose one of the matching answers to send to your current chat.`,
     searchAgain: 'Search Again',
+    tachiLink: 'Open in Tachiyomi',
     kitsu: 'Kitsu',
     anilist: 'AniList',
     setSource: 'Choose the default source fot the bot to use.\n(you can always use @a or @k to temporarily use a different source)',
