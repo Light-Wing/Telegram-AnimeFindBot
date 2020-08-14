@@ -2,9 +2,9 @@
 
 require('dotenv').config()
 const token = process.env.TELEGRAM_TOKEN;
-const port = process.env.PORT || 443;
+const port = (process.env.PORT || 8443);
 const host = process.env.HOST;
-
+console.log("port: "+ port)
 const TeleBot = require('telebot');
 const usePlugins = ['commandButton']; //, 'namedButtons', 'commandButton' , 'floodProtection'
 // const pluginFolder = '../plugins/';

@@ -4,3 +4,4 @@ dist
 .editorconfig
 *.svg
 package-lock.json
+.DS_Store
